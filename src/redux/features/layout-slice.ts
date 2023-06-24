@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 const appBarSlice = createSlice({
-  name: 'appBar',
-  initialState: {height: 0},
-  reducers: {
-    setHeight: (state, action: PayloadAction<number>) => {
-      state.height = action.payload;
+    name: 'appBar',
+    initialState: {height: 0},
+    reducers: {
+        setHeight: (state, action: PayloadAction<number>) => {
+            state.height = action.payload;
+        },
     },
-  },
 })
 
 export const { setHeight } = appBarSlice.actions;

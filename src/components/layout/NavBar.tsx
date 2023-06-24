@@ -15,14 +15,14 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import {createContext, useContext, useEffect, useRef} from "react";
 import { useDispatch } from 'react-redux';
-import {setHeight} from "@/features/layout/layoutSlice";
+import {setHeight} from "@/redux/features/layout-slice";
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const AppBarHeightContext = createContext(0);
 export const useAppBarHeight = () => useContext(AppBarHeightContext);
 
-export default function ResponsiveAppBar() {
+export default function ResponsiveNavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const dispatch = useDispatch();

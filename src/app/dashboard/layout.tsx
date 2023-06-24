@@ -1,16 +1,22 @@
 import React from "react";
-import AppBar from "@/components/layout/AppBar";
-import Sidebar from "@/components/layout/SideBar";
-import {Provider} from "react-redux";
-import store from "@/store/store";
+import NavBar from "@/components/layout/NavBar";
+import SideBar from "@/components/layout/SideBar";
+import {ReduxProvider} from "@/redux/provider";
+
 export default function DashboardLayout({children}:{children:React.ReactNode}){
-  return (
-      <section>
-        <Provider store={store}>
-          <AppBar />
-          <Sidebar />
-          {children}
-        </Provider>
-      </section>
-  )
+    return (
+        <section>
+            <ReduxProvider>
+                <div className="flex">
+                    <div className="w-full">
+                        <NavBar />
+                        <div className="flex">
+                            <SideBar />
+                            <div className="flex-grow">{children}</div>
+                        </div>
+                    </div>
+                </div>
+            </ReduxProvider>
+        </section>
+    )
 }

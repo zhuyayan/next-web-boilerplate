@@ -1,5 +1,5 @@
 import React from "react";
-
+import {ReduxProvider} from "@/redux/provider";
 export default function LoginLayout(
     {
       children
@@ -8,7 +8,9 @@ export default function LoginLayout(
     }){
   return (
       <section>
-        {children}
+          <ReduxProvider>
+              {children}
+          </ReduxProvider>
       </section>
   )
 }
