@@ -12,24 +12,74 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
-import {createContext, useContext, useEffect, useRef} from "react";
-import { useDispatch } from 'react-redux';
+import {useEffect, useRef} from "react";
+import {useDispatch} from "react-redux";
 import {setHeight} from "@/redux/features/layout-slice";
+import {Dialog, Popover, Slide} from "@mui/material";
+import {useAppSelector} from "@/redux/store";
+import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
+import {TransitionProps} from "@mui/material/transitions";
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-const AppBarHeightContext = createContext(0);
-export const useAppBarHeight = () => useContext(AppBarHeightContext);
+const pages: string[] = ['用户', '设备', '康复', '配置'];
+const settings: string[] = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-export default function ResponsiveNavBar() {
+const Transition = React.forwardRef(function Transition(
+    props: TransitionProps & {
+      children: React.ReactElement;
+    },
+    ref: React.Ref<unknown>,
+) {
+  return <Slide direction="down" ref={ref} {...props}/>;
+});
+
+export default function NavBar() {
+  const appBarRef = useRef<HTMLDivElement>(null);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+
+  const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+    console.log('handlePopoverOpen')
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const openPopover = Boolean(anchorEl);
+
+
   const dispatch = useDispatch();
+  const appBarHeight = useAppSelector((state) => {
+    return state.appBar.height
+  })
+  useEffect(() => {
+    const currentRef = appBarRef.current;
+    const resizeObserver : ResizeObserver = new ResizeObserver((entries,observer) => {
+      for (let entry of entries) {
+        dispatch(setHeight(entry.contentRect.height));
+      }
+    })
+
+    if (currentRef) {
+      resizeObserver.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        resizeObserver.unobserve(currentRef);
+      }
+    }
+  })
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
+
+  const handleSideBarToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("handleSideBarToggle");
+  }
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -41,20 +91,31 @@ export default function ResponsiveNavBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
-  const appBarRef = useRef<HTMLDivElement>(null);
+  const handleClose = () => {
+    setOpen(false);
+  }
 
-  useEffect(() => {
-    if (appBarRef.current) {
-      dispatch(setHeight(appBarRef.current.offsetHeight));
-    }
-  }, []);
-
+  const id = open ? 'simple-popover' : undefined;
   return (
-      <AppBar position="static" className="bg-gray-900" ref={appBarRef}>
+      <AppBar position="static" ref={appBarRef}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+            <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ display: { xs: 'none', md: 'flex', lg: 'none' }, mr: 1 }}
+                onClick={handleSideBarToggle}
+            >
+              <MenuIcon />
+            </IconButton>
+
             <Typography
                 variant="h6"
                 noWrap
@@ -70,7 +131,7 @@ export default function ResponsiveNavBar() {
                   textDecoration: 'none',
                 }}
             >
-              LOGO
+              LOGO1
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -79,42 +140,85 @@ export default function ResponsiveNavBar() {
                   aria-label="account of current user"
                   aria-controls="menu-appbar"
                   aria-haspopup="true"
-                  onClick={handleOpenNavMenu}
+                  // onClick={handleOpenNavMenu}
+                  onClick={handleClickOpen}
                   color="inherit"
               >
                 <MenuIcon />
               </IconButton>
-              <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorElNav}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                  }}
-                  open={Boolean(anchorElNav)}
-                  onClose={handleCloseNavMenu}
-                  sx={{
-                    display: { xs: 'block', md: 'none' },
-                  }}
+              <Dialog
+                  fullScreen
+                  open={open}
+                  onClose={handleClose}
+                  TransitionComponent={Transition}
               >
-                {pages.map((page) => (
-                    <MenuItem key={page} onClick={handleCloseNavMenu}>
-                      <Typography textAlign="center">{page}</Typography>
-                    </MenuItem>
-                ))}
-              </Menu>
+                <AppBar sx={{ position: 'relative' }}>
+                  <Toolbar>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                      <IconButton
+                          edge="start"
+                          color="inherit"
+                          onClick={handleClose}
+                          aria-label="close"
+                      >
+                        <CloseIcon />
+                      </IconButton>
+
+                      <Typography
+                          variant="h5"
+                          noWrap
+                          component="a"
+                          href=""
+                          sx={{
+                            margin: 'auto',
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            letterSpacing: '.3rem',
+                            color: 'inherit',
+                            textDecoration: 'none',
+                          }}
+                      >
+                        LOGO2
+                      </Typography>
+                      <Box sx={{ width: "24px", height: "24px" }} />
+                      {/* Placeholder box with the same dimensions as your IconButton */}
+                    </Box>
+                  </Toolbar>
+                </AppBar>
+                <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorElNav}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
+                    }}
+                    open={Boolean(anchorElNav)}
+                    onClose={handleCloseNavMenu}
+                    sx={{
+                      display: { xs: 'block', md: 'none' },
+                    }}
+                >
+                  {pages.map((page) => (
+                      <MenuItem key={page} onClick={handleCloseNavMenu}>
+                        <Typography textAlign="center">{page}</Typography>
+                      </MenuItem>
+                  ))}
+                </Menu>
+              </Dialog>
             </Box>
-            <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+
             <Typography
                 variant="h5"
                 noWrap
                 component="a"
                 href=""
+                onMouseEnter={handlePopoverOpen}
+                // onMouseLeave={handlePopoverClose}
                 sx={{
                   mr: 2,
                   display: { xs: 'flex', md: 'none' },
@@ -126,8 +230,50 @@ export default function ResponsiveNavBar() {
                   textDecoration: 'none',
                 }}
             >
-              LOGO
+              LOGO3
             </Typography>
+            <Typography
+                variant="h5"
+                noWrap
+                component="a"
+                href=""
+                onMouseEnter={handlePopoverOpen}
+                // onMouseLeave={handlePopoverClose}
+                sx={{
+                  mr: 2,
+                  display: { xs: 'flex', md: 'none' },
+                  flexGrow: 1,
+                  fontFamily: 'monospace',
+                  fontWeight: 700,
+                  letterSpacing: '.3rem',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+            >
+              LOGO4
+            </Typography>
+            {/*<Box style={{marginTop: appBarHeight+'px', flexGrow: 1}}>*/}
+            <Box>
+              <Popover
+                  id={id}
+                  open={openPopover}
+                  anchorEl={anchorEl}
+                  onClose={handlePopoverClose}
+                  onMouseLeave={handlePopoverClose}
+                  anchorReference="anchorPosition"
+                  anchorPosition={{ top: appBarHeight, left: 0 }}
+                  sx={{
+                    '.MuiPaper-root': {
+                      width: '100vh',
+                      height: '20vh',
+                    }
+                  }}
+              >
+                <Box sx={{ p: 2 }}>
+                  <Typography>The content of the Popover.</Typography>
+                </Box>
+              </Popover>
+            </Box>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
                   <Button
@@ -143,7 +289,7 @@ export default function ResponsiveNavBar() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt="Remy Sharp" src="/images/avatar/2.jpg" />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -172,5 +318,5 @@ export default function ResponsiveNavBar() {
           </Toolbar>
         </Container>
       </AppBar>
-  )
+  );
 }
