@@ -19,10 +19,11 @@ import {
 import {addMedicalStaff, deleteMedicalStaff, editMedicalStaff, MedicalStaff} from "@/redux/features/rehab/rehab-slice";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
-import {ThunkDispatch} from "redux-thunk";
-import {AnyAction} from "redux";
+// import {ThunkDispatch} from "redux-thunk";
+// import {AnyAction} from "redux";
 import {RootState, useAppSelector} from "@/redux/store";
 import Box from "@mui/material/Box";
+import {Delete as DeleteIcon} from "@mui/icons-material";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -32,7 +33,7 @@ const StyledDiv = styled.div`
 
 export default function MedicalStaffManagement() {
   const dispatch = useDispatch()
-  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  // const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
   const [openAddStaff, setOpenAddStaff] = React.useState(false);
@@ -48,6 +49,10 @@ export default function MedicalStaffManagement() {
     password: '',
     fullName: '',
   })
+
+  useEffect(() => {
+  }, []);
+
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
     console.log(id, value)
@@ -60,9 +65,6 @@ export default function MedicalStaffManagement() {
   const getMedicalStaffById = (id: number) => {
     return medicalStaffList.find((staff) => staff.id === id);
   }
-
-  useEffect(() => {
-  }, []);
 
   const handleAddMedicalStaff = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -165,7 +167,7 @@ export default function MedicalStaffManagement() {
                       <Button variant="outlined" color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>
                         修改
                       </Button>
-                      <Button variant="contained" color="secondary" onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
+                      <Button variant="contained" color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
                         删除
                       </Button>
                     </TableCell>

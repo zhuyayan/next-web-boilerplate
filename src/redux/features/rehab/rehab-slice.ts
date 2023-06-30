@@ -1,6 +1,7 @@
 import {ActionReducerMapBuilder, createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
-import axios, {AxiosResponse} from "axios";
+import {AxiosResponse} from "axios";
 import {WritableDraft} from "immer/dist/types/types-external";
+import MCTAxiosInstance from "@/utils/mct-request";
 
 export interface MedicalStaff {
   id: number;
@@ -9,23 +10,39 @@ export interface MedicalStaff {
   fullName: string;
 }
 
+export interface Patient {
+  id: number;
+  name: string;
+  age: number;
+  gender: string;
+  medicalHistory: string;
+}
+
 // Default Staff
 let medicalStaffList: MedicalStaff[] = [
   { id: 1, username: 'john', password: 'password', fullName: 'John Doe' },
   { id: 2, username: 'jane', password: 'password', fullName: 'Jane Smith' },
   // Add more medical staff members as needed
 ];
+// let patients: Patient[] = [
+//   { id: 1, name: 'John Doe', age: 30, gender: 'Male', medicalHistory: 'Lorem ipsum dolor sit amet' },
+//   { id: 2, name: 'Jane Smith', age: 40, gender: 'Female', medicalHistory: 'Lorem ipsum dolor sit amet' },
+//   // Add more patients as needed
+// ];
+let patients: Patient[] = []
 
 interface RehabState {
   staff: MedicalStaff[]
+  patient: Patient[]
 }
 
 const initialState: RehabState = {
   staff: medicalStaffList,
+  patient: patients,
 }
 
-export const fetchData = createAsyncThunk('data/fetchData', async ():Promise<any> => {
-  const response:AxiosResponse<any, any> = await axios.get('api/login');
+export const fetchPatients = createAsyncThunk('fetchPatients', async ():Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('api/patients');
   return response.data;
 });
 
@@ -55,20 +72,50 @@ const RehabSlice = createSlice({
     deleteMedicalStaff: (state, action:PayloadAction<number>) => {
       state.staff = state.staff.filter((staff) => staff.id !== action.payload);
     },
+    addPatient:(state,action: PayloadAction<Patient>)=>{
+      const maxId = state.patient.reduce((max, item) => {
+        return item.id > max ? item.id : max
+      }, 0)
+      action.payload.id = maxId + 1
+      state.patient.push(action.payload)
+    },
+    editPatient:(state, action: PayloadAction<Patient>)=>{
+      let targetPatientIndex = state.patient.findIndex((p) => p.id === action.payload.id)
+      if (targetPatientIndex !== -1) {
+        state.patient[targetPatientIndex] = {
+          ...state.patient[targetPatientIndex],
+          name: action.payload.name,
+          age: action.payload.age,
+          gender: action.payload.gender,
+          medicalHistory: action.payload.medicalHistory
+        }
+      }
+    },
+    deletePatient:(state, action: PayloadAction<number>)=>{
+      state.patient = state.patient.filter((patient) => patient.id !== action.payload);
+    },
   },
   extraReducers: (builder: ActionReducerMapBuilder<RehabState>) => {
     builder
-        .addCase(fetchData.pending, (state: WritableDraft<RehabState>) => {
+        .addCase(fetchPatients.pending, (state: WritableDraft<RehabState>) => {
         })
-        .addCase(fetchData.fulfilled, (state, action) => {
+        .addCase(fetchPatients.fulfilled, (state, action) => {
+          state.patient = action.payload.data
           console.log('action', action.payload)
         })
-        .addCase(fetchData.rejected, (state, action) => {
+        .addCase(fetchPatients.rejected, (state, action) => {
 
         })
   },
 })
 
-export const {addMedicalStaff, editMedicalStaff, deleteMedicalStaff} = RehabSlice.actions
+export const {
+  addMedicalStaff,
+  editMedicalStaff,
+  deleteMedicalStaff,
+  addPatient,
+  editPatient,
+  deletePatient
+} = RehabSlice.actions
 
 export default RehabSlice.reducer
