@@ -19,8 +19,35 @@ import {Dialog, Popover, Slide} from "@mui/material";
 import {useAppSelector} from "@/redux/store";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import {TransitionProps} from "@mui/material/transitions";
+import Link from "next/link";
+import styled from "styled-components";
 
-const pages: string[] = ['用户', '设备', '康复', '配置'];
+interface MCTMenu {
+  name: string,
+  path: string
+}
+
+const pages: MCTMenu[] = [
+  {
+    name: "用户",
+    path: "/rehab/staff",
+  },
+  {
+    name: "设备",
+    path: "/rehab/equipment",
+  },
+  // {
+  //   name: "康复",
+  //   path: "/rehab/rehabilitation",
+  // },
+  {
+    name: "病人",
+    path: "/rehab/patients",
+  },
+  {
+    name: "配置",
+    path: "/rehab/config",
+  }];
 const settings: string[] = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const Transition = React.forwardRef(function Transition(
@@ -31,6 +58,12 @@ const Transition = React.forwardRef(function Transition(
 ) {
   return <Slide direction="down" ref={ref} {...props}/>;
 });
+
+const MCTStyledButton = styled(Button)`
+  &&:hover {
+    background-color: red; // 设置 hover 状态下的背景颜色
+  }
+`;
 
 export default function NavBar() {
   const appBarRef = useRef<HTMLDivElement>(null);
@@ -204,8 +237,8 @@ export default function NavBar() {
                     }}
                 >
                   {pages.map((page) => (
-                      <MenuItem key={page} onClick={handleCloseNavMenu}>
-                        <Typography textAlign="center">{page}</Typography>
+                      <MenuItem key={page.name} onClick={handleCloseNavMenu}>
+                        <Typography textAlign="center">{page.name}</Typography>
                       </MenuItem>
                   ))}
                 </Menu>
@@ -276,13 +309,16 @@ export default function NavBar() {
             </Box>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
-                  <Button
-                      key={page}
-                      onClick={handleCloseNavMenu}
-                      sx={{ my: 2, color: 'white', display: 'block' }}
-                  >
-                    {page}
-                  </Button>
+                  <Link
+                      key={page.name}
+                      href={page.path} passHref>
+                    <MCTStyledButton
+                        key={page.name}
+                        sx={{ my: 2, color: 'white', display: 'block' }}
+                    >
+                      {page.name}
+                    </MCTStyledButton>
+                  </Link>
               ))}
             </Box>
 

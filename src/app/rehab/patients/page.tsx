@@ -181,7 +181,7 @@ export default function PatientList() {
                     <TableCell>{patient.gender}</TableCell>
                     <TableCell>{patient.medicalHistory}</TableCell>
                     <TableCell>
-                      <Link href={`/rehabilitation_management`} passHref>
+                      <Link href={`/rehab/rehabilitation/` + patient.id} passHref>
                         <Button variant="contained" color="primary">
                           查看康复信息
                         </Button>

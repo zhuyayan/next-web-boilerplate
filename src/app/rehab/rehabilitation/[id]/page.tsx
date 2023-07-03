@@ -26,8 +26,15 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
+import {useEffect} from "react";
 
-const MUITable = () => {
+const StyledDiv = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+`;
+
+export default function MUITable({ params }: { params: { id: string } }) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -38,18 +45,15 @@ const MUITable = () => {
     setOpen(false);
   };
 
-  const StyledDiv = styled.div`
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-    `;
-
   const [age, setAge] = React.useState('');
 
   const handleChange = (event: SelectChangeEvent) => {
     setAge(event.target.value);
   };
 
+  useEffect(() => {
+    console.log("patient id: ", params.id)
+  }, [])
   return (
       <Grid container spacing={6}>
         <Grid item xs={12}>
@@ -152,5 +156,3 @@ const MUITable = () => {
       </Grid>
   )
 }
-
-export default MUITable
