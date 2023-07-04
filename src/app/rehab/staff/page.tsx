@@ -17,16 +17,14 @@ import {
   Typography
 } from '@mui/material';
 import {
-  addMedicalStaff,
-  deleteMedicalStaff, deleteStaff,
+  deleteStaff,
   editMedicalStaff,
+  addMedicalStaff,
   fetchStaffs,
-  MedicalStaff
+  MedicalStaff, addStaff, editStaff,
 } from "@/redux/features/rehab/rehab-slice";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
-// import {ThunkDispatch} from "redux-thunk";
-// import {AnyAction} from "redux";
 import {RootState, useAppSelector} from "@/redux/store";
 import Box from "@mui/material/Box";
 import {Delete as DeleteIcon} from "@mui/icons-material";
@@ -34,6 +32,7 @@ import Stack from "@mui/material/Stack";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
+import {useAppDispatch} from "@/redux/store";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -47,10 +46,10 @@ const StyledButton = styled(Button)`
     color: #ffffff;
   }`;
 
-
 export default function MedicalStaffManagement() {
   const dispatch = useDispatch()
-  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
+  const appDispatch = useAppDispatch()
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
   const [openAddStaff, setOpenAddStaff] = React.useState(false);
@@ -68,7 +67,7 @@ export default function MedicalStaffManagement() {
   })
 
   useEffect(() => {
-    thunkDispatch(fetchStaffs())
+    thunkDispatch(fetchStaffs({page: 1, size: 10, id: 0}))
   }, [thunkDispatch]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -93,12 +92,12 @@ export default function MedicalStaffManagement() {
   };
 
   const handleSaveAddMedicalStaff = () => {
-    thunkDispatch(addStaff(willAddStaff))
+    thunkDispatch(addStaff({name: willAddStaff.fullName, password: willAddStaff.password, username: willAddStaff.username}))
     setOpenAddStaff(false)
   };
 
   const handleDeleteMedicalStaff = (id: number) => {
-    thunkDispatch(deleteStaff(id))
+    appDispatch(deleteStaff({id: id}))
   };
 
   const handleClickOpen = () => {
@@ -126,7 +125,7 @@ export default function MedicalStaffManagement() {
     }
   }
   const handleEditRow = () => {
-    dispatch(editMedicalStaff(willEditStaff))
+    appDispatch(editStaff({ id: willEditStaff.id, name: willEditStaff.fullName, username: willEditStaff.username, password: willEditStaff.password }))
     handleClose()
   }
 

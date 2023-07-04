@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const MCTAxiosInstance = axios.create({
-  baseURL: 'http://192.168.2.101:56567/api/v1/',
+  baseURL: 'http://172.16.5.100:56567/api/v1/',
 })
 
 MCTAxiosInstance.interceptors.request.use((config)=>{

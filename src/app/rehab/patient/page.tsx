@@ -13,8 +13,6 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import Stack from '@mui/material/Stack';
-
-//dialog
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -34,7 +32,6 @@ import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {Delete as DeleteIcon} from "@mui/icons-material";
-import {borderRight} from "@mui/system";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 
@@ -73,16 +70,17 @@ export default function PatientList() {
   });
 
   useEffect(() => {
-    thunkDispatch(fetchPatients())
+    thunkDispatch(fetchPatients({page: 1, size: 10, id: 0}))
   }, [thunkDispatch]);
 
   const handleAddPatient = () => {
-    dispatch(addPatient(willAddPatient))
+    // 使用 id 页面需要调整
+    thunkDispatch(addPatient({ name: willAddPatient.name, age: willAddPatient.age, sex: willAddPatient.gender, medical_history: willAddPatient.medicalHistory, staff_id: 1}))
     handleAddPatientClose()
   };
 
   const handleDeletePatient = (id: number) => {
-    dispatch(deletePatient(id))
+    thunkDispatch(deletePatient({id: id}))
   };
 
   const [addPatientOpen, setAddPatientOpen] = React.useState(false);
@@ -105,7 +103,8 @@ export default function PatientList() {
   };
 
   const handleEditPatient = () => {
-    dispatch(editPatient(willEditPatient))
+    // 使用 id 页面需要调整
+    thunkDispatch(editPatient({ id: willEditPatient.id, name: willEditPatient.name, age: willEditPatient.age, sex: willEditPatient.gender, medical_history: willEditPatient.medicalHistory, staff_id: 1 }))
     setOpen(false)
   }
   const handleAddPatientOpen = () => {
