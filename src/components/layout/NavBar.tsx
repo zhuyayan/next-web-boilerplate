@@ -21,9 +21,7 @@ import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/
 import {TransitionProps} from "@mui/material/transitions";
 import Link from "next/link";
 import styled from "styled-components";
-
-//logo
-import logoImage from '../../../public/images/logo/MCTlogo.png';
+import Image from "next/image";
 
 interface MCTMenu {
   name: string,
@@ -174,7 +172,14 @@ export default function NavBar() {
                   textDecoration: 'none',
                 }}
             >
-                <img src={logoImage} alt="Logo"/>
+              <Image
+                  src="/images/logo/MCTlogo.png"
+                  alt="Vercel Logo"
+                  className="dark:invert"
+                  width={100}
+                  height={24}
+                  priority
+              />
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>

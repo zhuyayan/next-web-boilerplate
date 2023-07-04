@@ -55,9 +55,9 @@ export const fetchStaffs = createAsyncThunk('fetchStaff', async ():Promise<any> 
   return response.data;
 });
 
-export const deleteStaff = createAsyncThunk('deleteStaff', async ():Promise<any> => {
+export const deleteStaff = createAsyncThunk('deleteStaff', async (staffId, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('staff',{params:{
-      id:1,
+      id: staffId,
     }});
   return response.data;
 });
@@ -127,7 +127,10 @@ const RehabSlice = createSlice({
           console.log('staff_action', action.payload)
         })
         .addCase(deleteStaff.fulfilled,(state,action)=>{
-          state.staff = action.payload.data
+          // 重新分页查询
+          state.staff = state.staff.filter((item) => {
+            return item.id != action.payload.data.staffs[0].id
+          })
           console.log('delete_staff_action', action.payload)
         })
   },
