@@ -47,6 +47,21 @@ export const fetchPatients = createAsyncThunk('fetchPatients', async ():Promise<
   return response.data;
 });
 
+export const fetchStaffs = createAsyncThunk('fetchStaff', async ():Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('staff',{params:{
+      page:1,
+      size:10,
+    }});
+  return response.data;
+});
+
+export const deleteStaff = createAsyncThunk('deleteStaff', async ():Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('staff',{params:{
+      id:1,
+    }});
+  return response.data;
+});
+
 const RehabSlice = createSlice({
   name: 'rehab',
   initialState: initialState,
@@ -106,6 +121,14 @@ const RehabSlice = createSlice({
         })
         .addCase(fetchPatients.rejected, (state, action) => {
 
+        })
+        .addCase(fetchStaffs.fulfilled,(state,action)=>{
+          state.staff = action.payload.data.staffs
+          console.log('staff_action', action.payload)
+        })
+        .addCase(deleteStaff.fulfilled,(state,action)=>{
+          state.staff = action.payload.data
+          console.log('delete_staff_action', action.payload)
         })
   },
 })

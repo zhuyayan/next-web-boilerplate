@@ -49,7 +49,7 @@ export default function ConfigManagement() {
           <form onSubmit={e => e.preventDefault()}>
             <Grid container spacing={5}>
               <Grid item xs={12}>
-                <TextField fullWidth label='Title' placeholder='彭浦新村社区卫生服务中心' />
+                <TextField fullWidth label='Title' placeholder='请输入要改的医院名称' />
               </Grid>
 
 
@@ -63,7 +63,7 @@ export default function ConfigManagement() {
                       justifyContent: 'space-between'
                     }}
                 >
-                  <StyledButton type='submit' variant='contained' size='large'>
+                  <StyledButton type='submit' variant='contained' size='large' color="secondary">
                     提交
                   </StyledButton>
                 </Box>

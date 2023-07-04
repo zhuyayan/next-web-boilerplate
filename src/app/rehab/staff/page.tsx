@@ -16,7 +16,13 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import {addMedicalStaff, deleteMedicalStaff, editMedicalStaff, MedicalStaff} from "@/redux/features/rehab/rehab-slice";
+import {
+  addMedicalStaff,
+  deleteMedicalStaff, deleteStaff,
+  editMedicalStaff,
+  fetchStaffs,
+  MedicalStaff
+} from "@/redux/features/rehab/rehab-slice";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
 // import {ThunkDispatch} from "redux-thunk";
@@ -26,6 +32,8 @@ import Box from "@mui/material/Box";
 import {Delete as DeleteIcon} from "@mui/icons-material";
 import Stack from "@mui/material/Stack";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -42,7 +50,7 @@ const StyledButton = styled(Button)`
 
 export default function MedicalStaffManagement() {
   const dispatch = useDispatch()
-  // const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
   const [openAddStaff, setOpenAddStaff] = React.useState(false);
@@ -60,7 +68,8 @@ export default function MedicalStaffManagement() {
   })
 
   useEffect(() => {
-  }, []);
+    thunkDispatch(fetchStaffs())
+  }, [thunkDispatch]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -84,12 +93,12 @@ export default function MedicalStaffManagement() {
   };
 
   const handleSaveAddMedicalStaff = () => {
-    dispatch(addMedicalStaff(willAddStaff))
+    thunkDispatch(addStaff(willAddStaff))
     setOpenAddStaff(false)
   };
 
   const handleDeleteMedicalStaff = (id: number) => {
-    dispatch(deleteMedicalStaff(id))
+    thunkDispatch(deleteStaff(id))
   };
 
   const handleClickOpen = () => {
