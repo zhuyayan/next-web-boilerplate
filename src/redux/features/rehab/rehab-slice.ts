@@ -16,6 +16,7 @@ export interface Patient {
   age: number;
   gender: string;
   medicalHistory: string;
+  physician:string;
 }
 
 // Default Staff

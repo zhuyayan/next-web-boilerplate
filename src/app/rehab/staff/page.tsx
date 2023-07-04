@@ -24,12 +24,21 @@ import {useDispatch} from "react-redux";
 import {RootState, useAppSelector} from "@/redux/store";
 import Box from "@mui/material/Box";
 import {Delete as DeleteIcon} from "@mui/icons-material";
+import Stack from "@mui/material/Stack";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 const StyledDiv = styled.div`
   display: flex;
   gap: 10px;
   margin-top: 20px;
 `;
+
+const StyledButton = styled(Button)`
+  && {
+    background-color: #1976d1;
+    color: #ffffff;
+  }`;
+
 
 export default function MedicalStaffManagement() {
   const dispatch = useDispatch()
@@ -114,9 +123,9 @@ export default function MedicalStaffManagement() {
 
   return (
       <Container>
-        <Typography variant="h2">Medical Staff Management</Typography>
+        <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>医护用户管理</Typography>
         <div>
-          <Button variant="outlined" onClick={handleAddStaffClickOpen}>
+          <Button startIcon={<AddCircleOutlineIcon /> } variant="outlined" onClick={handleAddStaffClickOpen}>
             添加医护
           </Button>
           <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
@@ -164,12 +173,14 @@ export default function MedicalStaffManagement() {
                     <TableCell>{medicalStaff.password}</TableCell>
                     <TableCell>{medicalStaff.fullName}</TableCell>
                     <TableCell>
-                      <Button variant="outlined" color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>
-                        修改
-                      </Button>
-                      <Button variant="contained" color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
-                        删除
-                      </Button>
+                      <Stack spacing={1} direction="row">
+                        <StyledButton variant="outlined" onClick={() => handleEditRowOpen(medicalStaff.id)}>
+                          修改
+                        </StyledButton>
+                        <StyledButton variant="contained" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
+                          删除
+                        </StyledButton>
+                      </Stack>
                     </TableCell>
                   </TableRow>
               ))}

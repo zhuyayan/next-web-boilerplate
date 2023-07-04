@@ -12,6 +12,7 @@ import {
   Button,
 } from '@mui/material';
 import Link from 'next/link';
+import Stack from '@mui/material/Stack';
 
 //dialog
 import TextField from '@mui/material/TextField';
@@ -26,15 +27,29 @@ import {addPatient, editPatient, deletePatient} from "@/redux/features/rehab/reh
 import {RootState, useAppSelector} from "@/redux/store";
 import {useDispatch} from "react-redux";
 import Box from "@mui/material/Box";
-import {AppDispatch} from "@/redux/store";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import {Delete as DeleteIcon} from "@mui/icons-material";
+import {borderRight} from "@mui/system";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+
 
 const StyledDiv = styled.div`
   display: flex;
   gap: 10px;
   margin-top: 20px;
 `;
+
+const StyledButton = styled(Button)`
+  && {
+    background-color: #1976d1;
+    color: #ffffff;
+  }`;
+
 
 export default function PatientList() {
   const patientList = useAppSelector((state: RootState) => state.rehab.patient)
@@ -46,13 +61,15 @@ export default function PatientList() {
     age: 0,
     gender: '',
     medicalHistory: '',
+    physician:'tom',
   });
   const [willAddPatient, setWillAddPatient] = useState<Patient>({
     id: 0,
     name: '',
     age: 0,
-    gender: '',
+    gender: '男',
     medicalHistory: '',
+    physician:'lily',
   });
 
   useEffect(() => {
@@ -116,41 +133,69 @@ export default function PatientList() {
     }));
   };
 
+  const [gender, setGender] = React.useState('');
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setGender(event.target.value);
+  };
+
   return (
       <Container>
-        <Typography variant="h2">病人列表</Typography>
+        <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333' }}>病人列表</Typography>
         <div>
-          <Button variant="outlined" onClick={handleAddPatientOpen}>
+          <Button startIcon={<AddCircleOutlineIcon />}  variant="outlined" onClick={handleAddPatientOpen}>
             添加病人
           </Button>
           <Dialog open={addPatientOpen} onClose={handleAddPatientClose}>
             <DialogTitle>添加病人</DialogTitle>
             <DialogContent>
               <DialogContentText>
-                请正确填写处方各项信息
+                请正确填写病人各项信息
               </DialogContentText>
               <Box component="form">
                 <StyledDiv>
-                  <TextField sx={{ m: 1, minWidth: 120 }}
+                  <TextField sx={{ m: 1, minWidth: 110 }}
                              id="name"
                              value={willAddPatient.name}
                              onChange={handleAddPatientInput}
                              label="姓名" variant="outlined" size="small"/>
-                  <TextField sx={{ m: 1, minWidth: 120 }}
+                  <TextField sx={{ m: 1, minWidth: 110 }}
                              id="age"
                              value={willAddPatient.age}
                              onChange={handleAddPatientInput}
                              label="年龄" variant="outlined" size="small"/>
-                  <TextField sx={{ m: 1, minWidth: 120 }}
-                             id="gender"
-                             value={willAddPatient.gender}
-                             onChange={handleAddPatientInput}
-                             label="性别" variant="outlined" size="small"/>
-                  <TextField sx={{ m: 1, minWidth: 120 }}
+                  <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
+                    <InputLabel id="gender">性别</InputLabel>
+                    <Select
+                        labelId="gender"
+                        id="gender"
+                        value={gender}
+                        label="性别"
+                        onChange={handleChange}
+                    >
+                      <MenuItem value={10}>男</MenuItem>
+                      <MenuItem value={21}>女</MenuItem>
+                    </Select>
+                  </FormControl>
+                  {/*<TextField sx={{ m: 1, minWidth: 120 }}*/}
+                  {/*           id="gender"*/}
+                  {/*           value={willAddPatient.gender}*/}
+                  {/*           onChange={handleAddPatientInput}*/}
+                  {/*           label="性别" variant="outlined" size="small"/>*/}
+                </StyledDiv>
+                <StyledDiv>
+                  <TextField sx={{ m: 1, minWidth: 110 }}
                              id="medicalHistory"
-                             value={willAddPatient.medicalHistory}
+                             value={willEditPatient.medicalHistory}
+                             onChange={handleEditPatientInput}
+                             label="病史" variant="outlined" size="small"
+                             multiline
+                             rows={4} />
+                  <TextField sx={{ m: 1, minWidth: 110 }}
+                             id="physician"
+                             value={willAddPatient.physician}
                              onChange={handleAddPatientInput}
-                             label="病史" variant="outlined" size="small"/>
+                             label="主治医生" variant="outlined" size="small"/>
                 </StyledDiv>
               </Box>
             </DialogContent>
@@ -169,6 +214,7 @@ export default function PatientList() {
                 <TableCell>年龄</TableCell>
                 <TableCell>性别</TableCell>
                 <TableCell>病史</TableCell>
+                <TableCell>主治医生</TableCell>
                 <TableCell>操作</TableCell>
               </TableRow>
             </TableHead>
@@ -180,22 +226,25 @@ export default function PatientList() {
                     <TableCell>{patient.age}</TableCell>
                     <TableCell>{patient.gender}</TableCell>
                     <TableCell>{patient.medicalHistory}</TableCell>
+                    <TableCell>{patient.physician}</TableCell>
                     <TableCell>
+                      <Stack spacing={1} direction="row">
                       <Link href={`/rehab/rehabilitation/` + patient.id} passHref>
-                        <Button variant="contained" color="primary">
+                        <StyledButton variant="contained" color="primary">
                           查看康复信息
-                        </Button>
+                        </StyledButton>
                       </Link>
-                      <Button
+                      <StyledButton
                           variant="contained"
                           color="primary"
                           onClick={ () => handleEditClickOpen(patient.id) }
                       >
                         修改
-                      </Button>
-                      <Button variant="contained" color="primary" onClick={() => handleDeletePatient(patient.id)}>
+                      </StyledButton>
+                      <StyledButton variant="contained" color="primary" startIcon={<DeleteIcon/>} onClick={() => handleDeletePatient(patient.id)}>
                         删除
-                      </Button>
+                      </StyledButton>
+                      </Stack>
                     </TableCell>
                   </TableRow>
               ))}
@@ -203,30 +252,47 @@ export default function PatientList() {
           </Table>
         </TableContainer>
         <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>添加医护</DialogTitle>
+          <DialogTitle>修改病人信息</DialogTitle>
           <DialogContent>
             <Box component="form">
               <StyledDiv>
-                <TextField sx={{ m: 1, minWidth: 120 }}
+                <TextField sx={{ m: 1, minWidth: 110 }}
                            id="name"
                            value={willEditPatient.name}
                            onChange={handleEditPatientInput}
                            label="姓名" variant="outlined" size="small"/>
-                <TextField sx={{ m: 1, minWidth: 120 }}
+                <TextField sx={{ m: 1, minWidth: 110 }}
                            id="age"
                            value={willEditPatient.age}
                            onChange={handleEditPatientInput}
                            label="年龄" variant="outlined" size="small"/>
-                <TextField sx={{ m: 1, minWidth: 120 }}
-                           id="gender"
-                           value={willEditPatient.gender}
-                           onChange={handleEditPatientInput}
-                           label="性别" variant="outlined" size="small"/>
-                <TextField sx={{ m: 1, minWidth: 120 }}
+                <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
+                  <InputLabel id="gender">性别</InputLabel>
+                  <Select
+                      labelId="gender"
+                      id="gender"
+                      value={gender}
+                      label="性别"
+                      onChange={handleChange}
+                  >
+                    <MenuItem value={10}>男</MenuItem>
+                    <MenuItem value={21}>女</MenuItem>
+                  </Select>
+                </FormControl>
+              </StyledDiv>
+            <StyledDiv>
+                <TextField sx={{ m: 1, minWidth: 110 }}
                            id="medicalHistory"
                            value={willEditPatient.medicalHistory}
                            onChange={handleEditPatientInput}
-                           label="病史" variant="outlined" size="small"/>
+                           label="病史" variant="outlined" size="small"
+                           multiline
+                           rows={4} />
+                <TextField sx={{ m: 1, minWidth: 110 }}
+                           id="physician"
+                           value={willAddPatient.physician}
+                           onChange={handleAddPatientInput}
+                           label="主治医生" variant="outlined" size="small"/>
               </StyledDiv>
             </Box>
           </DialogContent>

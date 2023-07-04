@@ -30,7 +30,7 @@ export default function EquipmentManagement() {
 
   return (
       <Container>
-        <Typography variant="h3">Equipment Management</Typography>
+        <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>设备管理</Typography>
         <EquipmentList>
           {equipmentList.map((equipment) => (
               <EquipmentItem key={equipment.id}>
