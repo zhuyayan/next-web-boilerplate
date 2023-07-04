@@ -65,7 +65,7 @@ const PrescriptionTable = () => {
                   <StyledTableCell align='right'>{row.fat}</StyledTableCell>
                   <StyledTableCell align='right'>{row.carbs}</StyledTableCell>
                   <StyledTableCell align='right'>
-                    <Button variant="contained" color="secondary">
+                    <Button variant="outlined" color="secondary">
                       删除
                     </Button>
                   </StyledTableCell>

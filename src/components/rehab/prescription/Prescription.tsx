@@ -53,13 +53,13 @@ export default function Prescription() {
                   <TableCell align='right'>{row.bendingtimevalue}</TableCell>
                   <TableCell align='right'>{row.stretchtimevalue}</TableCell>
                   <TableCell align='right'>
-                    <Button variant="contained" color="primary">
+                    <Button variant="outlined" color="primary">
                       下发处方
                     </Button>
-                    <Button variant="contained" color="primary">
+                    <Button variant="outlined" color="primary">
                       修改
                     </Button>
-                    <Button variant="contained" color="secondary">
+                    <Button variant="outlined" color="secondary">
                       删除
                     </Button>
                   </TableCell>
@@ -70,5 +70,6 @@ export default function Prescription() {
       </TableContainer>
   )
 }
+
 
 
