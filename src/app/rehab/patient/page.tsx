@@ -11,6 +11,7 @@ import {
   TableBody,
   Button,
 } from '@mui/material';
+import TablePagination from '@mui/material/TablePagination';
 import Link from 'next/link';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -70,7 +71,7 @@ export default function PatientList() {
   });
 
   useEffect(() => {
-    thunkDispatch(fetchPatients({page: 1, size: 10, id: 0}))
+    thunkDispatch(fetchPatients({page: 1, size: 100, id: 0}))
   }, [thunkDispatch]);
 
   const handleAddPatient = () => {
@@ -136,6 +137,19 @@ export default function PatientList() {
 
   const handleChange = (event: SelectChangeEvent) => {
     setGender(event.target.value);
+  };
+
+  //分页
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
   };
 
   return (
@@ -204,7 +218,7 @@ export default function PatientList() {
             </DialogActions>
           </Dialog>
         </div>
-        <TableContainer>
+        <TableContainer sx={{ maxHeight: 620}}>
           <Table>
             <TableHead>
               <TableRow>
@@ -218,7 +232,9 @@ export default function PatientList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {patientList.map((patient) => (
+              {patientList
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((patient) => (
                   <TableRow key={patient.id}>
                     <TableCell>{patient.id}</TableCell>
                     <TableCell>{patient.name}</TableCell>
@@ -229,18 +245,19 @@ export default function PatientList() {
                     <TableCell>
                       <Stack spacing={1} direction="row">
                       <Link href={`/rehab/rehabilitation/` + patient.id} passHref>
-                        <StyledButton variant="contained" color="primary">
+                        <StyledButton style={{height:'23px'}} variant="contained" color="primary">
                           查看康复信息
                         </StyledButton>
                       </Link>
                       <StyledButton
+                          style={{height:'23px'}}
                           variant="contained"
                           color="primary"
                           onClick={ () => handleEditClickOpen(patient.id) }
                       >
                         修改
                       </StyledButton>
-                      <StyledButton variant="contained" color="primary" startIcon={<DeleteIcon/>} onClick={() => handleDeletePatient(patient.id)}>
+                      <StyledButton style={{height:'23px'}} variant="contained" color="primary" startIcon={<DeleteIcon/>} onClick={() => handleDeletePatient(patient.id)}>
                         删除
                       </StyledButton>
                       </Stack>
@@ -250,6 +267,15 @@ export default function PatientList() {
             </TableBody>
           </Table>
         </TableContainer>
+        <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={patientList.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+        />
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>修改病人信息</DialogTitle>
           <DialogContent>

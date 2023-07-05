@@ -16,6 +16,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import TablePagination from '@mui/material/TablePagination';
 import {
   deleteStaff,
   editMedicalStaff,
@@ -67,7 +68,7 @@ export default function MedicalStaffManagement() {
   })
 
   useEffect(() => {
-    thunkDispatch(fetchStaffs({page: 1, size: 10, id: 0}))
+    thunkDispatch(fetchStaffs({page: 1, size: 100, id: 0}))
   }, [thunkDispatch]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -130,6 +131,20 @@ export default function MedicalStaffManagement() {
     handleClose()
   }
 
+  //分页
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+
   return (
       <Container>
         <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>医护用户管理</Typography>
@@ -163,7 +178,7 @@ export default function MedicalStaffManagement() {
             </DialogActions>
           </Dialog>
         </div>
-        <TableContainer>
+        <TableContainer sx={{ maxHeight: 620}}>
           <Table>
             <TableHead>
               <TableRow>
@@ -175,7 +190,9 @@ export default function MedicalStaffManagement() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {medicalStaffList.map((medicalStaff) => (
+              {medicalStaffList
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((medicalStaff) => (
                   <TableRow key={medicalStaff.id}>
                     <TableCell>{medicalStaff.id}</TableCell>
                     <TableCell>{medicalStaff.username}</TableCell>
@@ -183,10 +200,10 @@ export default function MedicalStaffManagement() {
                     <TableCell>{medicalStaff.fullName}</TableCell>
                     <TableCell>
                       <Stack spacing={1} direction="row">
-                        <StyledButton variant="outlined" onClick={() => handleEditRowOpen(medicalStaff.id)}>
+                        <StyledButton style={{height:'23px'}} variant="outlined" onClick={() => handleEditRowOpen(medicalStaff.id)}>
                           修改
                         </StyledButton>
-                        <StyledButton variant="contained" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
+                        <StyledButton style={{height:'23px'}} variant="contained" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
                           删除
                         </StyledButton>
                       </Stack>
@@ -196,6 +213,15 @@ export default function MedicalStaffManagement() {
             </TableBody>
           </Table>
         </TableContainer>
+        <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={medicalStaffList.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+        />
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>修改</DialogTitle>
           <DialogContent>
@@ -228,5 +254,6 @@ export default function MedicalStaffManagement() {
           </DialogActions>
         </Dialog>
       </Container>
+
   );
 }
