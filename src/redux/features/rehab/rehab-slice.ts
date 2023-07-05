@@ -2,6 +2,7 @@ import {ActionReducerMapBuilder, createAsyncThunk, createSlice, PayloadAction,} 
 import {AxiosResponse} from "axios";
 import {WritableDraft} from "immer/dist/types/types-external";
 import MCTAxiosInstance from "@/utils/mct-request";
+import {genderLabelToValue, getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
 
 export interface MedicalStaff {
   id: number;
@@ -15,6 +16,7 @@ export interface Patient {
   name: string;
   age: number;
   gender: string;
+  genderLabel: string;
   medicalHistory: string;
   physician:string;
 }
@@ -34,15 +36,26 @@ export interface Patient {
 
 let staffs: MedicalStaff[] = []
 let patients: Patient[] = []
+let patient: Patient = {
+  id: 0,
+  name: '',
+  age: 0,
+  gender: getDefaultGenderValue(),
+  genderLabel: getDefaultGenderLabel(),
+  medicalHistory: '',
+  physician: '',
+}
 
 interface RehabState {
   staff: MedicalStaff[]
   patient: Patient[]
+  rehabPatient: Patient
 }
 
 const initialState: RehabState = {
   staff: staffs,
   patient: patients,
+  rehabPatient: patient,
 }
 
 function convertAPIPatientToPatient(apiStaff: any): Patient {
@@ -50,7 +63,8 @@ function convertAPIPatientToPatient(apiStaff: any): Patient {
     id: apiStaff.id,
     name: apiStaff.name,
     age: apiStaff.age,
-    gender: apiStaff.sex,
+    gender: genderLabelToValue(apiStaff.sex),
+    genderLabel: apiStaff.sex,
     medicalHistory: apiStaff.medical_history,
     physician: apiStaff.staff.name,
   };
@@ -60,6 +74,14 @@ export const fetchPatients = createAsyncThunk<Patient[], {page: number, size: nu
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id}});
   console.log("fetch patient async thunk: ", response.data.data.patients)
   return response.data.data.patients.map(convertAPIPatientToPatient)
+});
+
+export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fetchPatientById', async ({ id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page: 1, size: 10, id}});
+  console.log("fetch patient by id async thunk: ", response.data.data.patients)
+  let p = response.data.data.patients.map(convertAPIPatientToPatient)
+  console.log('p', p)
+  return p[0]
 });
 
 export const deletePatient = createAsyncThunk<{id: number}, {id: number}, {}>('deletePatient', async ({id}):Promise<any> => {
@@ -201,8 +223,11 @@ const RehabSlice = createSlice({
           }
           console.log("edit_staff_action", action.payload)
         })
+        .addCase(fetchPatientById.fulfilled, (state, action) => {
+          console.log("fetch_patient_by_id", action.payload)
+          state.rehabPatient = action.payload
+        })
   },
-
 })
 
 export const {
