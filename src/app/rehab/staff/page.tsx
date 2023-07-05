@@ -17,19 +17,22 @@ import {
   Typography
 } from '@mui/material';
 import {
-  addMedicalStaff, addPatient,
-  deleteMedicalStaff,
-  editMedicalStaff, fetchMedicalStaff,
-  fetchPatients,
-  MedicalStaff
+  deleteStaff,
+  editMedicalStaff,
+  addMedicalStaff,
+  fetchStaffs,
+  MedicalStaff, addStaff, editStaff,
 } from "@/redux/features/rehab/rehab-slice";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
-import {ThunkDispatch} from "redux-thunk";
-import {AnyAction} from "redux";
 import {RootState, useAppSelector} from "@/redux/store";
 import Box from "@mui/material/Box";
 import {Delete as DeleteIcon} from "@mui/icons-material";
+import Stack from "@mui/material/Stack";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
+import {useAppDispatch} from "@/redux/store";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -37,10 +40,17 @@ const StyledDiv = styled.div`
   margin-top: 20px;
 `;
 
+const StyledButton = styled(Button)`
+  && {
+    background-color: #1976d1;
+    color: #ffffff;
+  }`;
+
 export default function MedicalStaffManagement() {
-  const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
-  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const dispatch = useDispatch()
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
+  const appDispatch = useAppDispatch()
+  const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
   const [openAddStaff, setOpenAddStaff] = React.useState(false);
   const [willEditStaff, setWillEditStaff] = React.useState<MedicalStaff>({
@@ -57,7 +67,7 @@ export default function MedicalStaffManagement() {
   })
 
   useEffect(() => {
-    thunkDispatch(fetchMedicalStaff())
+    thunkDispatch(fetchStaffs({page: 1, size: 10, id: 0}))
   }, [thunkDispatch]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -83,12 +93,12 @@ export default function MedicalStaffManagement() {
   };
 
   const handleSaveAddMedicalStaff = () => {
-    dispatch(addMedicalStaff(willAddStaff))
+    thunkDispatch(addStaff({name: willAddStaff.fullName, password: willAddStaff.password, username: willAddStaff.username}))
     setOpenAddStaff(false)
   };
 
   const handleDeleteMedicalStaff = (id: number) => {
-    dispatch(deleteMedicalStaff(id))
+    appDispatch(deleteStaff({id: id}))
   };
 
   const handleClickOpen = () => {
@@ -116,15 +126,15 @@ export default function MedicalStaffManagement() {
     }
   }
   const handleEditRow = () => {
-    dispatch(editMedicalStaff(willEditStaff))
+    appDispatch(editStaff({ id: willEditStaff.id, name: willEditStaff.fullName, username: willEditStaff.username, password: willEditStaff.password }))
     handleClose()
   }
 
   return (
       <Container>
-        <Typography variant="h2">Medical Staff Management</Typography>
+        <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>医护用户管理</Typography>
         <div>
-          <Button variant="outlined" onClick={handleAddStaffClickOpen}>
+          <Button startIcon={<AddCircleOutlineIcon /> } variant="outlined" onClick={handleAddStaffClickOpen}>
             添加医护
           </Button>
           <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
@@ -172,12 +182,14 @@ export default function MedicalStaffManagement() {
                     <TableCell>{medicalStaff.password}</TableCell>
                     <TableCell>{medicalStaff.fullName}</TableCell>
                     <TableCell>
-                      <Button variant="outlined" color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>
-                        修改
-                      </Button>
-                      <Button variant="contained" color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
-                        删除
-                      </Button>
+                      <Stack spacing={1} direction="row">
+                        <StyledButton variant="outlined" onClick={() => handleEditRowOpen(medicalStaff.id)}>
+                          修改
+                        </StyledButton>
+                        <StyledButton variant="contained" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
+                          删除
+                        </StyledButton>
+                      </Stack>
                     </TableCell>
                   </TableRow>
               ))}

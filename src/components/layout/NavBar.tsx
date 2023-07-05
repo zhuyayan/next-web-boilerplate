@@ -21,6 +21,7 @@ import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/
 import {TransitionProps} from "@mui/material/transitions";
 import Link from "next/link";
 import styled from "styled-components";
+import Image from "next/image";
 
 interface MCTMenu {
   name: string,
@@ -48,7 +49,7 @@ const pages: MCTMenu[] = [
     name: "配置",
     path: "/rehab/config",
   }];
-const settings: string[] = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings: string[] = ['Logout'];
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -61,7 +62,7 @@ const Transition = React.forwardRef(function Transition(
 
 const MCTStyledButton = styled(Button)`
   &&:hover {
-    background-color: red; // 设置 hover 状态下的背景颜色
+    background-color: #0015ff; // 设置 hover 状态下的背景颜色
   }
 `;
 
@@ -133,7 +134,14 @@ export default function NavBar() {
     setOpen(false);
   }
 
-  const id = open ? 'simple-popover' : undefined;
+    const handleLogout = (): void => {
+        // 执行注销逻辑，例如清除用户登录状态等
+        // 跳转到登录页面
+        window.location.href = '/login';
+    };
+
+
+    const id = open ? 'simple-popover' : undefined;
   return (
       <AppBar position="static" ref={appBarRef}>
         <Container maxWidth="xl">
@@ -164,7 +172,14 @@ export default function NavBar() {
                   textDecoration: 'none',
                 }}
             >
-              LOGO1
+              <Image
+                  src="/images/logo/MCTlogo.png"
+                  alt="Vercel Logo"
+                  className="dark:invert"
+                  width={100}
+                  height={24}
+                  priority
+              />
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -344,11 +359,14 @@ export default function NavBar() {
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                      <Typography textAlign="center">{setting}</Typography>
-                    </MenuItem>
-                ))}
+                {/*{settings.map((setting) => (*/}
+                {/*    <MenuItem key={setting} onClick={handleCloseUserMenu}>*/}
+                {/*      <Typography textAlign="center">{setting}</Typography>*/}
+                {/*    </MenuItem>*/}
+                {/*))}*/}
+                  <MenuItem key="Logout" onClick={handleLogout}>
+                      <Typography textAlign="center">Logout</Typography>
+                  </MenuItem>
               </Menu>
             </Box>
           </Toolbar>
