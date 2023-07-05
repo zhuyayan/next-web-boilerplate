@@ -69,16 +69,16 @@ export default function MUITable({ params }: { params: { id: string } }) {
   return (
       <Container>
         <Grid container spacing={8}>
-          <Grid item xs={12}>
-            <Box position="absolute" top="10%" left="10%">
-              <Typography variant='h4'>
+          <Grid item xs={12} md={12}>
+              <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333' }}>
                 康复管理
               </Typography>
-            </Box>
           </Grid>
-          <Box position="absolute" top="20%" left="8%">
-            <Grid item xs={3}>
-              <Card sx={{ minWidth: 275 ,backgroundColor: '#fff'}}>
+        </Grid>
+          <Grid container spacing={2}>
+          {/*病人card*/}
+            <Grid item xs={6} md={2}>
+              <Card sx={{ backgroundColor: '#c9d8e8'}}>
                 <CardContent>
                   <Typography component="div">
                     {rehabPatient.name}
@@ -96,17 +96,14 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 </CardContent>
               </Card>
             </Grid>
-          </Box>
 
-
-          <Box position="absolute" top="10%" right="2%" sx={{width: 950, height: 300,}}>
+          {/*处方*/}
+          <Grid item xs={6} md={10}>
             <Card>
               <CardHeader title='处方' titleTypographyProps={{ variant: 'h5' }} />
-              <Box position="absolute" top="5%" right="5%">
                 <Button startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>
                   添加处方
                 </Button>
-              </Box>
               <div>
                 <Dialog open={open} onClose={handleClose}>
                   <DialogTitle>添加处方</DialogTitle>
@@ -170,24 +167,23 @@ export default function MUITable({ params }: { params: { id: string } }) {
               </div>
               <Prescription />
             </Card>
-          </Box>
-          <Box position="absolute" bottom="1%" right="5%">
-            <Grid item xs={12}>
+          </Grid>
+
+          {/*压力数据折线图*/}
+          <Grid item xs={6} md={6}>
+            <Card>
+              <CardHeader title='压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
+              <PrescriptionLine />
+            </Card>
+          </Grid>
+
+          {/*康复记录*/}
+            <Grid item xs={6} md={6}>
               <Card>
                 <CardHeader title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
                 <PrescriptionTable />
               </Card>
             </Grid>
-          </Box>
-
-          <Box position="absolute" bottom="1%" left="10%">
-            <Grid item xs={12}>
-              <Card>
-                <CardHeader title='压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
-                <PrescriptionLine />
-              </Card>
-            </Grid>
-          </Box>
         </Grid>
       </Container>
 

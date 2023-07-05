@@ -8,6 +8,25 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import {
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select
+} from "@mui/material";
+import styled from "styled-components";
+import {SelectChangeEvent} from "@mui/material/Select";
+
+const StyledDiv = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+`;
 
 interface Column {
   id: 'time' | 'pattern' | 'part' | 'count' | 'bendingtimevalue' | 'stretchtimevalue' | 'action';
@@ -84,6 +103,22 @@ const rows = [
 ];
 
 export default function StickyHeadTable() {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const [device, setDevice] = React.useState('');
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setDevice(event.target.value);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
 
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -123,11 +158,41 @@ export default function StickyHeadTable() {
                     <TableCell align='right'>{row.stretchtimevalue}</TableCell>
                     <TableCell align='right'>
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
-                        <Button color="primary">下发处方</Button>
+                        <Button color="primary"  onClick={handleClickOpen}>下发</Button>
                         <Button color="primary">修改</Button>
                         <Button color="secondary">删除</Button>
                       </ButtonGroup>
                     </TableCell>
+                    <div>
+                      <Dialog open={open} onClose={handleClose}>
+                        <DialogContent>
+                          <DialogContentText>
+                            请选择要下发至哪台康复仪
+                          </DialogContentText>
+                          <StyledDiv>
+                            <Box>
+                              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                                <InputLabel id="device">康复仪设备</InputLabel>
+                                <Select
+                                    labelId="device"
+                                    id="device"
+                                    value={device}
+                                    label="device"
+                                    onChange={handleChange}
+                                >
+                                  <MenuItem value={10}>设备1</MenuItem>
+                                  <MenuItem value={20}>设备二</MenuItem>
+                                </Select>
+                              </FormControl>
+                            </Box>
+                          </StyledDiv>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleClose}>取消</Button>
+                          <Button onClick={handleClose}>确定</Button>
+                        </DialogActions>
+                      </Dialog>
+                    </div>
                   </TableRow>
               ))}
 
