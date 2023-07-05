@@ -43,7 +43,7 @@ const pages: MCTMenu[] = [
   // },
   {
     name: "病人",
-    path: "/rehab/patients",
+    path: "/rehab/patient",
   },
   {
     name: "配置",

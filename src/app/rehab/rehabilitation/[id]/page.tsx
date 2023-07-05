@@ -31,6 +31,11 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
 import {useEffect} from "react";
+import {RootState, useAppSelector} from "@/redux/store";
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
+import {useDispatch} from "react-redux";
+import {fetchPatientById} from "@/redux/features/rehab/rehab-slice";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -39,6 +44,8 @@ const StyledDiv = styled.div`
 `;
 
 export default function MUITable({ params }: { params: { id: string } }) {
+  const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -56,8 +63,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
   };
 
   useEffect(() => {
+    thunkDispatch(fetchPatientById({id: parseInt(params.id)}))
     console.log("patient id: ", params.id)
-  }, [])
+  }, [useEffect])
   return (
       <Container>
         <Grid container spacing={8}>
@@ -73,7 +81,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <Card sx={{ minWidth: 275 ,backgroundColor: '#fff'}}>
                 <CardContent>
                   <Typography component="div">
-                    name
+                    {rehabPatient.name}
                   </Typography>
                   <Typography variant="body2">
                     <br />
@@ -83,7 +91,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                     <br />
                   </Typography>
                   <Typography component="div">
-                    病人id
+                    {rehabPatient.id}
                   </Typography>
                 </CardContent>
               </Card>
