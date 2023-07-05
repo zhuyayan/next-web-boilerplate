@@ -1,7 +1,7 @@
 "use client";
 import React, {ChangeEvent, useEffect} from 'react';
 import {
-  Button,
+  Button, ButtonGroup,
   Container,
   Dialog,
   DialogActions,
@@ -40,12 +40,6 @@ const StyledDiv = styled.div`
   gap: 10px;
   margin-top: 20px;
 `;
-
-const StyledButton = styled(Button)`
-  && {
-    background-color: #1976d1;
-    color: #ffffff;
-  }`;
 
 export default function MedicalStaffManagement() {
   const dispatch = useDispatch()
@@ -200,12 +194,14 @@ export default function MedicalStaffManagement() {
                     <TableCell>{medicalStaff.fullName}</TableCell>
                     <TableCell>
                       <Stack spacing={1} direction="row">
-                        <StyledButton style={{height:'23px'}} variant="outlined" onClick={() => handleEditRowOpen(medicalStaff.id)}>
+                        <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
+                        <Button color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>
                           修改
-                        </StyledButton>
-                        <StyledButton style={{height:'23px'}} variant="contained" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
+                        </Button>
+                        <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
                           删除
-                        </StyledButton>
+                        </Button>
+                        </ButtonGroup>
                       </Stack>
                     </TableCell>
                   </TableRow>
