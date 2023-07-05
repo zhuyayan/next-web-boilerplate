@@ -16,11 +16,17 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import {addMedicalStaff, deleteMedicalStaff, editMedicalStaff, MedicalStaff} from "@/redux/features/rehab/rehab-slice";
+import {
+  addMedicalStaff, addPatient,
+  deleteMedicalStaff,
+  editMedicalStaff, fetchMedicalStaff,
+  fetchPatients,
+  MedicalStaff
+} from "@/redux/features/rehab/rehab-slice";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
-// import {ThunkDispatch} from "redux-thunk";
-// import {AnyAction} from "redux";
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
 import {RootState, useAppSelector} from "@/redux/store";
 import Box from "@mui/material/Box";
 import {Delete as DeleteIcon} from "@mui/icons-material";
@@ -32,9 +38,9 @@ const StyledDiv = styled.div`
 `;
 
 export default function MedicalStaffManagement() {
-  const dispatch = useDispatch()
-  // const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  const dispatch = useDispatch()
   const [open, setOpen] = React.useState(false);
   const [openAddStaff, setOpenAddStaff] = React.useState(false);
   const [willEditStaff, setWillEditStaff] = React.useState<MedicalStaff>({
@@ -51,7 +57,8 @@ export default function MedicalStaffManagement() {
   })
 
   useEffect(() => {
-  }, []);
+    thunkDispatch(fetchMedicalStaff())
+  }, [thunkDispatch]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -68,6 +75,7 @@ export default function MedicalStaffManagement() {
 
   const handleAddMedicalStaff = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
+    console.log(id, value)
     setWillAddStaff((prevInputValues) => ({
       ...prevInputValues,
       [id]: value,

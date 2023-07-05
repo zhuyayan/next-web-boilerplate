@@ -19,11 +19,12 @@ export interface Patient {
 }
 
 // Default Staff
-let medicalStaffList: MedicalStaff[] = [
-  { id: 1, username: 'john', password: 'password', fullName: 'John Doe' },
-  { id: 2, username: 'jane', password: 'password', fullName: 'Jane Smith' },
+//let medicalStaffList: MedicalStaff[] = [
+//  { id: 1, username: 'john', password: 'password', fullName: 'John Doe' },
+//  { id: 2, username: 'jane', password: 'password', fullName: 'Jane Smith' },
   // Add more medical staff members as needed
-];
+//];
+let medicalStaffList: MedicalStaff[] = []
 // let patients: Patient[] = [
 //   { id: 1, name: 'John Doe', age: 30, gender: 'Male', medicalHistory: 'Lorem ipsum dolor sit amet' },
 //   { id: 2, name: 'Jane Smith', age: 40, gender: 'Female', medicalHistory: 'Lorem ipsum dolor sit amet' },
@@ -41,8 +42,29 @@ const initialState: RehabState = {
   patient: patients,
 }
 
+export const fetchMedicalStaff = createAsyncThunk('fetchMedicalStaff', async ():Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get(
+      'staff',
+      {
+        params: {
+          page: 1,
+          size: 10
+        }
+      }
+  );
+  return response.data;
+});
+
 export const fetchPatients = createAsyncThunk('fetchPatients', async ():Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('api/patients');
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get(
+      'patient',
+      {
+        params: {
+          page: 1,
+          size: 10
+      }
+    }
+  );
   return response.data;
 });
 
@@ -100,13 +122,25 @@ const RehabSlice = createSlice({
         .addCase(fetchPatients.pending, (state: WritableDraft<RehabState>) => {
         })
         .addCase(fetchPatients.fulfilled, (state, action) => {
-          state.patient = action.payload.data
+          state.patient = action.payload.data.patients
           console.log('action', action.payload)
         })
         .addCase(fetchPatients.rejected, (state, action) => {
 
         })
+
+    builder
+        .addCase(fetchMedicalStaff.pending, (state: WritableDraft<RehabState>) => {
+        })
+        .addCase(fetchMedicalStaff.fulfilled, (state, action) => {
+          state.patient = action.payload.data.medicalStaffList
+          console.log('action', action.payload)
+        })
+        .addCase(fetchMedicalStaff.rejected, (state, action) => {
+
+        })
   },
+
 })
 
 export const {

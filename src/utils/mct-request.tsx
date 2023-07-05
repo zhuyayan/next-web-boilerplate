@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const MCTAxiosInstance = axios.create({
-  baseURL: 'http://localhost:3000/',
+  baseURL: 'http://192.168.2.101:56567/api/v1',
 })
 
 MCTAxiosInstance.interceptors.request.use((config)=>{
