@@ -1,7 +1,7 @@
 "use client";
 import React, {ChangeEvent, useEffect} from 'react';
 import {
-  Button,
+  Button, ButtonGroup,
   Container,
   Dialog,
   DialogActions,
@@ -41,12 +41,6 @@ const StyledDiv = styled.div`
   gap: 10px;
   margin-top: 20px;
 `;
-
-const StyledButton = styled(Button)`
-  && {
-    background-color: #1976d1;
-    color: #ffffff;
-  }`;
 
 export default function MedicalStaffManagement() {
   const dispatch = useDispatch()
@@ -202,13 +196,16 @@ export default function MedicalStaffManagement() {
                           <TableCell align='center'>{medicalStaff.password}</TableCell>
                           <TableCell align='center'>{medicalStaff.fullName}</TableCell>
                           <TableCell align='right'>
-                            <StyledButton style={{height:'23px'}} variant="outlined" onClick={() => handleEditRowOpen(medicalStaff.id)}>
-                              修改
-                            </StyledButton>
-                            <StyledButton style={{height:'23px'}} variant="outlined" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
-                              删除
-                            </StyledButton>
-
+                            <Stack spacing={1} direction="row">
+                              <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
+                                <Button color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>
+                                  修改
+                                </Button>
+                                <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
+                                  删除
+                                </Button>
+                              </ButtonGroup>
+                            </Stack>
                           </TableCell>
                         </TableRow>
                     ))}
@@ -256,7 +253,6 @@ export default function MedicalStaffManagement() {
             </DialogActions>
           </Dialog>
         </Paper>
-
       </Container>
 
   );
