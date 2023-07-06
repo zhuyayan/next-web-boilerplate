@@ -23,10 +23,19 @@ import styled from "styled-components";
 import {SelectChangeEvent} from "@mui/material/Select";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-import {ChangeEvent, useState} from "react";
-import {editStaff, MedicalStaff, Patient} from "@/redux/features/rehab/rehab-slice";
+import {ChangeEvent, useEffect, useState} from "react";
+import {
+  editStaff,
+  fetchPatientById,
+  fetchPrescriptionById,
+  MedicalStaff,
+  Patient, Prescription, PrescriptionRecord
+} from "@/redux/features/rehab/rehab-slice";
 import {getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
 import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
+import {useDispatch} from "react-redux";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -108,7 +117,13 @@ const rows = [
 
 ];
 
-export default function StickyHeadTable() {
+export default function StickyHeadTable(params: {PId:string,
+  prescription:Prescription[]}) {
+  // const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
+  const [age1, setAge1] = React.useState('');
+  const [age2, setAge2] = React.useState('');
+  const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
 
@@ -119,11 +134,6 @@ export default function StickyHeadTable() {
   const handleClickModify = () => {
     setOpenModify(true);
   };
-
-  const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
-  const [age1, setAge1] = React.useState('');
-  const [age2, setAge2] = React.useState('');
-  const [device, setDevice] = React.useState('');
 
   const handleChange = (event: SelectChangeEvent) => {
     setDevice(event.target.value);
@@ -145,6 +155,10 @@ export default function StickyHeadTable() {
     setOpenModify(false);
   };
 
+  // useEffect(() => {
+  //   thunkDispatch(fetchPrescriptionById({id: parseInt(params.PId)}))
+  // })
+
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 265 }}>
@@ -163,9 +177,9 @@ export default function StickyHeadTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map(row => (
+              {params.prescription.map(row => (
                   <TableRow
-                      key={row.time}
+                      key={row.created_at}
                       style={{height:'30px'}}
                       sx={{
                         '&:last-of-type td, &:last-of-type th': {
@@ -174,13 +188,13 @@ export default function StickyHeadTable() {
                       }}
                   >
                     <TableCell component='th' scope='row'>
-                      {row.time}
+                      {row.created_at}
                     </TableCell>
-                    <TableCell align='right'>{row.pattern}</TableCell>
+                    <TableCell align='right'>{row.mode}</TableCell>
                     <TableCell align='right'>{row.part}</TableCell>
-                    <TableCell align='right'>{row.count}</TableCell>
-                    <TableCell align='right'>{row.bendingtimevalue}</TableCell>
-                    <TableCell align='right'>{row.stretchtimevalue}</TableCell>
+                    <TableCell align='right'>{row.zz}</TableCell>
+                    <TableCell align='right'>{row.u}</TableCell>
+                    <TableCell align='right'>{row.v}</TableCell>
                     <TableCell align='right'>
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
                         <Button color="primary"  onClick={handleClickOpen}>下发</Button>

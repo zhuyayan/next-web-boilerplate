@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import appBarReducer from './features/layout-slice'
 import loginReducer from './features/login-slice'
-import rehabReducer, {onlineEquipmentApi} from './features/rehab/rehab-slice'
+import rehabReducer, {rehabApi} from './features/rehab/rehab-slice'
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import {setupListeners} from "@reduxjs/toolkit/query";
 
@@ -10,10 +10,11 @@ const store = configureStore({
     appBar: appBarReducer,
     login: loginReducer,
     rehab: rehabReducer,
-    [onlineEquipmentApi.reducerPath]: onlineEquipmentApi.reducer
+    [rehabApi.reducerPath]: rehabApi.reducer,
   },
   middleware:(getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat(onlineEquipmentApi.middleware)
+    return getDefaultMiddleware()
+        .concat(rehabApi.middleware)
   }
 });
 
@@ -23,4 +24,4 @@ export const useAppDispatch: () => AppDispatch = useDispatch
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 export default store;
 
-// setupListeners(store.dispatch)
+setupListeners(store.dispatch)

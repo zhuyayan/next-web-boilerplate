@@ -2,7 +2,7 @@ import {ActionReducerMapBuilder, createAsyncThunk, createSlice, PayloadAction,} 
 import {AxiosResponse} from "axios";
 import {WritableDraft} from "immer/dist/types/types-external";
 import MCTAxiosInstance from "@/utils/mct-request";
-import {genderLabelToValue, getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
+import {genderLabelToValue, getDefaultGenderLabel, getDefaultGenderValue, timeSampleFormat} from "@/utils/mct-utils";
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 
 export interface MedicalStaff {
@@ -22,6 +22,23 @@ export interface Patient {
   physician:string;
 }
 
+export interface Prescription {
+  id: number;
+  created_at: string;
+  part: string;
+  mode: string;
+  zz: number;
+  u: number;
+  v: number;
+}
+export interface PrescriptionRecord {
+  id: number
+  created_at: string
+  eid: string
+  pid: string
+  state: string
+  updated_at: string
+}
 // Default Staff
 // let medicalStaffList: MedicalStaff[] = [
 //   { id: 1, username: 'john', password: 'password', fullName: 'John Doe' },
@@ -37,6 +54,9 @@ export interface Patient {
 
 let staffs: MedicalStaff[] = []
 let patients: Patient[] = []
+let prescriptions: Prescription[] = []
+let prescriptionRecord: PrescriptionRecord[] = []
+
 let patient: Patient = {
   id: 0,
   name: '',
@@ -51,14 +71,17 @@ interface RehabState {
   staff: MedicalStaff[]
   patient: Patient[]
   rehabPatient: Patient
+  prescription: Prescription[]
+  prescriptionRecord: PrescriptionRecord[]
 }
 
 const initialState: RehabState = {
   staff: staffs,
   patient: patients,
   rehabPatient: patient,
+  prescription: prescriptions,
+  prescriptionRecord: prescriptionRecord,
 }
-
 
 export type Channel = 'redux' | 'general'
 
@@ -81,8 +104,11 @@ function isWSMessage(data: any): data is WSMessage {
   );
 }
 
-export const onlineEquipmentApi = createApi({
-  reducerPath: 'onlineEquipmentApi',
+export interface RealTimeTrainData {
+  D: number[]
+}
+export const rehabApi = createApi({
+  reducerPath: 'rehabApi',
   baseQuery: fetchBaseQuery({baseUrl: '/'}),
   endpoints:(builder) => ({
     getMessages: builder.query<string[], Channel>({
@@ -108,6 +134,46 @@ export const onlineEquipmentApi = createApi({
             })
           }
           ws.addEventListener('message', listener)
+        }catch {
+          console.log("ws error")
+        }
+        await cacheEntryRemoved
+        ws.close()
+        console.log("ws closed")
+      },
+    }),
+    getTrainMessage: builder.query<RealTimeTrainData, Channel>({
+      query: () => "",
+      async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
+        const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/train/ws')
+        try {
+          const l = (event: MessageEvent) => {
+            const data: WSMessage = JSON.parse(event.data)
+            console.log("data11 -> ", data)
+            if (!isWSMessage(data)) {
+              // return
+            }
+            updateCachedData((draft) => {
+              // if (draft === undefined) {
+              //   draft = {
+              //     D: []
+              //   }
+              // }
+              draft = {
+                D: []
+              }
+              if (!Array.isArray(draft.D)) {
+                draft.D = []
+              }
+              console.log("data22 -> ", data.data)
+
+              draft.D.length = 0
+              // Add each item from data.data to the draft
+              data.data.D.forEach(item => draft.D.push(item))
+              console.log("draft22 -> ", draft)
+            })
+          }
+          ws.addEventListener('message', l)
         }catch {
           console.log("ws error")
         }
@@ -144,7 +210,6 @@ export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fe
   console.log('p', p)
   return p[0]
 });
-
 
 export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, staff_id: number}, {}>('addPatient', async ({name, age, sex, medical_history, staff_id}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('patient',{name, age, sex, medical_history, staff_id})
@@ -196,6 +261,74 @@ export const editStaff = createAsyncThunk<MedicalStaff, { id: number, name: stri
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('staff',{id, name, username, password})
   console.log("add staff async thunk: ", response.data.data.staffs[0])
   return convertAPIStaffToMedicalStaff(response.data.data.staffs[0])
+});
+
+const BodyPartToNumMapping: { [key: number]: string } = {
+  1: "左手",
+  2: "右手",
+  3: "左腕",
+  4: "右腕",
+  5: "左踝",
+  6: "右踝",
+  0: "无效",
+};
+
+const ModeToNumMapping: { [key: number]: string } = {
+  1: "被动计次模式",
+  2: "被动定时模式",
+  3: "主动计次模式",
+  4: "主动定时模式",
+  5: "助力计次模式",
+  6: "助力定时模式",
+  7: "手动计次模式",
+  0: "无效",
+};
+
+const StateToNumMapping: { [key: number]: string } = {
+  1: "停止态",
+  2: "暂停态",
+  3: "伸动作态",
+  4: "弯曲动作态",
+  5: "伸保持态",
+  6: "弯曲保持态",
+};
+
+function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescription {
+  return {
+    id: apiPrescription.id,
+    created_at: timeSampleFormat(apiPrescription.created_at),
+    part: BodyPartToNumMapping[apiPrescription.part],
+    mode: ModeToNumMapping[apiPrescription.mode],
+    zz: apiPrescription.zz,
+    u:apiPrescription.u,
+    v:apiPrescription.v,
+  }
+}
+
+export const fetchPrescriptionById = createAsyncThunk<Prescription[], { id: number}, {}>('fetchPrescriptionById', async ({ id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('prescription', {params:{ page: 1, size: 10, id}});
+  console.log("fetch prescription by id async thunk: ", response.data.data.prescriptions)
+  let p = response.data.data.prescriptions.map(convertAPIPrescriptionToPrescription)
+  console.log('prescription', p)
+  return p
+});
+
+function convertAPIPrescriptionRecordToPrescriptionRecord(apiPrescriptionRecord: any): PrescriptionRecord {
+  return {
+    id: apiPrescriptionRecord.id,
+    created_at: timeSampleFormat(apiPrescriptionRecord.created_at),
+    eid: apiPrescriptionRecord.eid,
+    pid: apiPrescriptionRecord.pid,
+    state: apiPrescriptionRecord.state,
+    updated_at: timeSampleFormat(apiPrescriptionRecord.updated_at),
+  }
+}
+export const fetchPrescriptionRecordById = createAsyncThunk<PrescriptionRecord[], { id: number}, {}>('fetchPrescriptionRecordById', async ({ id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('train', {params:{ page: 1, size: 10, id}});
+  console.log("fetch prescription_record by id async thunk: ", response.data.data.tasks)
+  let p = response.data.data.tasks.map(convertAPIPrescriptionRecordToPrescriptionRecord)
+  console.log('prescription_record', p)
+  return p
 });
 
 const RehabSlice = createSlice({
@@ -296,10 +429,18 @@ const RehabSlice = createSlice({
           console.log("fetch_patient_by_id", action.payload)
           state.rehabPatient = action.payload
         })
+        .addCase(fetchPrescriptionById.fulfilled, (state, action) => {
+          console.log("fetch_prescription_by_id", action.payload)
+          state.prescription = action.payload
+        })
+        .addCase(fetchPrescriptionRecordById.fulfilled, (state, action) => {
+          console.log("fetch_prescription_record_by_id", action.payload)
+          state.prescriptionRecord = action.payload
+        })
   },
 })
 
-export const { useGetMessagesQuery } = onlineEquipmentApi
+export const { useGetMessagesQuery, useGetTrainMessageQuery } = rehabApi
 export const {
   addMedicalStaff,
   editMedicalStaff,

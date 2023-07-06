@@ -16,7 +16,7 @@ import {useEffect, useRef} from "react";
 import {useDispatch} from "react-redux";
 import {setHeight} from "@/redux/features/layout-slice";
 import {Dialog, Popover, Slide} from "@mui/material";
-import {useAppSelector} from "@/redux/store";
+import {RootState, useAppSelector} from "@/redux/store";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import {TransitionProps} from "@mui/material/transitions";
 import Link from "next/link";
@@ -85,7 +85,7 @@ export default function NavBar() {
 
 
   const dispatch = useDispatch();
-  const appBarHeight = useAppSelector((state) => {
+  const appBarHeight = useAppSelector((state:RootState) => {
     return state.appBar.height
   })
   useEffect(() => {

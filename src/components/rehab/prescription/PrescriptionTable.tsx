@@ -8,7 +8,16 @@ import TableContainer from '@mui/material/TableContainer'
 import TableRow, { TableRowProps } from '@mui/material/TableRow'
 import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/TableCell'
 import {Button} from "@mui/material";
-
+import {useEffect} from "react";
+import {
+  fetchPrescriptionById,
+  fetchPrescriptionRecordById,
+  PrescriptionRecord
+} from "@/redux/features/rehab/rehab-slice";
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
+import {useDispatch} from "react-redux";
+import {RootState, useAppSelector} from "@/redux/store";
 
 
 const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({
@@ -53,7 +62,12 @@ const rows = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ]
 
-const PrescriptionTable = () => {
+const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
+  // const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
+  // const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
+  // useEffect(() => {
+  //   thunkDispatch(fetchPrescriptionRecordById({id: parseInt(params.PId)}))
+  // })
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 335 }}>
@@ -62,20 +76,20 @@ const PrescriptionTable = () => {
               <TableRow>
                 <StyledTableCell>康复开始时间</StyledTableCell>
                 <StyledTableCell align='right'>康复结束时间</StyledTableCell>
-                <StyledTableCell align='right'>压力数据</StyledTableCell>
-                <StyledTableCell align='right'>康复次数</StyledTableCell>
+                <StyledTableCell align='right'>状态</StyledTableCell>
+                {/*<StyledTableCell align='right'>康复次数</StyledTableCell>*/}
                 <StyledTableCell align='center'>操作</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map(row => (
-                  <StyledTableRow key={row.name}>
+              {params.record.map(row => (
+                  <StyledTableRow key={row.id}>
                     <StyledTableCell component='th' scope='row'>
-                      {row.name}
+                      {row.created_at}
                     </StyledTableCell>
-                    <StyledTableCell align='right'>{row.calories}</StyledTableCell>
-                    <StyledTableCell align='right'>{row.fat}</StyledTableCell>
-                    <StyledTableCell align='right'>{row.carbs}</StyledTableCell>
+                    <StyledTableCell align='right'>{row.updated_at}</StyledTableCell>
+                    {/*<StyledTableCell align='right'>{row.state}</StyledTableCell>*/}
+                    <StyledTableCell align='right'>{row.state}</StyledTableCell>
                     <StyledTableCell align='right'>
                       <Button style={{height:'20px'}} variant="outlined" color="secondary">
                         删除
