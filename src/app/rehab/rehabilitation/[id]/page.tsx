@@ -106,7 +106,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   <Divider />
                     <br />
                   <Typography component="div">
-                    性别：{rehabPatient.gender}<br/>
+                    性别：{rehabPatient.genderLabel}<br/>
                   </Typography>
                   <Divider />
                     <br />
