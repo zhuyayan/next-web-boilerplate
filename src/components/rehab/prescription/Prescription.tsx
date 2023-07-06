@@ -23,19 +23,25 @@ import styled from "styled-components";
 import {SelectChangeEvent} from "@mui/material/Select";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-import {ChangeEvent, useEffect, useState} from "react";
-import {
-  editStaff,
-  fetchPatientById,
-  fetchPrescriptionById,
-  MedicalStaff,
-  Patient, Prescription, PrescriptionRecord
-} from "@/redux/features/rehab/rehab-slice";
+// <<<<<<< HEAD
+// import {ChangeEvent, useEffect, useState} from "react";
+// import {
+//   editStaff,
+//   fetchPatientById,
+//   fetchPrescriptionById,
+//   MedicalStaff,
+//   Patient, Prescription, PrescriptionRecord
+// } from "@/redux/features/rehab/rehab-slice";
+// =======
+// import {ChangeEvent, useState} from "react";
+// import {editStaff, MedicalStaff, Patient, useGetMessagesQuery} from "@/redux/features/rehab/rehab-slice";
+// >>>>>>> 47807e9eb34d4e5c0b50fab2360e35cf7d6166da
 import {getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
 import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
+import {Prescription, useGetMessagesQuery} from "@/redux/features/rehab/rehab-slice";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -135,6 +141,15 @@ export default function StickyHeadTable(params: {PId:string,
     setOpenModify(true);
   };
 
+// <<<<<<< HEAD
+// =======
+//   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
+//   const [age1, setAge1] = React.useState('');
+//   const [age2, setAge2] = React.useState('');
+//   const [device, setDevice] = React.useState('');
+  const { data, error, isLoading } = useGetMessagesQuery('redux');
+//
+// >>>>>>> 47807e9eb34d4e5c0b50fab2360e35cf7d6166da
   const handleChange = (event: SelectChangeEvent) => {
     setDevice(event.target.value);
   };
@@ -161,7 +176,7 @@ export default function StickyHeadTable(params: {PId:string,
 
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 265 }}>
+        <TableContainer sx={{ height: 265 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -203,7 +218,7 @@ export default function StickyHeadTable(params: {PId:string,
                       </ButtonGroup>
                     </TableCell>
                     <div>
-                      <Dialog open={open} onClose={handleClose} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.01)' } }} PaperProps={{ elevation: 0 }}>
+                      <Dialog open={open} onClose={handleClose} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
                         <DialogContent>
                           <DialogContentText>
                             请选择要下发至哪台康复仪
@@ -219,8 +234,13 @@ export default function StickyHeadTable(params: {PId:string,
                                     label="device"
                                     onChange={handleChange}
                                 >
-                                  <MenuItem value={10}>设备1</MenuItem>
-                                  <MenuItem value={20}>设备二</MenuItem>
+                                  {data ? (
+                                      data.map((item) => (
+                                          <MenuItem key={item.id} value={item.id}>
+                                            {item.name}
+                                          </MenuItem>
+                                      ))
+                                  ) : null}
                                 </Select>
                               </FormControl>
                             </Box>
@@ -233,7 +253,7 @@ export default function StickyHeadTable(params: {PId:string,
                       </Dialog>
                     </div>
                     <div>
-                      <Dialog open={openModify} onClose={handleCloseModify} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.01)' } }} PaperProps={{ elevation: 0 }}>
+                      <Dialog open={openModify} onClose={handleCloseModify} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
                         <DialogTitle>修改处方</DialogTitle>
                         <DialogContent>
                           <DialogContentText>
@@ -295,10 +315,10 @@ export default function StickyHeadTable(params: {PId:string,
                     </div>
                   </TableRow>
               ))}
-
             </TableBody>
           </Table>
         </TableContainer>
+
       </Paper>
   );
 }

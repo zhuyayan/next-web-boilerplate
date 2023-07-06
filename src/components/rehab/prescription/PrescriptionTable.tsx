@@ -22,8 +22,8 @@ import {RootState, useAppSelector} from "@/redux/store";
 
 const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    color: theme.palette.common.white,
-    backgroundColor: theme.palette.common.black
+    color: theme.palette.common.black,
+    backgroundColor: theme.palette.common.white
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14
@@ -70,7 +70,7 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
   // })
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 335 }}>
+        <TableContainer sx={{ maxHeight: 365 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
