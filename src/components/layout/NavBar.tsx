@@ -139,9 +139,7 @@ export default function NavBar() {
         // 跳转到登录页面
         window.location.href = '/login';
     };
-
-
-    const id = open ? 'simple-popover' : undefined;
+  const id = open ? 'simple-popover' : undefined;
   return (
       <AppBar position="static" ref={appBarRef}>
         <Container maxWidth="xl">
@@ -175,7 +173,7 @@ export default function NavBar() {
               <Image
                   src="/images/logo/MCTlogo.png"
                   alt="Vercel Logo"
-                  className="dark:invert"
+                  // className="dark:invert"
                   width={100}
                   height={24}
                   priority

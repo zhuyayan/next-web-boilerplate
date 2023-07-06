@@ -3,6 +3,7 @@ import {AxiosResponse} from "axios";
 import {WritableDraft} from "immer/dist/types/types-external";
 import MCTAxiosInstance from "@/utils/mct-request";
 import {genderLabelToValue, getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
+import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 
 export interface MedicalStaff {
   id: number;
@@ -57,6 +58,66 @@ const initialState: RehabState = {
   patient: patients,
   rehabPatient: patient,
 }
+
+
+export type Channel = 'redux' | 'general'
+
+export interface WSMessage {
+  code: number
+  data: string[]
+  msg: string
+}
+
+function isWSMessage(data: any): data is WSMessage {
+  return (
+      typeof data === 'object' &&
+      data !== null &&
+      'code' in data &&
+      'data' in data &&
+      'msg' in data &&
+      typeof data.id === 'number' &&
+      typeof data.data === 'object' &&
+      typeof data.msg === 'string'
+  );
+}
+
+export const onlineEquipmentApi = createApi({
+  reducerPath: 'onlineEquipmentApi',
+  baseQuery: fetchBaseQuery({baseUrl: '/'}),
+  endpoints:(builder) => ({
+    getMessages: builder.query<string[], Channel>({
+      query: () => "",
+      async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
+        const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/equipment/ws')
+        try {
+          console.log(123)
+          // await cacheDataLoaded
+          console.log(456)
+          const listener = (event: MessageEvent) => {
+            const data: WSMessage = JSON.parse(event.data)
+            console.log("data1 -> ", data)
+            if (!isWSMessage(data)) {
+              // return
+            }
+            updateCachedData((draft= []) => {
+              console.log("data2 -> ", data.data)
+              draft.length = 0
+              // Add each item from data.data to the draft
+              data.data.forEach(item => draft.push(item))
+              console.log("draft -> ", draft)
+            })
+          }
+          ws.addEventListener('message', listener)
+        }catch {
+          console.log("ws error")
+        }
+        await cacheEntryRemoved
+        ws.close()
+        console.log("ws closed")
+      },
+    }),
+  }),
+})
 
 function convertAPIPatientToPatient(apiStaff: any): Patient {
   return {
@@ -230,6 +291,7 @@ const RehabSlice = createSlice({
   },
 })
 
+export const { useGetMessagesQuery } = onlineEquipmentApi
 export const {
   addMedicalStaff,
   editMedicalStaff,

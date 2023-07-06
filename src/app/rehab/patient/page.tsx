@@ -161,6 +161,7 @@ export default function PatientList() {
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  }
   const handleAddPatientGenderChange = (event: SelectChangeEvent) => {
     const { value } = event.target;
     setWillAddPatient((prevInputValues) => ({
