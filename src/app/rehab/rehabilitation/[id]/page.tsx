@@ -124,7 +124,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
             </Grid>
           {/*处方*/}
           <Grid item xs={6} md={10}>
-            <Card>
+            <Card sx={{ padding: '10px' ,height: 365}}>
               <CardHeader title='处方' titleTypographyProps={{ variant: 'h5' }} />
                 <Button style={{float: 'right'}} startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>
                   添加处方
@@ -196,14 +196,14 @@ export default function MUITable({ params }: { params: { id: string } }) {
             <br/>
           {/*压力数据折线图*/}
           <Grid item xs={6} md={6}>
-            <Card sx={{ height: 365 }}>
+            <Card sx={{ height: 365 ,padding: '10px'}}>
               <CardHeader title='压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
               <PrescriptionLine />
             </Card>
           </Grid>
           {/*康复记录*/}
             <Grid item xs={6} md={6}>
-              <Card sx={{ height: 365 }}>
+              <Card sx={{ height: 365 ,padding: '10px'}}>
                 <CardHeader title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
                 <PrescriptionTable />
               </Card>
