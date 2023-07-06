@@ -13,8 +13,8 @@ import {Button} from "@mui/material";
 
 const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    color: theme.palette.common.white,
-    backgroundColor: theme.palette.common.black
+    color: theme.palette.common.black,
+    backgroundColor: theme.palette.common.white
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14
@@ -56,7 +56,7 @@ const rows = [
 const PrescriptionTable = () => {
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 335 }}>
+        <TableContainer sx={{ maxHeight: 365 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>

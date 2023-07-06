@@ -44,7 +44,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const [open, setOpen] = React.useState(false)
   const [mode, setMode] = React.useState<string>('')
   const [part, setPart] = React.useState<string>('')
-  const { data, error, isLoading } = useGetMessagesQuery('redux');
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -86,26 +85,40 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333' }}>
                 康复管理
               </Typography>
+            <br />
           </Grid>
         </Grid>
           <Grid container spacing={2}>
           {/*病人card*/}
             <Grid item xs={6} md={2}>
-              <Card sx={{ backgroundColor: '#c9d8e8'}}>
+              <Card sx={{ backgroundColor: '#ffffff', height: 365}} >
+                <CardHeader title='病人信息' titleTypographyProps={{ variant: 'h5' }} />
+                <br />
                 <CardContent>
                   <Typography component="div">
-                    {rehabPatient.name}
-                  </Typography>
-                  <Typography variant="body2">
-                    <br />
+                    姓名：{rehabPatient.name}
                   </Typography>
                   <Divider />
-                  <Typography variant="body2">
                     <br />
-                  </Typography>
                   <Typography component="div">
-                    {rehabPatient.id}<br/>
+                    年龄：{rehabPatient.age}<br/>
                   </Typography>
+                  <Divider />
+                    <br />
+                  <Typography component="div">
+                    性别：{rehabPatient.gender}<br/>
+                  </Typography>
+                  <Divider />
+                    <br />
+                  <Typography component="div">
+                    病史：{rehabPatient.medicalHistory}<br/>
+                  </Typography>
+                  <Divider />
+                    <br />
+                  <Typography component="div">
+                    主治医生：{rehabPatient.physician}<br/>
+                  </Typography>
+                  <Divider />
                 </CardContent>
               </Card>
             </Grid>
@@ -180,22 +193,23 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <Prescription />
             </Card>
           </Grid>
-
+            <br/>
           {/*压力数据折线图*/}
           <Grid item xs={6} md={6}>
-            <Card>
+            <Card sx={{ height: 365 }}>
               <CardHeader title='压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
               <PrescriptionLine />
             </Card>
           </Grid>
           {/*康复记录*/}
             <Grid item xs={6} md={6}>
-              <Card>
+              <Card sx={{ height: 365 }}>
                 <CardHeader title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
                 <PrescriptionTable />
               </Card>
             </Grid>
         </Grid>
+        <br/>
       </Container>
 
       <Dialog open={open} onClose={handleClose}>

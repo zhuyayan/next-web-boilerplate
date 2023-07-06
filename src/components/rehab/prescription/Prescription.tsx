@@ -24,7 +24,7 @@ import {SelectChangeEvent} from "@mui/material/Select";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import {ChangeEvent, useState} from "react";
-import {editStaff, MedicalStaff, Patient} from "@/redux/features/rehab/rehab-slice";
+import {editStaff, MedicalStaff, Patient, useGetMessagesQuery} from "@/redux/features/rehab/rehab-slice";
 import {getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
 import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 
@@ -124,6 +124,7 @@ export default function StickyHeadTable() {
   const [age1, setAge1] = React.useState('');
   const [age2, setAge2] = React.useState('');
   const [device, setDevice] = React.useState('');
+  const { data, error, isLoading } = useGetMessagesQuery('redux');
 
   const handleChange = (event: SelectChangeEvent) => {
     setDevice(event.target.value);
@@ -147,7 +148,7 @@ export default function StickyHeadTable() {
 
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 265 }}>
+        <TableContainer sx={{ height: 265 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -189,7 +190,7 @@ export default function StickyHeadTable() {
                       </ButtonGroup>
                     </TableCell>
                     <div>
-                      <Dialog open={open} onClose={handleClose} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.01)' } }} PaperProps={{ elevation: 0 }}>
+                      <Dialog open={open} onClose={handleClose} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
                         <DialogContent>
                           <DialogContentText>
                             请选择要下发至哪台康复仪
@@ -205,8 +206,13 @@ export default function StickyHeadTable() {
                                     label="device"
                                     onChange={handleChange}
                                 >
-                                  <MenuItem value={10}>设备1</MenuItem>
-                                  <MenuItem value={20}>设备二</MenuItem>
+                                  {data ? (
+                                      data.map((item) => (
+                                          <MenuItem key={item.id} value={item.id}>
+                                            {item.name}
+                                          </MenuItem>
+                                      ))
+                                  ) : null}
                                 </Select>
                               </FormControl>
                             </Box>
@@ -219,7 +225,7 @@ export default function StickyHeadTable() {
                       </Dialog>
                     </div>
                     <div>
-                      <Dialog open={openModify} onClose={handleCloseModify} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.01)' } }} PaperProps={{ elevation: 0 }}>
+                      <Dialog open={openModify} onClose={handleCloseModify} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
                         <DialogTitle>修改处方</DialogTitle>
                         <DialogContent>
                           <DialogContentText>
@@ -281,10 +287,10 @@ export default function StickyHeadTable() {
                     </div>
                   </TableRow>
               ))}
-
             </TableBody>
           </Table>
         </TableContainer>
+
       </Paper>
   );
 }

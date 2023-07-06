@@ -283,7 +283,6 @@ export default function PatientList() {
                             </Link>
                             <ButtonGroup variant="outlined" aria-label="outlined button group"
                                          style={{height: '20px'}}>
-
                               <Button
                                   color="primary"
                                   onClick={() => handleEditClickOpen(patient.id)}

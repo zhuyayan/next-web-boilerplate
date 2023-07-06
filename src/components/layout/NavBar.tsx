@@ -166,7 +166,6 @@ export default function NavBar() {
                   fontFamily: 'monospace',
                   fontWeight: 700,
                   letterSpacing: '.3rem',
-                  color: 'inherit',
                   textDecoration: 'none',
                 }}
             >
@@ -209,23 +208,6 @@ export default function NavBar() {
                       >
                         <CloseIcon />
                       </IconButton>
-
-                      <Typography
-                          variant="h5"
-                          noWrap
-                          component="a"
-                          href=""
-                          sx={{
-                            margin: 'auto',
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            letterSpacing: '.3rem',
-                            color: 'inherit',
-                            textDecoration: 'none',
-                          }}
-                      >
-                        LOGO2
-                      </Typography>
                       <Box sx={{ width: "24px", height: "24px" }} />
                       {/* Placeholder box with the same dimensions as your IconButton */}
                     </Box>
@@ -278,26 +260,7 @@ export default function NavBar() {
             >
               LOGO3
             </Typography>
-            <Typography
-                variant="h5"
-                noWrap
-                component="a"
-                href=""
-                onMouseEnter={handlePopoverOpen}
-                // onMouseLeave={handlePopoverClose}
-                sx={{
-                  mr: 2,
-                  display: { xs: 'flex', md: 'none' },
-                  flexGrow: 1,
-                  fontFamily: 'monospace',
-                  fontWeight: 700,
-                  letterSpacing: '.3rem',
-                  color: 'inherit',
-                  textDecoration: 'none',
-                }}
-            >
-              LOGO4
-            </Typography>
+
             {/*<Box style={{marginTop: appBarHeight+'px', flexGrow: 1}}>*/}
             <Box>
               <Popover
