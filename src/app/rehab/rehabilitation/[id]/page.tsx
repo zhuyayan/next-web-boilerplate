@@ -113,7 +113,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
           <Grid item xs={6} md={10}>
             <Card>
               <CardHeader title='处方' titleTypographyProps={{ variant: 'h5' }} />
-                <Button startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>
+                <Button style={{float: 'right'}} startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>
                   添加处方
                 </Button>
               <div>
