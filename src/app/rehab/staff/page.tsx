@@ -195,17 +195,15 @@ export default function MedicalStaffManagement() {
                           <TableCell align='center'>{medicalStaff.username}</TableCell>
                           <TableCell align='center'>{medicalStaff.password}</TableCell>
                           <TableCell align='center'>{medicalStaff.fullName}</TableCell>
-                          <TableCell align='right'>
-                            <Stack spacing={1} direction="row">
-                              <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
-                                <Button color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>
-                                  修改
-                                </Button>
-                                <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
-                                  删除
-                                </Button>
-                              </ButtonGroup>
-                            </Stack>
+                          <TableCell align='center'>
+                            <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
+                              <Button color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>
+                                修改
+                              </Button>
+                              <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
+                                删除
+                              </Button>
+                            </ButtonGroup>
                           </TableCell>
                         </TableRow>
                     ))}

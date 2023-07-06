@@ -272,28 +272,28 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.genderLabel}</TableCell>
                           <TableCell align='center'>{patient.medicalHistory}</TableCell>
                           <TableCell align='center'>{patient.physician}</TableCell>
-                          <TableCell align='right'>
-                            <Stack spacing={1} direction="row">
-                              <Link href={`/rehab/rehabilitation/` + patient.id} passHref>
-                                <Button style={{height: '23px'}} variant="outlined" color="primary">
-                                  查看康复信息
-                                </Button>
-                              </Link>
-                              <ButtonGroup variant="outlined" aria-label="outlined button group"
-                                           style={{height: '20px'}}>
+                          <TableCell align='center'>
 
-                                <Button
-                                    color="primary"
-                                    onClick={() => handleEditClickOpen(patient.id)}
-                                >
-                                  修改
-                                </Button>
-                                <Button color="secondary" startIcon={<DeleteIcon/>}
-                                        onClick={() => handleDeletePatient(patient.id)}>
-                                  删除
-                                </Button>
-                              </ButtonGroup>
-                            </Stack>
+                            <Link href={`/rehab/rehabilitation/` + patient.id} passHref>
+                              <Button style={{height: '23px'}} variant="outlined" color="primary">
+                                查看康复信息
+                              </Button>
+                            </Link>
+                            <ButtonGroup variant="outlined" aria-label="outlined button group"
+                                         style={{height: '20px'}}>
+
+                              <Button
+                                  color="primary"
+                                  onClick={() => handleEditClickOpen(patient.id)}
+                              >
+                                修改
+                              </Button>
+                              <Button color="secondary" startIcon={<DeleteIcon/>}
+                                      onClick={() => handleDeletePatient(patient.id)}>
+                                删除
+                              </Button>
+                            </ButtonGroup>
+
                           </TableCell>
                         </TableRow>
                     ))}

@@ -56,10 +56,15 @@ export default function MUITable({ params }: { params: { id: string } }) {
     setOpen(false);
   };
 
-  const [age, setAge] = React.useState('');
+  const [age1, setAge1] = React.useState('');
+  const [age2, setAge2] = React.useState('');
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value);
+  const handleTPChange = (event: SelectChangeEvent) => {
+    setAge1(event.target.value);
+  };
+
+  const handlePartChange = (event: SelectChangeEvent) => {
+    setAge2(event.target.value);
   };
 
   useEffect(() => {
@@ -118,9 +123,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                           <Select
                               labelId="demo-select-small-label"
                               id="demo-select-small"
-                              value={age}
-                              label="Age"
-                              onChange={handleChange}
+                              value={age1}
+                              label="Age1"
+                              onChange={handleTPChange}
                           >
                             <MenuItem value={10}>被动计次模式</MenuItem>
                             <MenuItem value={20}>被动定时模式</MenuItem>
@@ -128,8 +133,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
                             <MenuItem value={40}>主动定时模式</MenuItem>
                             <MenuItem value={50}>主动计次模式</MenuItem>
                             <MenuItem value={60}>助力计次模式</MenuItem>
-                            <MenuItem value={50}>助力定时模式</MenuItem>
-                            <MenuItem value={60}>手动计次模式</MenuItem>
+                            <MenuItem value={70}>助力定时模式</MenuItem>
+                            <MenuItem value={80}>手动计次模式</MenuItem>
                           </Select>
                         </FormControl>
                         <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
@@ -137,9 +142,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                           <Select
                               labelId="demo-select-small-label"
                               id="demo-select-small"
-                              value={age}
-                              label="Age"
-                              onChange={handleChange}
+                              value={age2}
+                              label="Age2"
+                              onChange={handlePartChange}
                           >
                             <MenuItem value={10}>左手</MenuItem>
                             <MenuItem value={20}>右手</MenuItem>
