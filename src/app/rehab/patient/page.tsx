@@ -24,7 +24,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import styled from "styled-components";
 import {fetchPatients, Patient} from "@/redux/features/rehab/rehab-slice";
 import {addPatient, editPatient, deletePatient} from "@/redux/features/rehab/rehab-slice";
-import {RootState, useAppSelector} from "@/redux/store";
+import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 import {useDispatch} from "react-redux";
 import Box from "@mui/material/Box";
 import {ThunkDispatch} from "redux-thunk";
@@ -52,9 +52,11 @@ const StyledButton = styled(Button)`
 
 
 export default function PatientList() {
-  const patientList = useAppSelector((state: RootState) => state.rehab.patient)
-  const dispatch = useDispatch()
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  const appDispatch = useAppDispatch()
+  const patientList = useAppSelector((state: RootState) => state.rehab.patient)
+  const [open, setOpen] = React.useState(false);
+  const [openAddPatient, setOpenAddPatient] = React.useState(false);
   const [willEditPatient, setWillEditPatient] = useState<Patient>({
     id: 0,
     name: '',
@@ -91,11 +93,11 @@ export default function PatientList() {
   };
 
   const handleDeletePatient = (id: number) => {
-    thunkDispatch(deletePatient({id: id}))
+    appDispatch(deletePatient({id: id}))
   };
 
   const [addPatientOpen, setAddPatientOpen] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
+
 
   const getPatientById = (id: number) => {
     return patientList.find((p) => p.id === id);
@@ -116,7 +118,7 @@ export default function PatientList() {
 
   const handleEditPatient = () => {
     // 使用 id 页面需要调整
-    thunkDispatch(editPatient({
+    appDispatch(editPatient({
       id: willEditPatient.id,
       name: willEditPatient.name,
       age: willEditPatient.age,
@@ -124,7 +126,7 @@ export default function PatientList() {
       medical_history: willEditPatient.medicalHistory,
       staff_id: 1
     }))
-    setOpen(false)
+    handleClose()
   }
   const handleAddPatientOpen = () => {
     setAddPatientOpen(true)
@@ -349,13 +351,13 @@ export default function PatientList() {
                   <TextField sx={{ m: 1, minWidth: 110 }}
                              id="physician"
                              value={willEditPatient.physician}
-                             onChange={handleAddPatientInput}
+                             onChange={handleEditPatientInput}
                              label="主治医生" variant="outlined" size="small"/>
                 </StyledDiv>
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>取消</Button>
+              <Button onClick={handleAddPatientClose}>取消</Button>
               <Button onClick={handleEditPatient}>确定</Button>
             </DialogActions>
           </Dialog>
