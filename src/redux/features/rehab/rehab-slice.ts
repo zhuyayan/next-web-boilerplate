@@ -145,11 +145,6 @@ export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fe
   return p[0]
 });
 
-export const deletePatient = createAsyncThunk<{id: number}, {id: number}, {}>('deletePatient', async ({id}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('patient', {params:{ id }});
-  console.log("delete patient async thunk: ", response.data)
-  return {id: id}
-});
 
 export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, staff_id: number}, {}>('addPatient', async ({name, age, sex, medical_history, staff_id}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('patient',{name, age, sex, medical_history, staff_id})
@@ -185,12 +180,18 @@ export const deleteStaff = createAsyncThunk<{ id: number }, { id: number }, {}>(
   return {id: id}
 });
 
+export const deletePatient = createAsyncThunk<{id: number}, {id: number}, {}>('deletePatient', async ({id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('patient', {params:{ id }});
+  console.log("delete patient async thunk: ", response.data)
+  return {id: id}
+});
+
+
 export const addStaff = createAsyncThunk<MedicalStaff, { name: string, username: string, password: string }, {}>('addStaff', async ({name, username, password}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('staff',{name, username, password})
   console.log("add staff async thunk: ", response.data.data.staffs[0])
   return convertAPIStaffToMedicalStaff(response.data.data.staffs[0])
 });
-
 export const editStaff = createAsyncThunk<MedicalStaff, { id: number, name: string, username: string, password: string }, {}>('editStaff', async ({id, name, username, password}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('staff',{id, name, username, password})
   console.log("add staff async thunk: ", response.data.data.staffs[0])
@@ -264,6 +265,13 @@ const RehabSlice = createSlice({
         .addCase(deleteStaff.fulfilled,(state,action)=>{
           // 重新分页查询
           state.staff = state.staff.filter((item) => {
+            return item.id != action.payload.id
+          })
+          console.log('delete_staff_action', action.payload)
+        })
+        .addCase(deletePatient.fulfilled,(state,action)=>{
+          // 重新分页查询
+          state.patient = state.patient.filter((item) => {
             return item.id != action.payload.id
           })
           console.log('delete_staff_action', action.payload)
