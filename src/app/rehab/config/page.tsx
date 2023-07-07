@@ -14,6 +14,9 @@ import CardContent from '@mui/material/CardContent'
 import styled from "styled-components";
 import {Container} from "@mui/material";
 
+import { useDispatch } from 'react-redux';
+import { setHospitalName } from '@/redux/store';
+
 // ** Icons Imports
 // import EyeOutline from 'mdi-material-ui/EyeOutline'
 // import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
@@ -30,29 +33,34 @@ interface State {
 }
 
 export default function ConfigManagement() {
-// ** States
-  const [values, setValues] = useState<State>({
-    password: '',
-    showPassword: false
-  })
-  const [confirmPassValues, setConfirmPassValues] = useState<State>({
-    password: '',
-    showPassword: false
-  })
+        const dispatch = useDispatch();
 
+    // ** States
+    const [values, setValues] = useState<State>({
+        password: '',
+        showPassword: false
+    })
+    const [confirmPassValues, setConfirmPassValues] = useState<State>({
+        password: '',
+        showPassword: false
+    })
+
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            const hospitalName = e.target.elements.title.value;
+            dispatch(setHospitalName(hospitalName));
+        };
 
   return (
       <Container>
       <Card>
         <CardHeader title='配置管理' titleTypographyProps={{ variant: 'h6' }} />
         <CardContent>
-          <form onSubmit={e => e.preventDefault()}>
+          <form onSubmit={handleSubmit}>
             <Grid container spacing={5}>
               <Grid item xs={12}>
                 <TextField fullWidth label='Title' placeholder='请输入要改的医院名称' />
               </Grid>
-
-
               <Grid item xs={12}>
                 <Box
                     sx={{

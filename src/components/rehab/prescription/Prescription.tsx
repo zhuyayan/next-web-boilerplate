@@ -23,6 +23,7 @@ import styled from "styled-components";
 import {SelectChangeEvent} from "@mui/material/Select";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
+
 import {
   editPrescription,
   EquipmentOnline,
@@ -34,6 +35,13 @@ import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
+
+import {getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
+import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
+import {deletePatient, deletePrescription} from "@/redux/features/rehab/rehab-slice";
+import prescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+
 
 const StyledDiv = styled.div`
   display: flex;
@@ -91,11 +99,11 @@ const columns: readonly Column[] = [
   },
 ];
 
-
 export default function StickyHeadTable(params: {PId:string,
   prescription:Prescription[],
-  onlineEquipment: EquipmentOnline[],
-}) {
+  onlineEquipment: EquipmentOnline[]}) {
+  const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
+  const appDispatch = useAppDispatch()
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -119,6 +127,11 @@ export default function StickyHeadTable(params: {PId:string,
     v: 0,
   })
   const [clientId, setClientId] = useState("")
+
+  const handleDeletePrescription = (id: number) => {
+    appDispatch(deletePrescription({id: id}))
+  };
+
   const handleClickOpen = (row: Prescription) => {
     setOpen(true);
     setSelectedPrescription(row)
@@ -241,7 +254,7 @@ export default function StickyHeadTable(params: {PId:string,
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
                         <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>
                         <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>
-                        <Button color="secondary">删除</Button>
+                        <Button color="secondary" onClick={() => handleDeletePrescription(prescription.id)}>删除</Button>
                       </ButtonGroup>
                     </TableCell>
                   </TableRow>
@@ -249,7 +262,6 @@ export default function StickyHeadTable(params: {PId:string,
             </TableBody>
           </Table>
         </TableContainer>
-
       </Paper>
         <Dialog open={open} onClose={handleClose} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
             <DialogContent>

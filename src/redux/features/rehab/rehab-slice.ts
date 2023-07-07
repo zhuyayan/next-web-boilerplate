@@ -32,6 +32,7 @@ export interface Patient {
   genderLabel: string;
   medicalHistory: string;
   physician:string;
+  i18n:string;
 }
 
 export interface Prescription {
@@ -77,6 +78,7 @@ let patient: Patient = {
   genderLabel: getDefaultGenderLabel(),
   medicalHistory: '',
   physician: '',
+  i18n: '',
 }
 
 interface RehabState {
@@ -248,15 +250,16 @@ export const rehabApi = createApi({
   }),
 })
 
-function convertAPIPatientToPatient(apiStaff: any): Patient {
+function convertAPIPatientToPatient(p: any): Patient {
   return {
-    id: apiStaff.id,
-    name: apiStaff.name,
-    age: apiStaff.age,
-    gender: genderLabelToValue(apiStaff.sex),
-    genderLabel: apiStaff.sex,
-    medicalHistory: apiStaff.medical_history,
-    physician: apiStaff.staff.name,
+    id: p.id,
+    name: p.name,
+    age: p.age,
+    gender: genderLabelToValue(p.sex),
+    genderLabel: p.sex,
+    medicalHistory: p.medical_history,
+    physician: p.staff.name,
+    i18n: p.i_18_d,
   };
 }
 
@@ -314,6 +317,12 @@ export const deletePatient = createAsyncThunk<{id: number}, {id: number}, {}>('d
   return {id: id}
 });
 
+export const deletePrescription = createAsyncThunk<{id: number}, {id: number}, {}>('deletePrescription', async ({id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('patient', {params:{ id }});
+  console.log("delete prescription async thunk: ", response.data)
+  return {id: id}
+});
+
 
 export const addStaff = createAsyncThunk<MedicalStaff, { name: string, username: string, password: string }, {}>('addStaff', async ({name, username, password}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('staff',{name, username, password})
@@ -324,6 +333,18 @@ export const editStaff = createAsyncThunk<MedicalStaff, { id: number, name: stri
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('staff',{id, name, username, password})
   console.log("add staff async thunk: ", response.data.data.staffs[0])
   return convertAPIStaffToMedicalStaff(response.data.data.staffs[0])
+});
+
+// PID uint `json:"pid" binding:"required"`
+// X   int  `json:"x" binding:"required"`
+// Y   int  `json:"y" binding:"required"`
+// ZZ  int  `json:"zz" binding:"required"`
+// U   int  `json:"u" binding:"required"`
+// V   int  `json:"v" binding:"required"`
+export const addPrescription = createAsyncThunk<number, { pid: number, x: number, y: number , zz: number, u: number, v: number},
+    {}>('addPrescription', async ({pid, x, y , zz, u, v}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('prescription',{pid, x, y , zz, u, v})
+  console.log("add prescription async thunk: ", response.data)
 });
 
 function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescription {
@@ -340,6 +361,14 @@ function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescriptio
 
 export const fetchPrescriptionById = createAsyncThunk<Prescription[], { id: number}, {}>('fetchPrescriptionById', async ({ id}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('prescription', {params:{ page: 1, size: 10, id}});
+  console.log("fetch prescription by id async thunk: ", response.data.data.prescriptions)
+  let p = response.data.data.prescriptions.map(convertAPIPrescriptionToPrescription)
+  console.log('prescription', p)
+  return p
+});
+
+export const fetchPrescriptionByPId = createAsyncThunk<Prescription[], { pid: number}, {}>('fetchPrescriptionByPId', async ({ pid}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('prescription', {params:{ page: 1, size: 10000, pid}});
   console.log("fetch prescription by id async thunk: ", response.data.data.prescriptions)
   let p = response.data.data.prescriptions.map(convertAPIPrescriptionToPrescription)
   console.log('prescription', p)
@@ -468,18 +497,22 @@ const RehabSlice = createSlice({
               password: action.payload.password,
             }
           }
-          console.log("edit_staff_action", action.payload)
+          console.log("edit staff action", action.payload)
         })
         .addCase(fetchPatientById.fulfilled, (state, action) => {
-          console.log("fetch_patient_by_id", action.payload)
+          console.log("fetch patient by id", action.payload)
           state.rehabPatient = action.payload
         })
         .addCase(fetchPrescriptionById.fulfilled, (state, action) => {
-          console.log("fetch_prescription_by_id", action.payload)
+          console.log("fetch prescription by id", action.payload)
+          state.prescription = action.payload
+        })
+        .addCase(fetchPrescriptionByPId.fulfilled, (state, action) => {
+          console.log("fetch prescription by pid", action.payload)
           state.prescription = action.payload
         })
         .addCase(fetchPrescriptionRecordById.fulfilled, (state, action) => {
-          console.log("fetch_prescription_record_by_id", action.payload)
+          console.log("fetch prescription record by id", action.payload)
           state.prescriptionRecord = action.payload
         })
         .addCase(sendPrescriptionToEquipment.fulfilled, (state, action) => {
@@ -487,6 +520,16 @@ const RehabSlice = createSlice({
         })
         .addCase(editPrescription.fulfilled, (state, action) => {
           console.log("edit prescription -> ", action.payload)
+        })
+        .addCase(deletePrescription.fulfilled,(state,action)=>{
+          // 重新分页查询
+          state.prescription = state.prescription.filter((item) => {
+            return item.id != action.payload.id
+          })
+          console.log('delete prescription action', action.payload)
+        })
+        .addCase(addPrescription.fulfilled, (state, action) => {
+
         })
   },
 })

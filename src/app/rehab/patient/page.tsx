@@ -21,7 +21,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import styled from "styled-components";
-import {fetchPatients, Patient} from "@/redux/features/rehab/rehab-slice";
+import {fetchPatients, fetchStaffs, Patient} from "@/redux/features/rehab/rehab-slice";
 import {addPatient, editPatient, deletePatient} from "@/redux/features/rehab/rehab-slice";
 import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 import {useDispatch} from "react-redux";
@@ -49,11 +49,11 @@ const StyledButton = styled(Button)`
     color: #ffffff;
   }`;
 
-
 export default function PatientList() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const appDispatch = useAppDispatch()
   const patientList = useAppSelector((state: RootState) => state.rehab.patient)
+  const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
   const [openAddPatient, setOpenAddPatient] = React.useState(false);
   const [willEditPatient, setWillEditPatient] = useState<Patient>({
@@ -64,6 +64,7 @@ export default function PatientList() {
     genderLabel: getDefaultGenderLabel(),
     medicalHistory: '',
     physician: '',
+    i18n: '',
   });
   const [willAddPatient, setWillAddPatient] = useState<Patient>({
     id: 0,
@@ -73,10 +74,15 @@ export default function PatientList() {
     genderLabel: getDefaultGenderLabel(),
     medicalHistory: '',
     physician: '',
+    i18n: '',
   });
 
   useEffect(() => {
     thunkDispatch(fetchPatients({page: 1, size: 100, id: 0}))
+  }, [thunkDispatch]);
+
+  useEffect(() => {
+    thunkDispatch(fetchStaffs({page: 1, size: 100, id: 0}))
   }, [thunkDispatch]);
 
   const handleAddPatient = () => {
@@ -153,6 +159,7 @@ export default function PatientList() {
   };
 
   const [gender, setGender] = React.useState('');
+  const [physician, setPhysician] = React.useState('');
 
   const handleChange = (event: SelectChangeEvent) => {
     const {value} = event.target;
@@ -163,6 +170,17 @@ export default function PatientList() {
       ["gender"]: value,
     }));
     setGender(event.target.value);
+  };
+
+  const handleChangePhysician = (event: SelectChangeEvent) => {
+    const {value} = event.target;
+    console.log("value: ", value)
+    console.log("event.target.value", event.target.value)
+    setWillEditPatient((prevInputValues) => ({
+      ...prevInputValues,
+      ["physician"]: value,
+    }));
+    setPhysician(event.target.value);
   };
 
   //分页
@@ -178,13 +196,21 @@ export default function PatientList() {
     setPage(0);
   }
 
-    const handleAddPatientGenderChange = (event: SelectChangeEvent) => {
-      const {value} = event.target;
-      setWillAddPatient((prevInputValues) => ({
-        ...prevInputValues,
-        ["gender"]: value,
-      }));
-    };
+  const handleAddPatientGenderChange = (event: SelectChangeEvent) => {
+    const {value} = event.target;
+    setWillAddPatient((prevInputValues) => ({
+      ...prevInputValues,
+      ["gender"]: value,
+    }));
+  };
+
+  const handleAddPatientPhysicianChange = (event: SelectChangeEvent) => {
+    const {value} = event.target;
+    setWillAddPatient((prevInputValues) => ({
+      ...prevInputValues,
+      ["physician"]: value,
+    }));
+  };
 
     return (
         <Container>
@@ -205,20 +231,17 @@ export default function PatientList() {
                   <StyledDiv>
                     <TextField sx={{m: 1, minWidth: 110}}
                                id="name"
-                               value={willAddPatient.name}
                                onChange={handleAddPatientInput}
                                label="姓名" variant="outlined" size="small"/>
-                    <TextField sx={{m: 1, minWidth: 110}}
+                    <TextField sx={{m: 1, minWidth: 80}}
                                id="age"
-                               value={willAddPatient.age}
                                onChange={handleAddPatientInput}
                                label="年龄" variant="outlined" size="small"/>
-                    <FormControl sx={{m: 1, minWidth: 80}} size="small">
+                    <FormControl sx={{m: 1, minWidth: 120}} size="small">
                       <InputLabel id="gender">性别</InputLabel>
                       <Select
                           labelId="gender"
                           id="gender"
-                          value={willAddPatient.gender.toString()}
                           label="性别"
                           onChange={handleAddPatientGenderChange}
                       >
@@ -228,19 +251,32 @@ export default function PatientList() {
                     </FormControl>
                   </StyledDiv>
                   <StyledDiv>
-                    <TextField sx={{m: 1, minWidth: 110}}
-                               id="medicalHistory"
-                               value={willAddPatient.medicalHistory}
+                    <TextField sx={{m: 1, minWidth: 340}}
+                               id="i18n"
                                onChange={handleAddPatientInput}
-                               label="病史" variant="outlined" size="small"
-                               multiline
-                               rows={4}/>
-                    <TextField sx={{m: 1, minWidth: 110}}
-                               id="physician"
-                               value={willAddPatient.physician}
-                               onChange={handleAddPatientInput}
-                               label="主治医生" variant="outlined" size="small"/>
+                               label="身份证号" variant="outlined" size="small"/>
+                    <FormControl sx={{m: 1, minWidth: 160}} size="small">
+                      <InputLabel id="physician">主治医生</InputLabel>
+                      <Select
+                          labelId="physician"
+                          id="physician"
+                          value={willAddPatient.physician}
+                          label="主治医生"
+                          onChange={handleAddPatientPhysicianChange}
+                      >
+                        {medicalStaffList.map((medicalStaff) =>
+                            <MenuItem value={medicalStaff.id} key={medicalStaff.id}>{medicalStaff.fullName}</MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
                   </StyledDiv>
+                  <TextField sx={{m: 1, minWidth: 400}}
+                             id="medicalHistory"
+                             value={willAddPatient.medicalHistory}
+                             onChange={handleAddPatientInput}
+                             label="病史" variant="outlined" size="small"
+                             multiline
+                             rows={4}/>
                 </Box>
               </DialogContent>
               <DialogActions>
@@ -255,12 +291,13 @@ export default function PatientList() {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell align='center'>姓名</TableCell>
-                  <TableCell align='center'>年龄</TableCell>
-                  <TableCell align='center'>性别</TableCell>
-                  <TableCell align='center'>病史</TableCell>
-                  <TableCell align='center'>主治医生</TableCell>
-                  <TableCell align='center'>操作</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 100}} align='center'>姓名</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 100}} align='center'>年龄</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 100}} align='center'>性别</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 150}} align='center'>病史</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 100}} align='center'>主治医生</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 200}} align='center'>身份证号</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 400}} align='center'>操作</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -273,6 +310,7 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.genderLabel}</TableCell>
                           <TableCell align='center'>{patient.medicalHistory}</TableCell>
                           <TableCell align='center'>{patient.physician}</TableCell>
+                          <TableCell align='center'>{patient.i18n}</TableCell>
                           <TableCell align='center'>
 
                             <Link href={`/rehab/rehabilitation/` + patient.id} passHref>
@@ -319,12 +357,12 @@ export default function PatientList() {
                              value={willEditPatient.name}
                              onChange={handleEditPatientInput}
                              label="姓名" variant="outlined" size="small"/>
-                  <TextField sx={{ m: 1, minWidth: 110 }}
+                  <TextField sx={{ m: 1, minWidth: 80 }}
                              id="age"
                              value={willEditPatient.age}
                              onChange={handleEditPatientInput}
                              label="年龄" variant="outlined" size="small"/>
-                  <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
+                  <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="gender">性别</InputLabel>
                     <Select
                         labelId="gender"
@@ -339,23 +377,37 @@ export default function PatientList() {
                   </FormControl>
                 </StyledDiv>
                 <StyledDiv>
-                  <TextField sx={{ m: 1, minWidth: 110 }}
-                             id="medicalHistory"
-                             value={willEditPatient.medicalHistory}
+                  <TextField sx={{ m: 1, minWidth: 340 }}
+                             id="i18n"
+                             value={willEditPatient.i18n}
                              onChange={handleEditPatientInput}
-                             label="病史" variant="outlined" size="small"
-                             multiline
-                             rows={4} />
-                  <TextField sx={{ m: 1, minWidth: 110 }}
-                             id="physician"
-                             value={willEditPatient.physician}
-                             onChange={handleEditPatientInput}
-                             label="主治医生" variant="outlined" size="small"/>
+                             label="身份证号" variant="outlined" size="small"/>
+                  <FormControl sx={{ m: 1, minWidth: 160 }} size="small">
+                    <InputLabel id="physician">主治医生</InputLabel>
+                    <Select
+                        labelId="physician"
+                        id="physician"
+                        value={willEditPatient.physician}
+                        label="主治医生"
+                        onChange={handleChangePhysician}
+                    >
+                      {medicalStaffList.map((medicalStaff) =>
+                          <MenuItem value={medicalStaff.id} key={medicalStaff.id}>{medicalStaff.fullName}</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
                 </StyledDiv>
+                <TextField sx={{ m: 1, minWidth: 400 }}
+                           id="medicalHistory"
+                           value={willEditPatient.medicalHistory}
+                           onChange={handleEditPatientInput}
+                           label="病史" variant="outlined" size="small"
+                           multiline
+                           rows={4} />
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleAddPatientClose}>取消</Button>
+              <Button onClick={handleClose}>取消</Button>
               <Button onClick={handleEditPatient}>确定</Button>
             </DialogActions>
           </Dialog>
