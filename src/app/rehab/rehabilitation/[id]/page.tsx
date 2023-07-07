@@ -33,7 +33,7 @@ import {useDispatch} from "react-redux";
 import {
   fetchPatientById,
   fetchPrescriptionById, fetchPrescriptionRecordById,
-  useGetMessagesQuery,
+  useGetOnlineEquipmentsQuery,
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
 
@@ -47,7 +47,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
   const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
-  const {data, error, isLoading} = useGetTrainMessageQuery("redux")
+  const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
+  const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const [open, setOpen] = React.useState(false)
   const [mode, setMode] = React.useState<string>('')
@@ -83,20 +84,14 @@ export default function MUITable({ params }: { params: { id: string } }) {
     console.log("patient id: ", params.id)
   },[params.id, thunkDispatch])
 
-  // useEffect(() => {
-  //   console.log('record ->', record, isLoading)
-  // }, [record])
   useEffect(() => {
-    console.log('datasssssssssssss ->', data, isLoading)
-  }, [data]);
+    console.log('trainData ->', trainData)
+  }, [trainData, useEffect])
 
   useEffect(() => {
-    console.log('datasssssssssssss ->', isLoading)
-  }, [isLoading]);
+    console.log('onlineData ->', onlineData)
+  }, [onlineData, useEffect])
 
-  useEffect(() => {
-    console.log('erroreeeeeeeeee ->', error)
-  }, [error]);
   return (
     <>
       <Container>
@@ -158,7 +153,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
             <Card sx={{ height: 365 ,padding: '10px'}}>
               <CardHeader title='压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
               {
-                isLoading ? <></> : <PrescriptionLine trainData={data}></PrescriptionLine>
+                trainLoading ? <></> : <PrescriptionLine trainData={trainData}></PrescriptionLine>
               }
               {/*<PrescriptionLine trainData={data}></PrescriptionLine>*/}
             </Card>

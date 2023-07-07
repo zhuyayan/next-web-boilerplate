@@ -41,7 +41,7 @@ import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import {Prescription, useGetMessagesQuery} from "@/redux/features/rehab/rehab-slice";
+import {Prescription} from "@/redux/features/rehab/rehab-slice";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -147,7 +147,7 @@ export default function StickyHeadTable(params: {PId:string,
 //   const [age1, setAge1] = React.useState('');
 //   const [age2, setAge2] = React.useState('');
 //   const [device, setDevice] = React.useState('');
-  const { data, error, isLoading } = useGetMessagesQuery('redux');
+//   const { data, error, isLoading } = useGetMessagesQuery('redux');
 //
 // >>>>>>> 47807e9eb34d4e5c0b50fab2360e35cf7d6166da
   const handleChange = (event: SelectChangeEvent) => {
@@ -234,13 +234,13 @@ export default function StickyHeadTable(params: {PId:string,
                                     label="device"
                                     onChange={handleChange}
                                 >
-                                  {data ? (
-                                      data.map((item) => (
-                                          <MenuItem key={item.id} value={item.id}>
-                                            {item.name}
-                                          </MenuItem>
-                                      ))
-                                  ) : null}
+                                  {/*{data ? (*/}
+                                  {/*    data.map((item) => (*/}
+                                  {/*        <MenuItem key={item.id} value={item.id}>*/}
+                                  {/*          {item.name}*/}
+                                  {/*        </MenuItem>*/}
+                                  {/*    ))*/}
+                                  {/*) : null}*/}
                                 </Select>
                               </FormControl>
                             </Box>

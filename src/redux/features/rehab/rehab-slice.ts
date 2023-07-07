@@ -1,4 +1,10 @@
-import {ActionReducerMapBuilder, createAsyncThunk, createSlice, PayloadAction,} from "@reduxjs/toolkit";
+import {
+  ActionReducerMapBuilder,
+  createAsyncThunk,
+  createEntityAdapter, createSelector,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import {AxiosResponse} from "axios";
 import {WritableDraft} from "immer/dist/types/types-external";
 import MCTAxiosInstance from "@/utils/mct-request";
@@ -105,19 +111,32 @@ function isWSMessage(data: any): data is WSMessage {
 }
 
 export interface RealTimeTrainData {
-  D: number[]
+  D: number
 }
+function isRealTimeTrainData(object: any): object is RealTimeTrainData {
+  return (
+      object &&
+      typeof object === 'object' &&
+      'D' in object &&
+      Array.isArray(object.D) &&
+      object.D.every(item => typeof item === 'number')
+  );
+}
+
 export const rehabApi = createApi({
   reducerPath: 'rehabApi',
   baseQuery: fetchBaseQuery({baseUrl: '/'}),
   endpoints:(builder) => ({
-    getMessages: builder.query<string[], Channel>({
-      query: () => "",
+    getOnlineEquipments: builder.query<string[], Channel>({
+      queryFn:() => {
+        const data = [""];
+        return { data };
+      },
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
         const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/equipment/ws')
         try {
           console.log(123)
-          // await cacheDataLoaded
+          await cacheDataLoaded
           console.log(456)
           const listener = (event: MessageEvent) => {
             const data: WSMessage = JSON.parse(event.data)
@@ -126,11 +145,11 @@ export const rehabApi = createApi({
               // return
             }
             updateCachedData((draft= []) => {
-              console.log("data2 -> ", data.data)
-              draft.length = 0
+              draft = []
               // Add each item from data.data to the draft
               data.data.forEach(item => draft.push(item))
               console.log("draft -> ", draft)
+              return draft
             })
           }
           ws.addEventListener('message', listener)
@@ -142,8 +161,12 @@ export const rehabApi = createApi({
         console.log("ws closed")
       },
     }),
-    getTrainMessage: builder.query<RealTimeTrainData, Channel>({
-      query: () => "",
+    getTrainMessage: builder.query<RealTimeTrainData[], Channel>({
+      queryFn:(channel) => {
+        // const response = /* make request */;
+        const data = [{D:0}]; // This assumes the response data has a property "data" that is an array
+        return { data };
+      },
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
         const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/train/ws')
         try {
@@ -159,18 +182,15 @@ export const rehabApi = createApi({
               //     D: []
               //   }
               // }
-              draft = {
-                D: []
-              }
-              if (!Array.isArray(draft.D)) {
-                draft.D = []
+              draft = []
+
+              if (!Array.isArray(draft)) {
+                draft= []
               }
               console.log("data22 -> ", data.data)
-
-              draft.D.length = 0
               // Add each item from data.data to the draft
-              data.data.D.forEach(item => draft.D.push(item))
-              console.log("draft22 -> ", draft)
+              data.data.D.forEach(item => draft.push({D: item}))
+              return draft
             })
           }
           ws.addEventListener('message', l)
@@ -440,10 +460,16 @@ const RehabSlice = createSlice({
   },
 })
 
-export const { useGetMessagesQuery, useGetTrainMessageQuery } = rehabApi
+export const { useGetOnlineEquipmentsQuery, useGetTrainMessageQuery } = rehabApi
 export const {
   addMedicalStaff,
   editMedicalStaff,
 } = RehabSlice.actions
+
+export const selectTrainMessageResult = rehabApi.endpoints?.getTrainMessage.select("redux")
+const selectTrainMessageData = createSelector(
+    selectTrainMessageResult,
+    msg => msg.data
+)
 
 export default RehabSlice.reducer
