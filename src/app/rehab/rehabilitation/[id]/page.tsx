@@ -144,7 +144,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 <Button style={{float: 'right'}} startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>
                   添加处方
                 </Button>
-              <Prescription PId={params.id} prescription={prescription}/>
+              <Prescription PId={params.id} prescription={prescription} onlineEquipment={onlineData || []}/>
             </Card>
           </Grid>
             <br/>
@@ -198,12 +198,12 @@ export default function MUITable({ params }: { params: { id: string } }) {
                     value={part}
                     label="部位"
                     onChange={handlePartChange}>
-                  <MenuItem value={10}>左手</MenuItem>
-                  <MenuItem value={20}>右手</MenuItem>
-                  <MenuItem value={30}>左腕</MenuItem>
-                  <MenuItem value={40}>右腕</MenuItem>
-                  <MenuItem value={50}>左踝</MenuItem>
-                  <MenuItem value={60}>右踝</MenuItem>
+                  <MenuItem value={1}>左手</MenuItem>
+                  <MenuItem value={2}>右手</MenuItem>
+                  <MenuItem value={3}>左腕</MenuItem>
+                  <MenuItem value={4}>右腕</MenuItem>
+                  <MenuItem value={5}>左踝</MenuItem>
+                  <MenuItem value={6}>右踝</MenuItem>
                 </Select>
               </FormControl>
             </Box>

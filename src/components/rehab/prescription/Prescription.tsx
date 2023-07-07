@@ -23,25 +23,17 @@ import styled from "styled-components";
 import {SelectChangeEvent} from "@mui/material/Select";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-// <<<<<<< HEAD
-// import {ChangeEvent, useEffect, useState} from "react";
-// import {
-//   editStaff,
-//   fetchPatientById,
-//   fetchPrescriptionById,
-//   MedicalStaff,
-//   Patient, Prescription, PrescriptionRecord
-// } from "@/redux/features/rehab/rehab-slice";
-// =======
-// import {ChangeEvent, useState} from "react";
-// import {editStaff, MedicalStaff, Patient, useGetMessagesQuery} from "@/redux/features/rehab/rehab-slice";
-// >>>>>>> 47807e9eb34d4e5c0b50fab2360e35cf7d6166da
-import {getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
-import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
+import {
+  editPrescription,
+  EquipmentOnline,
+  Prescription,
+  sendPrescriptionToEquipment
+} from "@/redux/features/rehab/rehab-slice";
+import {ChangeEvent, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import {Prescription} from "@/redux/features/rehab/rehab-slice";
+import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -99,82 +91,117 @@ const columns: readonly Column[] = [
   },
 ];
 
-const createData = (time: number, pattern: number, part: number, count: number, bendingtimevalue: number, stretchtimevalue: number) => {
-  return { time, pattern, part, count, bendingtimevalue, stretchtimevalue}
-}
-
-const rows = [
-  createData(20230627, 159, 6, 24, 4, 3),
-  createData(20230622, 237, 9, 37, 4.3, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-
-];
 
 export default function StickyHeadTable(params: {PId:string,
-  prescription:Prescription[]}) {
-  // const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
-  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
-  const [age1, setAge1] = React.useState('');
-  const [age2, setAge2] = React.useState('');
+  prescription:Prescription[],
+  onlineEquipment: EquipmentOnline[],
+}) {
+  const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
-
-  const handleClickOpen = () => {
+  const [selectedPrescription, setSelectedPrescription] = useState<Prescription>({
+    id: 0,
+    created_at: "",
+    part: "0",
+    mode: "0",
+    zz: 0,
+    u: 0,
+    v: 0,
+  })
+  const [willEditPrescription, setWillEditPrescription] = useState<Prescription>({
+    id: 0,
+    created_at: "",
+    part: "0",
+    mode: "0",
+    zz: 0,
+    u: 0,
+    v: 0,
+  })
+  const [clientId, setClientId] = useState("")
+  const handleClickOpen = (row: Prescription) => {
     setOpen(true);
+    setSelectedPrescription(row)
+    console.log("selectedPrescription -> ", row)
   };
 
-  const handleClickModify = () => {
+  const handleClickModify = (row: Prescription) => {
+    setWillEditPrescription(row)
     setOpenModify(true);
   };
 
-// <<<<<<< HEAD
-// =======
-//   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
-//   const [age1, setAge1] = React.useState('');
-//   const [age2, setAge2] = React.useState('');
-//   const [device, setDevice] = React.useState('');
-//   const { data, error, isLoading } = useGetMessagesQuery('redux');
-//
-// >>>>>>> 47807e9eb34d4e5c0b50fab2360e35cf7d6166da
   const handleChange = (event: SelectChangeEvent) => {
     setDevice(event.target.value);
+    const clientId = params.onlineEquipment.find(item => item.sId === parseInt(event.target.value))?.clientId;
+    console.log("clientId -> ", clientId)
+    setClientId(clientId ?? "");
   };
 
-  const handleTPChange = (event: SelectChangeEvent) => {
-    setAge1(event.target.value);
+  const handleModeChange = (event: SelectChangeEvent) => {
+    console.log(event.target)
+    console.log(ModeToNumMapping[parseInt(event.target.value)])
+    setWillEditPrescription((prevState) => ({
+      ...prevState,
+      mode: ModeToNumMapping[parseInt(event.target.value)]
+    }))
   };
 
   const handlePartChange = (event: SelectChangeEvent) => {
-    setAge2(event.target.value);
+    console.log(event.target)
+    console.log(BodyPartToNumMapping[parseInt(event.target.value)])
+    setWillEditPrescription((prevState) => ({
+      ...prevState,
+      part: BodyPartToNumMapping[parseInt(event.target.value)]
+    }))
   };
 
   const handleClose = () => {
     setOpen(false);
   };
 
+  const handleSendCommand = () => {
+    appThunkDispatch(sendPrescriptionToEquipment({prescription_id:selectedPrescription.id, e_id: clientId}))
+    setOpen(false);
+  };
+
+  const handleEditPrescription = () => {
+    appThunkDispatch(editPrescription({
+      id: willEditPrescription.id,
+      x: NumToBodyPartMapping[willEditPrescription.part],
+      y: NumToModeMapping[willEditPrescription.mode],
+      zz: willEditPrescription.zz,
+      u: willEditPrescription.u,
+      v: willEditPrescription.v,
+    }))
+    setOpenModify(false);
+  }
+
   const handleCloseModify = () => {
     setOpenModify(false);
   };
 
-  // useEffect(() => {
-  //   thunkDispatch(fetchPrescriptionById({id: parseInt(params.PId)}))
-  // })
+  function handleZZChange(e: ChangeEvent<HTMLInputElement>) {
+    setWillEditPrescription(prevState => ({
+      ...prevState,
+      zz: parseInt(e.target.value)
+    }));
+  }
 
-  return (
+  function handleUChange(e: ChangeEvent<HTMLInputElement>) {
+    setWillEditPrescription(prevState => ({
+      ...prevState,
+      u: parseInt(e.target.value)
+    }));
+  }
+
+  function handleVChange(e: ChangeEvent<HTMLInputElement>) {
+    setWillEditPrescription(prevState => ({
+      ...prevState,
+      v: parseInt(e.target.value)
+    }));
+  }
+
+  return (<>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ height: 265 }}>
           <Table stickyHeader aria-label="sticky table">
@@ -212,107 +239,11 @@ export default function StickyHeadTable(params: {PId:string,
                     <TableCell align='right'>{row.v}</TableCell>
                     <TableCell align='right'>
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
-                        <Button color="primary"  onClick={handleClickOpen}>下发</Button>
-                        <Button color="primary" onClick={handleClickModify}>修改</Button>
+                        <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>
+                        <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>
                         <Button color="secondary">删除</Button>
                       </ButtonGroup>
                     </TableCell>
-                    <div>
-                      <Dialog open={open} onClose={handleClose} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
-                        <DialogContent>
-                          <DialogContentText>
-                            请选择要下发至哪台康复仪
-                          </DialogContentText>
-                          <StyledDiv>
-                            <Box>
-                              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                                <InputLabel id="device">康复仪设备</InputLabel>
-                                <Select
-                                    labelId="device"
-                                    id="device"
-                                    value={device}
-                                    label="device"
-                                    onChange={handleChange}
-                                >
-                                  {/*{data ? (*/}
-                                  {/*    data.map((item) => (*/}
-                                  {/*        <MenuItem key={item.id} value={item.id}>*/}
-                                  {/*          {item.name}*/}
-                                  {/*        </MenuItem>*/}
-                                  {/*    ))*/}
-                                  {/*) : null}*/}
-                                </Select>
-                              </FormControl>
-                            </Box>
-                          </StyledDiv>
-                        </DialogContent>
-                        <DialogActions>
-                          <Button onClick={handleClose}>取消</Button>
-                          <Button onClick={handleClose}>确定</Button>
-                        </DialogActions>
-                      </Dialog>
-                    </div>
-                    <div>
-                      <Dialog open={openModify} onClose={handleCloseModify} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
-                        <DialogTitle>修改处方</DialogTitle>
-                        <DialogContent>
-                          <DialogContentText>
-                            请正确修改处方各项信息
-                          </DialogContentText>
-                          <StyledDiv>
-                            <Box>
-                              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                                <InputLabel id="demo-select-small-label">训练模式</InputLabel>
-                                <Select
-                                    labelId="demo-select-small-label"
-                                    id="demo-select-small"
-                                    value={age1}
-                                    label="Age1"
-                                    onChange={handleTPChange}
-                                >
-                                  <MenuItem value={10}>被动计次模式</MenuItem>
-                                  <MenuItem value={20}>被动定时模式</MenuItem>
-                                  <MenuItem value={30}>主动计次模式</MenuItem>
-                                  <MenuItem value={40}>主动定时模式</MenuItem>
-                                  <MenuItem value={50}>主动计次模式</MenuItem>
-                                  <MenuItem value={60}>助力计次模式</MenuItem>
-                                  <MenuItem value={70}>助力定时模式</MenuItem>
-                                  <MenuItem value={80}>手动计次模式</MenuItem>
-                                </Select>
-                              </FormControl>
-                              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                                <InputLabel id="demo-select-small-label">训练部位</InputLabel>
-                                <Select
-                                    labelId="demo-select-small-label"
-                                    id="demo-select-small"
-                                    value={age2}
-                                    label="Age2"
-                                    onChange={handlePartChange}
-                                >
-                                  <MenuItem value={10}>左手</MenuItem>
-                                  <MenuItem value={20}>右手</MenuItem>
-                                  <MenuItem value={30}>左腕</MenuItem>
-                                  <MenuItem value={40}>右腕</MenuItem>
-                                  <MenuItem value={50}>左踝</MenuItem>
-                                  <MenuItem value={60}>右踝</MenuItem>
-                                </Select>
-                              </FormControl>
-                            </Box>
-
-                            <Box>
-                              <TextField sx={{ m: 1, minWidth: 160 }} id="outlined-basic" label="训练次数或时间" variant="outlined" size="small"/>
-                              <TextField sx={{ m: 1, minWidth: 160 }} id="outlined-basic" label="弯曲定时值" variant="outlined" size="small"/>
-                              <TextField sx={{ m: 1, minWidth: 160 }} id="outlined-basic" label="伸展定时值" variant="outlined" size="small"/>
-                            </Box>
-
-                          </StyledDiv>
-                        </DialogContent>
-                        <DialogActions>
-                          <Button onClick={handleCloseModify}>取消</Button>
-                          <Button onClick={handleCloseModify}>确定</Button>
-                        </DialogActions>
-                      </Dialog>
-                    </div>
                   </TableRow>
               ))}
             </TableBody>
@@ -320,5 +251,119 @@ export default function StickyHeadTable(params: {PId:string,
         </TableContainer>
 
       </Paper>
+        <Dialog open={open} onClose={handleClose} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
+            <DialogContent>
+              <DialogContentText>
+                请选择要下发至哪台康复仪
+              </DialogContentText>
+              <StyledDiv>
+                <Box>
+                  <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                    <InputLabel id="device">康复仪设备</InputLabel>
+                    <Select
+                        labelId="device"
+                        id="device"
+                        value={device}
+                        label="device"
+                        onChange={handleChange}
+                        name="device"
+                    >
+                      {params.onlineEquipment ? (
+                          params.onlineEquipment.map((item) => (
+                              <MenuItem key={item.sId} value={item.sId}>
+                                {item.clientId}
+                              </MenuItem>
+                          ))
+                      ) : null}
+                    </Select>
+                  </FormControl>
+                </Box>
+              </StyledDiv>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>取消</Button>
+              <Button onClick={handleSendCommand}>确定</Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog open={openModify} onClose={handleCloseModify} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
+            <DialogTitle>修改处方</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                请正确修改处方各项信息
+              </DialogContentText>
+              <StyledDiv>
+                <Box>
+                  <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                    <InputLabel id="demo-select-small-label">训练模式</InputLabel>
+                    <Select
+                        labelId="demo-select-small-label"
+                        id="demo-select-small"
+                        value={NumToModeMapping[willEditPrescription.mode]}
+                        label="Age1"
+                        name="mode"
+                        onChange={handleModeChange}
+                    >
+                      <MenuItem value={1}>被动计次模式</MenuItem>
+                      <MenuItem value={2}>被动定时模式</MenuItem>
+                      <MenuItem value={3}>主动计次模式</MenuItem>
+                      <MenuItem value={4}>主动定时模式</MenuItem>
+                      <MenuItem value={5}>助力计次模式</MenuItem>
+                      <MenuItem value={6}>助力定时模式</MenuItem>
+                      <MenuItem value={7}>手动计次模式</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                    <InputLabel id="demo-select-small-label">训练部位</InputLabel>
+                    <Select
+                        labelId="demo-select-small-label"
+                        id="demo-select-small"
+                        value={NumToBodyPartMapping[willEditPrescription.part]}
+                        label="Age2"
+                        onChange={handlePartChange}
+                        name="part"
+                    >
+                      <MenuItem value={1}>左手</MenuItem>
+                      <MenuItem value={2}>右手</MenuItem>
+                      <MenuItem value={3}>左腕</MenuItem>
+                      <MenuItem value={4}>右腕</MenuItem>
+                      <MenuItem value={5}>左踝</MenuItem>
+                      <MenuItem value={6}>右踝</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+
+                <Box>
+                  <TextField
+                      sx={{ m: 1, minWidth: 160 }}
+                      value={willEditPrescription.zz}
+                      id="outlined-zz" label="训练次数或时间"
+                      onChange={handleZZChange}
+                      inputProps={{ type: 'number' }}
+                      variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 160 }}
+                      value={willEditPrescription.u}
+                      id="outlined-u"
+                      label="弯曲定时值"
+                      onChange={handleUChange}
+                      inputProps={{ type: 'number' }}
+                      variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 160 }}
+                      value={willEditPrescription.v}
+                      id="outlined-v"
+                      label="伸展定时值"
+                      onChange={handleVChange}
+                      inputProps={{ type: 'number' }}
+                      variant="outlined" size="small"/>
+                </Box>
+              </StyledDiv>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseModify}>取消</Button>
+              <Button onClick={handleEditPrescription}>确定</Button>
+            </DialogActions>
+          </Dialog>
+    </>
   );
 }

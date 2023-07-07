@@ -8,16 +8,9 @@ import TableContainer from '@mui/material/TableContainer'
 import TableRow, { TableRowProps } from '@mui/material/TableRow'
 import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/TableCell'
 import {Button} from "@mui/material";
-import {useEffect} from "react";
 import {
-  fetchPrescriptionById,
-  fetchPrescriptionRecordById,
   PrescriptionRecord
 } from "@/redux/features/rehab/rehab-slice";
-import {ThunkDispatch} from "redux-thunk";
-import {AnyAction} from "redux";
-import {useDispatch} from "react-redux";
-import {RootState, useAppSelector} from "@/redux/store";
 
 
 const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({

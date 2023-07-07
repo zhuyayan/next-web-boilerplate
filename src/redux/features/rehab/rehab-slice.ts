@@ -8,7 +8,13 @@ import {
 import {AxiosResponse} from "axios";
 import {WritableDraft} from "immer/dist/types/types-external";
 import MCTAxiosInstance from "@/utils/mct-request";
-import {genderLabelToValue, getDefaultGenderLabel, getDefaultGenderValue, timeSampleFormat} from "@/utils/mct-utils";
+import {
+  BodyPartToNumMapping,
+  genderLabelToValue,
+  getDefaultGenderLabel,
+  getDefaultGenderValue, ModeToNumMapping,
+  timeSampleFormat
+} from "@/utils/mct-utils";
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 
 export interface MedicalStaff {
@@ -91,9 +97,13 @@ const initialState: RehabState = {
 
 export type Channel = 'redux' | 'general'
 
+export interface EquipmentOnlineSIdClientIdMap {
+  client_id: string
+  s_id: number
+}
 export interface EquipmentOnlineWSMessage {
   code: number
-  data: string[]
+  data: EquipmentOnlineSIdClientIdMap[]
   msg: string
 }
 
@@ -146,21 +156,24 @@ function isRealTimeWSMessage(object: any): object is RealTimeWSMessage {
   )
 }
 
-function isEquipmentOnlineWSMessage(data: any): data is EquipmentOnlineWSMessage {
+function isEquipmentOnlineWSMessage(obj: any): obj is EquipmentOnlineWSMessage {
   return (
-      typeof data === 'object' &&
-      data !== null &&
-      'code' in data &&
-      'data' in data &&
-      'msg' in data &&
-      typeof data.id === 'number' &&
-      typeof data.data === 'object' &&
-      typeof data.msg === 'string'
-  );
+      obj &&
+      typeof obj === "object" &&
+      typeof obj.code === "number" &&
+      typeof obj.msg === "string" &&
+      Array.isArray(obj.data) &&
+      obj.data.every((item: EquipmentOnlineSIdClientIdMap) => item.client_id && item.s_id != null)
+  )
 }
 
 export interface RealTimeTrainData {
   D: number
+}
+
+export interface EquipmentOnline {
+  sId: number
+  clientId: string
 }
 
 export function isRealTimeTrainData(data: any): data is RealTimeTrainData {
@@ -171,10 +184,9 @@ export const rehabApi = createApi({
   reducerPath: 'rehabApi',
   baseQuery: fetchBaseQuery({baseUrl: '/'}),
   endpoints:(builder) => ({
-    getOnlineEquipments: builder.query<string[], Channel>({
+    getOnlineEquipments: builder.query<EquipmentOnline[], Channel>({
       queryFn:() => {
-        const data = [""];
-        return { data };
+        return { data:[] }
       },
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
         const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/equipment/ws')
@@ -188,7 +200,7 @@ export const rehabApi = createApi({
             updateCachedData((draft= []) => {
               draft = []
               // Add each item from data.data to the draft
-              data.data.forEach(item => draft.push(item))
+              data.data.forEach(item => draft.push({sId: item.s_id, clientId: item.client_id}))
               return draft
             })
           }
@@ -203,8 +215,8 @@ export const rehabApi = createApi({
     }),
     getTrainMessage: builder.query<RealTimeTrainData[], Channel>({
       queryFn:(channel) => {
-        const data = [{D:0}];
-        return { data };
+        // const data = [{D:0}];
+        return { data:[] };
       },
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
         const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/train/ws')
@@ -314,36 +326,6 @@ export const editStaff = createAsyncThunk<MedicalStaff, { id: number, name: stri
   return convertAPIStaffToMedicalStaff(response.data.data.staffs[0])
 });
 
-const BodyPartToNumMapping: { [key: number]: string } = {
-  1: "左手",
-  2: "右手",
-  3: "左腕",
-  4: "右腕",
-  5: "左踝",
-  6: "右踝",
-  0: "无效",
-};
-
-const ModeToNumMapping: { [key: number]: string } = {
-  1: "被动计次模式",
-  2: "被动定时模式",
-  3: "主动计次模式",
-  4: "主动定时模式",
-  5: "助力计次模式",
-  6: "助力定时模式",
-  7: "手动计次模式",
-  0: "无效",
-};
-
-const StateToNumMapping: { [key: number]: string } = {
-  1: "停止态",
-  2: "暂停态",
-  3: "伸动作态",
-  4: "弯曲动作态",
-  5: "伸保持态",
-  6: "弯曲保持态",
-};
-
 function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescription {
   return {
     id: apiPrescription.id,
@@ -364,6 +346,12 @@ export const fetchPrescriptionById = createAsyncThunk<Prescription[], { id: numb
   return p
 });
 
+export const sendPrescriptionToEquipment = createAsyncThunk<number, {prescription_id: number, e_id: string}, {}>('sendPrescriptionToEquipment', async ({prescription_id, e_id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('prescription/command', {params:{ prescription_id, e_id}});
+  console.log("send prescription to equipment: ", response.data)
+  return response.data.code
+});
+
 function convertAPIPrescriptionRecordToPrescriptionRecord(apiPrescriptionRecord: any): PrescriptionRecord {
   return {
     id: apiPrescriptionRecord.id,
@@ -380,6 +368,12 @@ export const fetchPrescriptionRecordById = createAsyncThunk<PrescriptionRecord[]
   let p = response.data.data.tasks.map(convertAPIPrescriptionRecordToPrescriptionRecord)
   console.log('prescription_record', p)
   return p
+});
+
+export const editPrescription = createAsyncThunk<number, {id: number, x: number, y: number, zz: number, u: number, v:number}, {}>('editPrescription', async ({id, x, y, zz, u, v}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('prescription', { id, x, y, zz, u, v});
+  console.log("edit prescription: ", response.data)
+  return response.data.code
 });
 
 const RehabSlice = createSlice({
@@ -487,6 +481,12 @@ const RehabSlice = createSlice({
         .addCase(fetchPrescriptionRecordById.fulfilled, (state, action) => {
           console.log("fetch_prescription_record_by_id", action.payload)
           state.prescriptionRecord = action.payload
+        })
+        .addCase(sendPrescriptionToEquipment.fulfilled, (state, action) => {
+          console.log("send prescription to equipment code -> ", action.payload)
+        })
+        .addCase(editPrescription.fulfilled, (state, action) => {
+          console.log("edit prescription -> ", action.payload)
         })
   },
 })
