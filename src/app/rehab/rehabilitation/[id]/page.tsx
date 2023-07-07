@@ -86,11 +86,11 @@ export default function MUITable({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     console.log('trainData ->', trainData)
-  }, [trainData, useEffect])
+  }, [trainData])
 
   useEffect(() => {
     console.log('onlineData ->', onlineData)
-  }, [onlineData, useEffect])
+  }, [onlineData])
 
   return (
     <>
@@ -153,7 +153,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
             <Card sx={{ height: 365 ,padding: '10px'}}>
               <CardHeader title='压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
               {
-                trainLoading ? <></> : <PrescriptionLine trainData={trainData}></PrescriptionLine>
+                trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
               }
               {/*<PrescriptionLine trainData={data}></PrescriptionLine>*/}
             </Card>

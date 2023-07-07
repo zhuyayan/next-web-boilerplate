@@ -14,7 +14,6 @@ import {
 import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
 import Link from 'next/link';
-import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -84,7 +83,7 @@ export default function PatientList() {
     // 使用 id 页面需要调整
     thunkDispatch(addPatient({
       name: willAddPatient.name,
-      age: parseInt(willAddPatient.age),
+      age: willAddPatient.age,
       sex: willAddPatient.genderLabel,
       medical_history: willAddPatient.medicalHistory,
       staff_id: 1
