@@ -1,7 +1,7 @@
 import {
   ActionReducerMapBuilder,
   createAsyncThunk,
-  createEntityAdapter, createSelector,
+  createSelector,
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
@@ -26,6 +26,7 @@ export interface Patient {
   genderLabel: string;
   medicalHistory: string;
   physician:string;
+  IDNumber:string;
 }
 
 export interface Prescription {
@@ -71,6 +72,7 @@ let patient: Patient = {
   genderLabel: getDefaultGenderLabel(),
   medicalHistory: '',
   physician: '',
+  IDNumber: '',
 }
 
 interface RehabState {
@@ -91,13 +93,62 @@ const initialState: RehabState = {
 
 export type Channel = 'redux' | 'general'
 
-export interface WSMessage {
+export interface EquipmentOnlineWSMessage {
   code: number
   data: string[]
   msg: string
 }
 
-function isWSMessage(data: any): data is WSMessage {
+export interface RealTimeWSMessage {
+  code: number
+  data: {
+    HT: string
+    ID: string
+    PID: string
+    HTBD: string
+    X: number
+    Y: number
+    ZZ: number
+    CC: number
+    U: number
+    V: number
+    TT: number
+    WW: number
+    S: number
+    D: number[]
+    CRC: number
+  }
+  msg: string
+}
+
+function isRealTimeWSMessage(object: any): object is RealTimeWSMessage {
+  return (
+      typeof object === 'object' &&
+      object !== null &&
+      typeof object.code === 'number' &&
+      typeof object.msg === 'string' &&
+      typeof object.data === 'object' &&
+      object.data !== null &&
+      typeof object.data.HT === 'string' &&
+      typeof object.data.ID === 'string' &&
+      typeof object.data.PID === 'string' &&
+      typeof object.data.HTBD === 'string' &&
+      typeof object.data.X === 'number' &&
+      typeof object.data.Y === 'number' &&
+      typeof object.data.ZZ === 'number' &&
+      typeof object.data.CC === 'number' &&
+      typeof object.data.U === 'number' &&
+      typeof object.data.V === 'number' &&
+      typeof object.data.TT === 'number' &&
+      typeof object.data.WW === 'number' &&
+      typeof object.data.S === 'number' &&
+      Array.isArray(object.data.D) &&
+      object.data.D.every((item: any) => typeof item === 'number') &&
+      typeof object.data.CRC === 'number'
+  )
+}
+
+function isEquipmentOnlineWSMessage(data: any): data is EquipmentOnlineWSMessage {
   return (
       typeof data === 'object' &&
       data !== null &&
@@ -113,14 +164,9 @@ function isWSMessage(data: any): data is WSMessage {
 export interface RealTimeTrainData {
   D: number
 }
-function isRealTimeTrainData(object: any): object is RealTimeTrainData {
-  return (
-      object &&
-      typeof object === 'object' &&
-      'D' in object &&
-      Array.isArray(object.D) &&
-      object.D.every(item => typeof item === 'number')
-  );
+
+export function isRealTimeTrainData(data: any): data is RealTimeTrainData {
+  return typeof data === 'object' && 'D' in data && typeof data.D === 'number';
 }
 
 export const rehabApi = createApi({
@@ -135,20 +181,16 @@ export const rehabApi = createApi({
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
         const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/equipment/ws')
         try {
-          console.log(123)
           await cacheDataLoaded
-          console.log(456)
           const listener = (event: MessageEvent) => {
-            const data: WSMessage = JSON.parse(event.data)
-            console.log("data1 -> ", data)
-            if (!isWSMessage(data)) {
+            const data: EquipmentOnlineWSMessage = JSON.parse(event.data)
+            if (!isEquipmentOnlineWSMessage(data)) {
               // return
             }
             updateCachedData((draft= []) => {
               draft = []
               // Add each item from data.data to the draft
               data.data.forEach(item => draft.push(item))
-              console.log("draft -> ", draft)
               return draft
             })
           }
@@ -159,35 +201,26 @@ export const rehabApi = createApi({
         await cacheEntryRemoved
         ws.close()
         console.log("ws closed")
-      },
+      }
     }),
     getTrainMessage: builder.query<RealTimeTrainData[], Channel>({
       queryFn:(channel) => {
-        // const response = /* make request */;
-        const data = [{D:0}]; // This assumes the response data has a property "data" that is an array
+        const data = [{D:0}];
         return { data };
       },
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
         const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/train/ws')
         try {
           const l = (event: MessageEvent) => {
-            const data: WSMessage = JSON.parse(event.data)
-            console.log("data11 -> ", data)
-            if (!isWSMessage(data)) {
+            const data: RealTimeWSMessage = JSON.parse(event.data)
+            if (!isRealTimeWSMessage(data)) {
               // return
             }
             updateCachedData((draft) => {
-              // if (draft === undefined) {
-              //   draft = {
-              //     D: []
-              //   }
-              // }
               draft = []
-
               if (!Array.isArray(draft)) {
                 draft= []
               }
-              console.log("data22 -> ", data.data)
               // Add each item from data.data to the draft
               data.data.D.forEach(item => draft.push({D: item}))
               return draft
@@ -214,6 +247,7 @@ function convertAPIPatientToPatient(apiStaff: any): Patient {
     genderLabel: apiStaff.sex,
     medicalHistory: apiStaff.medical_history,
     physician: apiStaff.staff.name,
+    IDNumber: apiStaff.staff.IDNumber,
   };
 }
 
