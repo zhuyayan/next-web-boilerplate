@@ -33,3 +33,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+yarn
+yarn.cmd
+yarn.lock
+yarn.ps1
+yarnpkg
+yarnpkg.cmd
+yarnpkg.ps1
