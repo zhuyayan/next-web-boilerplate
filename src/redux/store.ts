@@ -10,6 +10,15 @@ const WS_CONNECT = 'WS_CONNECT';
 const WS_DISCONNECT = 'WS_DISCONNECT';
 const WS_MESSAGE = 'WS_MESSAGE';
 
+// 在types.ts文件中定义action类型
+export const SET_HOSPITAL_NAME = 'SET_HOSPITAL_NAME';
+
+// 在actions.ts文件中创建action创建函数
+export const setHospitalName = (name: string) => ({
+  type: SET_HOSPITAL_NAME,
+  payload: name,
+});
+
 interface WSConnectAction {
   type: typeof WS_CONNECT;
   host: string;

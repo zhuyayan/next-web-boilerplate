@@ -22,6 +22,7 @@ import {TransitionProps} from "@mui/material/transitions";
 import Link from "next/link";
 import styled from "styled-components";
 import Image from "next/image";
+import { useSelector } from 'react-redux';
 
 interface MCTMenu {
   name: string,
@@ -71,6 +72,7 @@ export default function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const hospitalName = useSelector((state) => state.hospitalName);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
     console.log('handlePopoverOpen')
@@ -107,9 +109,6 @@ export default function NavBar() {
     }
   })
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
 
   const handleSideBarToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     console.log("handleSideBarToggle");
@@ -169,14 +168,16 @@ export default function NavBar() {
                   textDecoration: 'none',
                 }}
             >
-              <Image
-                  src="/images/logo/MCTlogo.png"
-                  alt="Vercel Logo"
-                  // className="dark:invert"
-                  width={100}
-                  height={24}
-                  priority
-              />
+                {hospitalName}
+                上海市静安区彭浦社区卫服务中心
+              {/*<Image*/}
+              {/*    src="/images/logo/MCTlogo.png"*/}
+              {/*    alt="Vercel Logo"*/}
+              {/*    // className="dark:invert"*/}
+              {/*    width={100}*/}
+              {/*    height={24}*/}
+              {/*    priority*/}
+              {/*/>*/}
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -301,7 +302,7 @@ export default function NavBar() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/images/avatar/2.jpg" />
+                  <Avatar alt="Remy Sharp" src="/images/logo/MCTlogo.png" />
                 </IconButton>
               </Tooltip>
               <Menu

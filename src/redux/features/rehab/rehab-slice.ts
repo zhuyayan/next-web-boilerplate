@@ -271,6 +271,12 @@ export const deletePatient = createAsyncThunk<{id: number}, {id: number}, {}>('d
   return {id: id}
 });
 
+export const deletePrescription = createAsyncThunk<{id: number}, {id: number}, {}>('deletePrescription', async ({id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('patient', {params:{ id }});
+  console.log("delete prescription async thunk: ", response.data)
+  return {id: id}
+});
+
 
 export const addStaff = createAsyncThunk<MedicalStaff, { name: string, username: string, password: string }, {}>('addStaff', async ({name, username, password}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('staff',{name, username, password})
@@ -281,6 +287,13 @@ export const editStaff = createAsyncThunk<MedicalStaff, { id: number, name: stri
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('staff',{id, name, username, password})
   console.log("add staff async thunk: ", response.data.data.staffs[0])
   return convertAPIStaffToMedicalStaff(response.data.data.staffs[0])
+});
+
+export const addPrescription = createAsyncThunk<Prescription, { PID: string, X: number, Y: number , ZZ: number, U: number, V: number},
+    {}>('addPrescription', async ({X, Y , ZZ, U, V}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('prescription',{X, Y , ZZ, U, V})
+  console.log("add Prescription async thunk: ", response.data.data.staffs[0])
+  return convertAPIPrescriptionToPrescription(response.data.data.staffs[0])
 });
 
 const BodyPartToNumMapping: { [key: number]: string } = {
@@ -456,6 +469,13 @@ const RehabSlice = createSlice({
         .addCase(fetchPrescriptionRecordById.fulfilled, (state, action) => {
           console.log("fetch_prescription_record_by_id", action.payload)
           state.prescriptionRecord = action.payload
+        })
+        .addCase(deletePrescription.fulfilled,(state,action)=>{
+          // 重新分页查询
+          state.prescription = state.prescription.filter((item) => {
+            return item.id != action.payload.id
+          })
+          console.log('delete_prescription_action', action.payload)
         })
   },
 })

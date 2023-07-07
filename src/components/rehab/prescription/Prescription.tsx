@@ -23,25 +23,14 @@ import styled from "styled-components";
 import {SelectChangeEvent} from "@mui/material/Select";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-// <<<<<<< HEAD
-// import {ChangeEvent, useEffect, useState} from "react";
-// import {
-//   editStaff,
-//   fetchPatientById,
-//   fetchPrescriptionById,
-//   MedicalStaff,
-//   Patient, Prescription, PrescriptionRecord
-// } from "@/redux/features/rehab/rehab-slice";
-// =======
-// import {ChangeEvent, useState} from "react";
-// import {editStaff, MedicalStaff, Patient, useGetMessagesQuery} from "@/redux/features/rehab/rehab-slice";
-// >>>>>>> 47807e9eb34d4e5c0b50fab2360e35cf7d6166da
 import {getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
 import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import {Prescription} from "@/redux/features/rehab/rehab-slice";
+import {deletePatient, deletePrescription, Prescription} from "@/redux/features/rehab/rehab-slice";
+import prescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -103,35 +92,21 @@ const createData = (time: number, pattern: number, part: number, count: number, 
   return { time, pattern, part, count, bendingtimevalue, stretchtimevalue}
 }
 
-const rows = [
-  createData(20230627, 159, 6, 24, 4, 3),
-  createData(20230622, 237, 9, 37, 4.3, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-  createData(20230621, 262, 16, 24, 6, 3),
-
-];
 
 export default function StickyHeadTable(params: {PId:string,
   prescription:Prescription[]}) {
-  // const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
-  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
+  const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  const appDispatch = useAppDispatch()
   const [age1, setAge1] = React.useState('');
   const [age2, setAge2] = React.useState('');
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
+
+  const handleDeletePrescription = (id: number) => {
+    appDispatch(deletePrescription({id: id}))
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -141,15 +116,6 @@ export default function StickyHeadTable(params: {PId:string,
     setOpenModify(true);
   };
 
-// <<<<<<< HEAD
-// =======
-//   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
-//   const [age1, setAge1] = React.useState('');
-//   const [age2, setAge2] = React.useState('');
-//   const [device, setDevice] = React.useState('');
-//   const { data, error, isLoading } = useGetMessagesQuery('redux');
-//
-// >>>>>>> 47807e9eb34d4e5c0b50fab2360e35cf7d6166da
   const handleChange = (event: SelectChangeEvent) => {
     setDevice(event.target.value);
   };
@@ -214,7 +180,7 @@ export default function StickyHeadTable(params: {PId:string,
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
                         <Button color="primary"  onClick={handleClickOpen}>下发</Button>
                         <Button color="primary" onClick={handleClickModify}>修改</Button>
-                        <Button color="secondary">删除</Button>
+                        <Button color="secondary" onClick={() => handleDeletePrescription(prescription.id)}>删除</Button>
                       </ButtonGroup>
                     </TableCell>
                     <div>
@@ -266,7 +232,7 @@ export default function StickyHeadTable(params: {PId:string,
                                 <Select
                                     labelId="demo-select-small-label"
                                     id="demo-select-small"
-                                    value={age1}
+                                    value={row.mode}
                                     label="Age1"
                                     onChange={handleTPChange}
                                 >
