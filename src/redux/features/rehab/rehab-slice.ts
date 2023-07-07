@@ -26,6 +26,7 @@ export interface Patient {
   genderLabel: string;
   medicalHistory: string;
   physician:string;
+  IDNumber:string;
 }
 
 export interface Prescription {
@@ -71,6 +72,7 @@ let patient: Patient = {
   genderLabel: getDefaultGenderLabel(),
   medicalHistory: '',
   physician: '',
+  IDNumber: '',
 }
 
 interface RehabState {
@@ -245,6 +247,7 @@ function convertAPIPatientToPatient(apiStaff: any): Patient {
     genderLabel: apiStaff.sex,
     medicalHistory: apiStaff.medical_history,
     physician: apiStaff.staff.name,
+    IDNumber: apiStaff.staff.IDNumber,
   };
 }
 
