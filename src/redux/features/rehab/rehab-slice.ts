@@ -318,7 +318,7 @@ export const deletePatient = createAsyncThunk<{id: number}, {id: number}, {}>('d
 });
 
 export const deletePrescription = createAsyncThunk<{id: number}, {id: number}, {}>('deletePrescription', async ({id}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('patient', {params:{ id }});
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('prescription', {params:{ id }});
   console.log("delete prescription async thunk: ", response.data)
   return {id: id}
 });
@@ -481,7 +481,7 @@ const RehabSlice = createSlice({
           state.patient = state.patient.filter((item) => {
             return item.id != action.payload.id
           })
-          console.log('delete_staff_action', action.payload)
+          console.log('delete_Patient_action', action.payload)
         })
         .addCase(addStaff.fulfilled,(state, action) => {
           console.log("add_staff_action", action.payload)
