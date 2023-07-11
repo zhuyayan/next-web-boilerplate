@@ -13,7 +13,7 @@ export default function PrescriptionLine(params: {trainData:RealTimeTrainData[]}
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis domain={[0, 3000]}/>
-        <Tooltip />
+        {/*<Tooltip />*/}
         <Legend />
         <Line type="monotone" dataKey="D" stroke="#8884d8" activeDot={{ r: 8 }} />
       </LineChart>

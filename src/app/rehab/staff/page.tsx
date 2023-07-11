@@ -20,8 +20,6 @@ import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
 import {
   deleteStaff,
-  editMedicalStaff,
-  addMedicalStaff,
   fetchStaffs,
   MedicalStaff, addStaff, editStaff,
 } from "@/redux/features/rehab/rehab-slice";
@@ -30,7 +28,6 @@ import {useDispatch} from "react-redux";
 import {RootState, useAppSelector} from "@/redux/store";
 import Box from "@mui/material/Box";
 import {Delete as DeleteIcon} from "@mui/icons-material";
-import Stack from "@mui/material/Stack";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
@@ -43,7 +40,6 @@ const StyledDiv = styled.div`
 `;
 
 export default function MedicalStaffManagement() {
-  const dispatch = useDispatch()
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const appDispatch = useAppDispatch()
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
@@ -139,119 +135,113 @@ export default function MedicalStaffManagement() {
     setPage(0);
   };
 
-
   return (
-      <Container>
-        <br/>
-        <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>医护用户管理</Typography>
-        <div>
-          <Button style={{float: 'right'}} startIcon={<AddCircleOutlineIcon /> } variant="outlined" onClick={handleAddStaffClickOpen}>
-            添加医护
-          </Button>
-          <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
-            <DialogTitle>添加医护</DialogTitle>
-            <DialogContent>
-              <Box>
-                <StyledDiv>
-                  <TextField sx={{ m: 1, minWidth: 120 }} id="username"
-                             value={willAddStaff.username}
-                             onChange={handleAddMedicalStaff}
-                             label="用户名" variant="outlined" size="small"/>
-                  <TextField sx={{ m: 1, minWidth: 120 }} id="password"
-                             value={willAddStaff.password}
-                             onChange={handleAddMedicalStaff}
-                             label="密码" variant="outlined" size="small"/>
-                  <TextField sx={{ m: 1, minWidth: 120 }} id="fullName"
-                             value={willAddStaff.fullName}
-                             onChange={handleAddMedicalStaff}
-                             label="全名" variant="outlined" size="small"/>
-                </StyledDiv>
-              </Box>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleAddStaffClickClose}>取消</Button>
-              <Button onClick={handleSaveAddMedicalStaff}>确定</Button>
-            </DialogActions>
-          </Dialog>
-        </div>
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-          <TableContainer sx={{ maxHeight: 620}}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {/*<TableCell align='center'>ID</TableCell>*/}
-                  <TableCell align='center'>用户名</TableCell>
-                  <TableCell align='center'>密码</TableCell>
-                  <TableCell align='center'>全名</TableCell>
-                  <TableCell align='center'>操作</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {medicalStaffList
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((medicalStaff) => (
-                        <TableRow key={medicalStaff.id}>
-                          {/*<TableCell align='center'>{medicalStaff.id}</TableCell>*/}
-                          <TableCell align='center'>{medicalStaff.username}</TableCell>
-                          <TableCell align='center'>{medicalStaff.password}</TableCell>
-                          <TableCell align='center'>{medicalStaff.fullName}</TableCell>
-                          <TableCell align='center'>
-                            <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
-                              <Button color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>
-                                修改
-                              </Button>
-                              <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>
-                                删除
-                              </Button>
-                            </ButtonGroup>
-                          </TableCell>
-                        </TableRow>
-                    ))}
-              </TableBody>
+    <Container>
+      <br/>
+      <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>医护用户管理</Typography>
+      <div>
+        <Button style={{float: 'right'}} startIcon={<AddCircleOutlineIcon /> } variant="outlined" onClick={handleAddStaffClickOpen}>
+          添加医护
+        </Button>
+        <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
+          <DialogTitle>添加医护</DialogTitle>
+          <DialogContent>
+            <Box>
+              <StyledDiv>
+                <TextField
+                  sx={{ m: 1, minWidth: 120 }} id="username"
+                  value={willAddStaff.username}
+                  onChange={handleAddMedicalStaff}
+                  label="用户名" variant="outlined" size="small"/>
+                <TextField
+                  sx={{ m: 1, minWidth: 120 }} id="password"
+                  value={willAddStaff.password}
+                  onChange={handleAddMedicalStaff}
+                  label="密码" variant="outlined" size="small"/>
+                <TextField
+                  sx={{ m: 1, minWidth: 120 }} id="fullName"
+                  value={willAddStaff.fullName}
+                  onChange={handleAddMedicalStaff}
+                  label="全名" variant="outlined" size="small"/>
+              </StyledDiv>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleAddStaffClickClose}>取消</Button>
+            <Button onClick={handleSaveAddMedicalStaff}>确定</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <TableContainer sx={{ maxHeight: 620}}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell align='center'>用户名</TableCell>
+                <TableCell align='center'>密码</TableCell>
+                <TableCell align='center'>全名</TableCell>
+                <TableCell align='center'>操作</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {medicalStaffList
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((medicalStaff) => (
+                  <TableRow key={medicalStaff.id}>
+                    <TableCell align='center'>{medicalStaff.username}</TableCell>
+                    <TableCell align='center'>{medicalStaff.password}</TableCell>
+                    <TableCell align='center'>{medicalStaff.fullName}</TableCell>
+                    <TableCell align='center'>
+                      <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
+                        <Button color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>修改</Button>
+                        <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>删除</Button>
+                      </ButtonGroup>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
             </Table>
-          </TableContainer>
-          <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={medicalStaffList.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-          <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>修改</DialogTitle>
-            <DialogContent>
-              <Box component="form">
-                <StyledDiv>
-                  <TextField
-                      sx={{ m: 1, minWidth: 120 }}
-                      id="username"
-                      value={willEditStaff.username}
-                      onChange={handleInputChange}
-                      label="用户名" variant="outlined" size="small"/>
-                  <TextField
-                      sx={{ m: 1, minWidth: 120 }}
-                      id="password"
-                      value={willEditStaff.password}
-                      onChange={handleInputChange}
-                      label="密码" variant="outlined" size="small"/>
-                  <TextField
-                      sx={{ m: 1, minWidth: 120 }}
-                      id="fullName"
-                      value={willEditStaff.fullName}
-                      onChange={handleInputChange}
-                      label="全名" variant="outlined" size="small"/>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={medicalStaffList.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}/>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>修改</DialogTitle>
+          <DialogContent>
+            <Box component="form">
+              <StyledDiv>
+                <TextField
+                  sx={{ m: 1, minWidth: 120 }}
+                  id="username"
+                  value={willEditStaff.username}
+                  onChange={handleInputChange}
+                  label="用户名" variant="outlined" size="small"/>
+                <TextField
+                  sx={{ m: 1, minWidth: 120 }}
+                  id="password"
+                  value={willEditStaff.password}
+                  onChange={handleInputChange}
+                  label="密码" variant="outlined" size="small"/>
+                <TextField
+                  sx={{ m: 1, minWidth: 120 }}
+                  id="fullName"
+                  value={willEditStaff.fullName}
+                  onChange={handleInputChange}
+                  label="全名" variant="outlined" size="small"/>
                 </StyledDiv>
               </Box>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose}>取消</Button>
-              <Button onClick={handleEditRow}>确定</Button>
-            </DialogActions>
-          </Dialog>
-        </Paper>
-      </Container>
-
-  );
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>取消</Button>
+            <Button onClick={handleEditRow}>确定</Button>
+          </DialogActions>
+        </Dialog>
+      </Paper>
+    </Container>
+  )
 }

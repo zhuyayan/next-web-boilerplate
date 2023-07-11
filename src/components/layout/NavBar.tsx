@@ -21,7 +21,6 @@ import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/
 import {TransitionProps} from "@mui/material/transitions";
 import Link from "next/link";
 import styled from "styled-components";
-import Image from "next/image";
 import { useSelector } from 'react-redux';
 
 interface MCTMenu {
@@ -38,10 +37,6 @@ const pages: MCTMenu[] = [
     name: "设备",
     path: "/rehab/equipment",
   },
-  // {
-  //   name: "康复",
-  //   path: "/rehab/rehabilitation",
-  // },
   {
     name: "病人",
     path: "/rehab/patient",
@@ -50,6 +45,7 @@ const pages: MCTMenu[] = [
     name: "配置",
     path: "/rehab/config",
   }];
+
 const settings: string[] = ['Logout'];
 
 const Transition = React.forwardRef(function Transition(
@@ -63,8 +59,10 @@ const Transition = React.forwardRef(function Transition(
 
 const MCTStyledButton = styled(Button)`
   &&:hover {
-    background-color: #0015ff; // 设置 hover 状态下的背景颜色
+    background-color: azure; // 设置 hover 状态下的背景颜色
   }
+  color: white;
+  display: block;
 `;
 
 export default function NavBar() {
@@ -72,7 +70,7 @@ export default function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const hospitalName = useSelector((state) => state.hospitalName);
+  const hospitalName = useSelector((state:RootState) => state.appBar.hospitalName);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
     console.log('handlePopoverOpen')
@@ -169,7 +167,6 @@ export default function NavBar() {
                 }}
             >
                 {hospitalName}
-                上海市静安区彭浦社区卫服务中心
               {/*<Image*/}
               {/*    src="/images/logo/MCTlogo.png"*/}
               {/*    alt="Vercel Logo"*/}
@@ -290,9 +287,7 @@ export default function NavBar() {
                       key={page.name}
                       href={page.path} passHref>
                     <MCTStyledButton
-                        key={page.name}
-                        sx={{ my: 2, color: 'white', display: 'block' }}
-                    >
+                        key={page.name}>
                       {page.name}
                     </MCTStyledButton>
                   </Link>
