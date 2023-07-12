@@ -55,42 +55,42 @@ interface Column {
 const columns: readonly Column[] = [
   { id: 'time',
     label: '处方创建时间',
-    minWidth: 100,
+    minWidth: 165,
     align: 'left',
   },
   { id: 'pattern',
     label: '训练模式',
-    minWidth: 100,
+    minWidth: 120,
     align: 'right',
   },
   {
     id: 'part',
     label: '训练部位',
-    minWidth: 100,
+    minWidth: 90,
     align: 'right',
   },
   {
     id: 'count',
     label: '训练次数或时间',
-    minWidth: 100,
+    minWidth: 135,
     align: 'right',
   },
   {
     id: 'bendingtimevalue',
     label: '弯曲定时值',
-    minWidth: 100,
+    minWidth: 105,
     align: 'right',
   },
   {
     id: 'stretchtimevalue',
     label: '伸展定时值',
-    minWidth: 100,
+    minWidth: 105,
     align: 'right',
   },
   {
     id: 'action',
     label: '操作',
-    minWidth: 100,
+    minWidth: 220,
     align: 'center',
   },
 ];
@@ -103,6 +103,11 @@ export default function StickyHeadTable(params: {PId:string,
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
+  const [value, setValue] = React.useState(false)
+  const [error, setError] = React.useState(false)
+  const [timeserror, setTimesError] = React.useState(false)
+  const [benderror, setBendError] = React.useState(false)
+  const [stretcherror, setStretchError] = React.useState(false)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription>({
     id: 0,
     created_at: "",
@@ -189,24 +194,64 @@ export default function StickyHeadTable(params: {PId:string,
   };
 
   function handleZZChange(e: ChangeEvent<HTMLInputElement>) {
-    setWillEditPrescription(prevState => ({
-      ...prevState,
-      zz: parseInt(e.target.value)
-    }));
+    const inputValue = e.target.value;
+    setValue(inputValue);
+    if (inputValue !== '' && inputValue < '1') {
+      setTimesError('输入的数字不能小于1');
+    } else {
+      setWillEditPrescription(prevState => ({
+        ...prevState,
+        zz: parseInt(inputValue)
+      }));
+    }
   }
-
+  const handleAddPrescriptionBend = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setValue(inputValue);
+    if (inputValue !== '' && inputValue < '3') {
+      setStretchError('输入的数字不能小于3');
+    } else {
+      setStretchError('');
+      setWillEditPrescription(prevState => ({
+        ...prevState,
+        u: parseInt(e.target.value)
+      }));
+    }
+  };
   function handleUChange(e: ChangeEvent<HTMLInputElement>) {
-    setWillEditPrescription(prevState => ({
-      ...prevState,
-      u: parseInt(e.target.value)
-    }));
+    // setWillEditPrescription(prevState => ({
+    //   ...prevState,
+    //   u: parseInt(e.target.value)
+    // }));
+    const inputValue = e.target.value;
+    setValue(inputValue);
+    if (inputValue !== '' && inputValue < '3') {
+      setBendError('输入的数字不能小于3');
+    } else {
+      setBendError('');
+      setWillEditPrescription(prevState => ({
+        ...prevState,
+        u: parseInt(e.target.value)
+      }));
+    }
   }
 
   function handleVChange(e: ChangeEvent<HTMLInputElement>) {
-    setWillEditPrescription(prevState => ({
-      ...prevState,
-      v: parseInt(e.target.value)
-    }));
+    // setWillEditPrescription(prevState => ({
+    //   ...prevState,
+    //   v: parseInt(e.target.value)
+    // }));
+    const inputValue = e.target.value;
+    setValue(inputValue);
+    if (inputValue !== '' && inputValue < '3') {
+      setStretchError('输入的数字不能小于3');
+    } else {
+      setStretchError('');
+      setWillEditPrescription(prevState => ({
+        ...prevState,
+        v: parseInt(inputValue)
+      }));
+    }
   }
 
   return (<>
@@ -245,7 +290,7 @@ export default function StickyHeadTable(params: {PId:string,
                     <TableCell align='right'>{row.zz}</TableCell>
                     <TableCell align='right'>{row.u}</TableCell>
                     <TableCell align='right'>{row.v}</TableCell>
-                    <TableCell align='right'>
+                    <TableCell align='left'>
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
                         <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>
                         <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>
@@ -352,6 +397,8 @@ export default function StickyHeadTable(params: {PId:string,
                       value={willEditPrescription.zz}
                       id="outlined-zz" label="训练次数或时间"
                       onChange={handleZZChange}
+                      error={Boolean(timeserror)}
+                      helperText={timeserror}
                       inputProps={{ type: 'number' }}
                       variant="outlined" size="small"/>
                   <TextField
@@ -360,6 +407,8 @@ export default function StickyHeadTable(params: {PId:string,
                       id="outlined-u"
                       label="弯曲定时值"
                       onChange={handleUChange}
+                      error={Boolean(benderror)}
+                      helperText={benderror}
                       inputProps={{ type: 'number' }}
                       variant="outlined" size="small"/>
                   <TextField
@@ -368,6 +417,8 @@ export default function StickyHeadTable(params: {PId:string,
                       id="outlined-v"
                       label="伸展定时值"
                       onChange={handleVChange}
+                      error={Boolean(stretcherror)}
+                      helperText={stretcherror}
                       inputProps={{ type: 'number' }}
                       variant="outlined" size="small"/>
                 </Box>
@@ -375,7 +426,7 @@ export default function StickyHeadTable(params: {PId:string,
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseModify}>取消</Button>
-              <Button onClick={handleEditPrescription}>确定</Button>
+              <Button onClick={handleEditPrescription} disabled={Boolean(error)}>确定</Button>
             </DialogActions>
           </Dialog>
     </>

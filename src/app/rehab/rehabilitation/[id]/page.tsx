@@ -54,6 +54,11 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const [open, setOpen] = React.useState(false)
+  const [value, setValue] = React.useState(false)
+  const [error, setError] = React.useState(false)
+  const [timeserror, setTimesError] = React.useState(false)
+  const [benderror, setBendError] = React.useState(false)
+  const [stretcherror, setStretchError] = React.useState(false)
 
   const [willAddPrescription, setWillAddPrescription] = React.useState<PrescriptionEntity>({
     id: 0,
@@ -65,13 +70,50 @@ export default function MUITable({ params }: { params: { id: string } }) {
     v: 0,
   })
 
-  const handleAddPrescription = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleAddPrescriptionTimes = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
-    console.log(id, value)
-    setWillAddPrescription((prevInputValues) => ({
-      ...prevInputValues,
-      [id]: parseInt(value),
-    }))
+    console.log(id, value);
+    setValue(value);
+    if (value !== '' && value < '1') {
+      setTimesError('输入的数字不能小于1');
+    } else {
+      setTimesError('');
+      setWillAddPrescription((prevInputValues) => ({
+        ...prevInputValues,
+        [id]: parseInt(value),
+      }))
+    }
+  };
+
+  const handleAddPrescriptionBend = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    console.log(id, value);
+    setValue(value);
+    if (value !== '' && value < '3') {
+      setBendError('输入的数字不能小于3');
+    } else {
+      setBendError('');
+      setWillAddPrescription((prevInputValues) => ({
+        ...prevInputValues,
+        [id]: parseInt(value),
+      }))
+    }
+  };
+
+  const handleAddPrescriptionStretch = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setValue(inputValue);
+    if (inputValue !== '' && inputValue < '3') {
+      setStretchError('输入的数字不能小于3');
+    } else {
+      setStretchError('');
+      const { id, value } = event.target;
+      console.log(id, value)
+      setWillAddPrescription((prevInputValues) => ({
+        ...prevInputValues,
+        [id]: parseInt(value),
+      }))
+    }
   };
 
   const handleClickOpen = () => {
@@ -252,19 +294,28 @@ export default function MUITable({ params }: { params: { id: string } }) {
             <Box>
               <TextField
                   value={willAddPrescription.zz}
-                  onChange={handleAddPrescription}
+                  onChange={handleAddPrescriptionTimes}
+                  error={Boolean(timeserror)}
+                  helperText={timeserror}
+                  inputProps={{ type: 'number' }}
                   sx={{ m: 1, minWidth: 160 }}
                   id="zz"
                   label="训练次数或时间" variant="outlined" size="small"/>
               <TextField
                   value={willAddPrescription.u}
-                  onChange={handleAddPrescription}
+                  onChange={handleAddPrescriptionBend}
+                  error={Boolean(benderror)}
+                  helperText={benderror}
+                  inputProps={{ type: 'number' }}
                   sx={{ m: 1, minWidth: 160 }}
                   id="u"
                   label="弯曲定时值" variant="outlined" size="small"/>
               <TextField
                   value={willAddPrescription.v}
-                  onChange={handleAddPrescription}
+                  onChange={handleAddPrescriptionStretch}
+                  error={Boolean(stretcherror)}
+                  helperText={stretcherror}
+                  inputProps={{ type: 'number' }}
                   sx={{ m: 1, minWidth: 160 }}
                   id="v"
                   label="伸展定时值" variant="outlined" size="small"/>
@@ -273,7 +324,10 @@ export default function MUITable({ params }: { params: { id: string } }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>取消</Button>
-          <Button onClick={handleSaveAddPrescription}>确定</Button>
+          <Button
+              onClick={handleSaveAddPrescription}
+              disabled={Boolean(error)}
+          >确定</Button>
         </DialogActions>
       </Dialog>
     </>
