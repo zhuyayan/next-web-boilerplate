@@ -32,7 +32,8 @@ export interface Patient {
   genderLabel: string;
   medicalHistory: string;
   physician:string;
-  i18n:string;
+  physicianId:number;
+  i18d:string;
 }
 
 export interface Prescription {
@@ -78,7 +79,8 @@ let patient: Patient = {
   genderLabel: getDefaultGenderLabel(),
   medicalHistory: '',
   physician: '',
-  i18n: '',
+  physicianId: 0,
+  i18d: '',
 }
 
 interface RehabState {
@@ -199,11 +201,15 @@ export const rehabApi = createApi({
             if (!isEquipmentOnlineWSMessage(data)) {
               // return
             }
-            updateCachedData((draft= []) => {
-              draft = []
-              // Add each item from data.data to the draft
-              data.data.forEach(item => draft.push({sId: item.s_id, clientId: item.client_id}))
-              return draft
+            updateCachedData((draft) => {
+              draft.length = 0
+              if(data.data.length == 0) {
+                draft.length = 0
+                draft.push({sId: -1,clientId: '无在线设备'})
+              } else {
+                // Add each item from data.data to the draft
+                data.data.forEach(item => draft.push({sId: item.s_id, clientId: item.client_id}))
+              }
             })
           }
           ws.addEventListener('message', listener)
@@ -259,7 +265,8 @@ function convertAPIPatientToPatient(p: any): Patient {
     genderLabel: p.sex,
     medicalHistory: p.medical_history,
     physician: p.staff.name,
-    i18n: p.i_18_d,
+    physicianId: p.staff.id,
+    i18d: p.i_18_d,
   };
 }
 
@@ -277,14 +284,14 @@ export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fe
   return p[0]
 });
 
-export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, staff_id: number}, {}>('addPatient', async ({name, age, sex, medical_history, staff_id}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('patient',{name, age, sex, medical_history, staff_id})
+export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, staff_id: number, i_18_d: string}, {}>('addPatient', async ({name, age, sex, medical_history, staff_id, i_18_d}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('patient',{name, age, sex, medical_history, staff_id, i_18_d})
   console.log("add patient async thunk: ", response.data.data.patients[0])
   return convertAPIPatientToPatient(response.data.data.patients[0])
 });
 
-export const editPatient = createAsyncThunk<Patient, { id: number, name: string, age: number, sex: string, medical_history: string, staff_id: number }, {}>('editPatient', async ({id, name, age, sex, medical_history, staff_id}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('patient',{id, name, age, sex, medical_history, staff_id})
+export const editPatient = createAsyncThunk<Patient, { id: number, name: string, age: number, sex: string, medical_history: string, staff_id: number, i_18_d: string }, {}>('editPatient', async ({id, name, age, sex, medical_history, staff_id,i_18_d}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('patient',{id, name, age, sex, medical_history, staff_id, i_18_d})
   console.log("edit patient async thunk: ", response.data.data.patients[0])
   return convertAPIPatientToPatient(response.data.data.patients[0])
 });
@@ -482,6 +489,18 @@ const RehabSlice = createSlice({
             return item.id != action.payload.id
           })
           console.log('delete_staff_action', action.payload)
+        })
+        .addCase(addPatient.fulfilled, (state, action) => {
+          state.patient.unshift(action.payload)
+        })
+        .addCase(editPatient.fulfilled, (state, action) => {
+          const updatedPatient = action.payload;
+          state.patient = state.patient.map((patient) => {
+            if (patient.id === updatedPatient.id) {
+              return updatedPatient;
+            }
+            return patient;
+          });
         })
         .addCase(addStaff.fulfilled,(state, action) => {
           console.log("add_staff_action", action.payload)

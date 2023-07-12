@@ -35,12 +35,8 @@ import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
-
-import {getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
-import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
-import {deletePatient, deletePrescription} from "@/redux/features/rehab/rehab-slice";
-import prescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import {useAppDispatch} from "@/redux/store";
+import { deletePrescription } from "@/redux/features/rehab/rehab-slice";
 
 
 const StyledDiv = styled.div`
@@ -102,7 +98,6 @@ const columns: readonly Column[] = [
 export default function StickyHeadTable(params: {PId:string,
   prescription:Prescription[],
   onlineEquipment: EquipmentOnline[]}) {
-  const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
   const appDispatch = useAppDispatch()
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
@@ -254,7 +249,7 @@ export default function StickyHeadTable(params: {PId:string,
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
                         <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>
                         <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>
-                        <Button color="secondary" onClick={() => handleDeletePrescription(prescription.id)}>删除</Button>
+                        <Button color="secondary" onClick={() => handleDeletePrescription(row.id)}>删除</Button>
                       </ButtonGroup>
                     </TableCell>
                   </TableRow>
@@ -263,7 +258,10 @@ export default function StickyHeadTable(params: {PId:string,
           </Table>
         </TableContainer>
       </Paper>
-        <Dialog open={open} onClose={handleClose} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
+        <Dialog open={open} onClose={handleClose}
+          slotProps={{
+            backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.06)'}}}}
+          PaperProps={{ elevation: 0 }}>
             <DialogContent>
               <DialogContentText>
                 请选择要下发至哪台康复仪
@@ -297,7 +295,11 @@ export default function StickyHeadTable(params: {PId:string,
               <Button onClick={handleSendCommand}>确定</Button>
             </DialogActions>
           </Dialog>
-          <Dialog open={openModify} onClose={handleCloseModify} BackdropProps={{ sx: { backgroundColor: 'rgba(0, 0, 0, 0.06)' } }} PaperProps={{ elevation: 0 }}>
+          <Dialog
+            open={openModify} onClose={handleCloseModify}
+            slotProps={{
+              backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.06)'}}}}
+            PaperProps={{ elevation: 0 }}>
             <DialogTitle>修改处方</DialogTitle>
             <DialogContent>
               <DialogContentText>
@@ -310,7 +312,7 @@ export default function StickyHeadTable(params: {PId:string,
                     <Select
                         labelId="demo-select-small-label"
                         id="demo-select-small"
-                        value={NumToModeMapping[willEditPrescription.mode]}
+                        value={String(NumToModeMapping[willEditPrescription.mode])}
                         label="Age1"
                         name="mode"
                         onChange={handleModeChange}
@@ -329,7 +331,7 @@ export default function StickyHeadTable(params: {PId:string,
                     <Select
                         labelId="demo-select-small-label"
                         id="demo-select-small"
-                        value={NumToBodyPartMapping[willEditPrescription.part]}
+                        value={String(NumToBodyPartMapping[willEditPrescription.part])}
                         label="Age2"
                         onChange={handlePartChange}
                         name="part"

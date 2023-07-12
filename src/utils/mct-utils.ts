@@ -4,6 +4,13 @@ export function genderLabelToValue(label:string): string {
   }
   return "21"
 }
+export function genderValueToLabel(value: string): string {
+  if (value === "10") {
+    return "男";
+  }
+  return "女";
+}
+
 export function getDefaultGenderValue(): string {
   return "10"
 }

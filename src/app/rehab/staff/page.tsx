@@ -39,6 +39,21 @@ const StyledDiv = styled.div`
   margin-top: 20px;
 `;
 
+const StyledTableRow = styled(TableRow)`
+  & td.MuiTableCell-root {
+  padding: 14px;
+  }`;
+
+const chineseLocalization = {
+  components: {
+    MuiTablePagination: {
+      labelRowsPerPage: '每页行数:',
+      backIconButtonText: '上一页',
+      nextIconButtonText: '下一页',
+    }
+  }
+};
+
 export default function MedicalStaffManagement() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const appDispatch = useAppDispatch()
@@ -187,7 +202,7 @@ export default function MedicalStaffManagement() {
               {medicalStaffList
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((medicalStaff) => (
-                  <TableRow key={medicalStaff.id}>
+                  <StyledTableRow key={medicalStaff.id}>
                     <TableCell align='center'>{medicalStaff.username}</TableCell>
                     <TableCell align='center'>{medicalStaff.password}</TableCell>
                     <TableCell align='center'>{medicalStaff.fullName}</TableCell>
@@ -197,12 +212,21 @@ export default function MedicalStaffManagement() {
                         <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>删除</Button>
                       </ButtonGroup>
                     </TableCell>
-                  </TableRow>
+                  </StyledTableRow>
                 ))}
             </TableBody>
             </Table>
         </TableContainer>
         <TablePagination
+          labelRowsPerPage="每页行数:"
+          nextIconButtonProps={{
+            'aria-label': '下一页',
+            'title': '下一页'
+          }}
+          backIconButtonProps={{
+            'aria-label': '上一页',
+            'title': '上一页'
+          }}
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
           count={medicalStaffList.length}
