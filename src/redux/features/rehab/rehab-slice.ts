@@ -191,7 +191,7 @@ export const rehabApi = createApi({
         return { data:[] }
       },
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
-        const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/equipment/ws')
+        const ws = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_ADDR + 'equipment/ws')
         try {
           await cacheDataLoaded
           const listener = (event: MessageEvent) => {
@@ -221,7 +221,7 @@ export const rehabApi = createApi({
         return { data:[] };
       },
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
-        const ws = new WebSocket('ws://192.168.2.101:56567/api/v1/train/ws')
+        const ws = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_ADDR + 'train/ws')
         try {
           const l = (event: MessageEvent) => {
             const data: RealTimeWSMessage = JSON.parse(event.data)

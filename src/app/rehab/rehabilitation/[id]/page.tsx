@@ -263,7 +263,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   id="y"
                   name="mode"
                   label="模式"
-                  value={NumToModeMapping[willAddPrescription.mode]}
+                  value={String(NumToModeMapping[willAddPrescription.mode])}
                   onChange={handleAddPrescriptionModeChange}>
                   <MenuItem value={1}>被动计次模式</MenuItem>
                   <MenuItem value={2}>被动定时模式</MenuItem>
@@ -280,7 +280,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                     id="x"
                     name="part"
                     label="部位"
-                    value={NumToBodyPartMapping[willAddPrescription.part]}
+                    value={String(NumToBodyPartMapping[willAddPrescription.part])}
                     onChange={handleAddPrescriptionPartChange}>
                   <MenuItem value={1}>左手</MenuItem>
                   <MenuItem value={2}>右手</MenuItem>
