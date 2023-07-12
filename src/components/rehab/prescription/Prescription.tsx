@@ -59,42 +59,42 @@ interface Column {
 const columns: readonly Column[] = [
   { id: 'time',
     label: '处方创建时间',
-    minWidth: 100,
+    minWidth: 165,
     align: 'left',
   },
   { id: 'pattern',
     label: '训练模式',
-    minWidth: 100,
+    minWidth: 120,
     align: 'right',
   },
   {
     id: 'part',
     label: '训练部位',
-    minWidth: 100,
+    minWidth: 90,
     align: 'right',
   },
   {
     id: 'count',
     label: '训练次数或时间',
-    minWidth: 100,
+    minWidth: 135,
     align: 'right',
   },
   {
     id: 'bendingtimevalue',
     label: '弯曲定时值',
-    minWidth: 100,
+    minWidth: 105,
     align: 'right',
   },
   {
     id: 'stretchtimevalue',
     label: '伸展定时值',
-    minWidth: 100,
+    minWidth: 105,
     align: 'right',
   },
   {
     id: 'action',
     label: '操作',
-    minWidth: 100,
+    minWidth: 220,
     align: 'center',
   },
 ];
@@ -295,7 +295,7 @@ export default function StickyHeadTable(params: {PId:string,
                     <TableCell align='right'>{row.zz}</TableCell>
                     <TableCell align='right'>{row.u}</TableCell>
                     <TableCell align='right'>{row.v}</TableCell>
-                    <TableCell align='right'>
+                    <TableCell align='left'>
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
                         <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>
                         <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>
