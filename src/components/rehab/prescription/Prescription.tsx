@@ -103,28 +103,28 @@ export default function StickyHeadTable(params: {PId:string,
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
-  const [value, setValue] = React.useState(false)
+  // const [value, setValue] = React.useState(false)
   const [error, setError] = React.useState(false)
-  const [timeserror, setTimesError] = React.useState(false)
-  const [benderror, setBendError] = React.useState(false)
-  const [stretcherror, setStretchError] = React.useState(false)
+  const [timesError, setTimesError] = React.useState<string>('')
+  const [bendError, setBendError] = React.useState<string>('')
+  const [stretchError, setStretchError] = React.useState<string>('')
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription>({
     id: 0,
     created_at: "",
     part: "0",
     mode: "0",
-    zz: 0,
-    u: 0,
-    v: 0,
+    zz: 10,
+    u: 3,
+    v: 3,
   })
   const [willEditPrescription, setWillEditPrescription] = useState<Prescription>({
     id: 0,
     created_at: "",
     part: "0",
     mode: "0",
-    zz: 0,
-    u: 0,
-    v: 0,
+    zz: 10,
+    u: 3,
+    v: 3,
   })
   const [clientId, setClientId] = useState("")
 
@@ -195,9 +195,8 @@ export default function StickyHeadTable(params: {PId:string,
 
   function handleZZChange(e: ChangeEvent<HTMLInputElement>) {
     const inputValue = e.target.value;
-    setValue(inputValue);
-    if (inputValue !== '' && inputValue < '1') {
-      setTimesError('输入的数字不能小于1');
+    if (inputValue !== '' && parseInt(inputValue) < 3) {
+      setTimesError('输入的数字不能小于3');
     } else {
       setWillEditPrescription(prevState => ({
         ...prevState,
@@ -205,27 +204,10 @@ export default function StickyHeadTable(params: {PId:string,
       }));
     }
   }
-  const handleAddPrescriptionBend = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setValue(inputValue);
-    if (inputValue !== '' && inputValue < '3') {
-      setStretchError('输入的数字不能小于3');
-    } else {
-      setStretchError('');
-      setWillEditPrescription(prevState => ({
-        ...prevState,
-        u: parseInt(e.target.value)
-      }));
-    }
-  };
+
   function handleUChange(e: ChangeEvent<HTMLInputElement>) {
-    // setWillEditPrescription(prevState => ({
-    //   ...prevState,
-    //   u: parseInt(e.target.value)
-    // }));
     const inputValue = e.target.value;
-    setValue(inputValue);
-    if (inputValue !== '' && inputValue < '3') {
+    if (inputValue !== '' && parseInt(inputValue) < 3) {
       setBendError('输入的数字不能小于3');
     } else {
       setBendError('');
@@ -237,13 +219,8 @@ export default function StickyHeadTable(params: {PId:string,
   }
 
   function handleVChange(e: ChangeEvent<HTMLInputElement>) {
-    // setWillEditPrescription(prevState => ({
-    //   ...prevState,
-    //   v: parseInt(e.target.value)
-    // }));
     const inputValue = e.target.value;
-    setValue(inputValue);
-    if (inputValue !== '' && inputValue < '3') {
+    if (inputValue !== '' && parseInt(inputValue) < 3) {
       setStretchError('输入的数字不能小于3');
     } else {
       setStretchError('');
@@ -397,8 +374,8 @@ export default function StickyHeadTable(params: {PId:string,
                       value={willEditPrescription.zz}
                       id="outlined-zz" label="训练次数或时间"
                       onChange={handleZZChange}
-                      error={Boolean(timeserror)}
-                      helperText={timeserror}
+                      error={timesError != ''}
+                      helperText={timesError}
                       inputProps={{ type: 'number' }}
                       variant="outlined" size="small"/>
                   <TextField
@@ -407,8 +384,8 @@ export default function StickyHeadTable(params: {PId:string,
                       id="outlined-u"
                       label="弯曲定时值"
                       onChange={handleUChange}
-                      error={Boolean(benderror)}
-                      helperText={benderror}
+                      error={bendError != ''}
+                      helperText={bendError}
                       inputProps={{ type: 'number' }}
                       variant="outlined" size="small"/>
                   <TextField
@@ -417,8 +394,8 @@ export default function StickyHeadTable(params: {PId:string,
                       id="outlined-v"
                       label="伸展定时值"
                       onChange={handleVChange}
-                      error={Boolean(stretcherror)}
-                      helperText={stretcherror}
+                      error={stretchError != ""}
+                      helperText={stretchError}
                       inputProps={{ type: 'number' }}
                       variant="outlined" size="small"/>
                 </Box>

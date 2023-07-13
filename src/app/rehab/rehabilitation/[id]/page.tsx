@@ -54,26 +54,24 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState(false)
   const [error, setError] = React.useState(false)
-  const [timeserror, setTimesError] = React.useState(false)
-  const [benderror, setBendError] = React.useState(false)
-  const [stretcherror, setStretchError] = React.useState(false)
+  const [timesError, setTimesError] = React.useState<string>('')
+  const [bendError, setBendError] = React.useState<string>('')
+  const [stretchError, setStretchError] = React.useState<string>('')
 
   const [willAddPrescription, setWillAddPrescription] = React.useState<PrescriptionEntity>({
     id: 0,
     created_at: "",
     part: "0",
     mode: "0",
-    zz: 0,
-    u: 0,
-    v: 0,
+    zz: 3,
+    u: 3,
+    v: 3,
   })
 
   const handleAddPrescriptionTimes = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
     console.log(id, value);
-    setValue(value);
     if (value !== '' && value < '1') {
       setTimesError('输入的数字不能小于1');
     } else {
@@ -88,8 +86,11 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const handleAddPrescriptionBend = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
     console.log(id, value);
-    setValue(value);
-    if (value !== '' && value < '3') {
+    if (value == '') {
+      setBendError('不能为空');
+      return
+    }
+    if (value !== '' && parseInt(value) < 3) {
       setBendError('输入的数字不能小于3');
     } else {
       setBendError('');
@@ -102,7 +103,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
 
   const handleAddPrescriptionStretch = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
-    setValue(inputValue);
     if (inputValue !== '' && inputValue < '3') {
       setStretchError('输入的数字不能小于3');
     } else {
@@ -295,8 +295,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <TextField
                   value={willAddPrescription.zz}
                   onChange={handleAddPrescriptionTimes}
-                  error={Boolean(timeserror)}
-                  helperText={timeserror}
+                  error={timesError != ''}
+                  helperText={timesError}
                   inputProps={{ type: 'number' }}
                   sx={{ m: 1, minWidth: 160 }}
                   id="zz"
@@ -304,8 +304,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <TextField
                   value={willAddPrescription.u}
                   onChange={handleAddPrescriptionBend}
-                  error={Boolean(benderror)}
-                  helperText={benderror}
+                  error={bendError !== ''}
+                  helperText={bendError}
                   inputProps={{ type: 'number' }}
                   sx={{ m: 1, minWidth: 160 }}
                   id="u"
@@ -313,8 +313,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <TextField
                   value={willAddPrescription.v}
                   onChange={handleAddPrescriptionStretch}
-                  error={Boolean(stretcherror)}
-                  helperText={stretcherror}
+                  error={stretchError !== ""}
+                  helperText={stretchError}
                   inputProps={{ type: 'number' }}
                   sx={{ m: 1, minWidth: 160 }}
                   id="v"
