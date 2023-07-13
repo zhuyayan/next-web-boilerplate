@@ -130,6 +130,7 @@ export default function StickyHeadTable(params: {PId:string,
 
   const handleDeletePrescription = (id: number) => {
     appDispatch(deletePrescription({id: id}))
+    setRefreshFlag(prevFlag => !prevFlag);
   };
 
   const handleClickOpen = (row: Prescription) => {

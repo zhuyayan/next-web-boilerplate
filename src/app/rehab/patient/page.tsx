@@ -23,7 +23,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import styled from "styled-components";
 import {fetchPatients, fetchStaffs, Patient} from "@/redux/features/rehab/rehab-slice";
 import {addPatient, editPatient, deletePatient} from "@/redux/features/rehab/rehab-slice";
-import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
+import {AppDispatch, RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 import {useDispatch} from "react-redux";
 import Box from "@mui/material/Box";
 import {ThunkDispatch} from "redux-thunk";
@@ -35,6 +35,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {Delete as DeleteIcon} from "@mui/icons-material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {genderValueToLabel, getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
+import {string} from "postcss-selector-parser";
 
 
 const StyledDiv = styled.div`
@@ -52,6 +53,7 @@ const StyledButton = styled(Button)`
 export default function PatientList() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const appDispatch = useAppDispatch()
+  const dispatch = useDispatch()
   const patientList = useAppSelector((state: RootState) => state.rehab.patient)
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
@@ -101,7 +103,7 @@ export default function PatientList() {
   };
 
   const handleDeletePatient = (id: number) => {
-    appDispatch(deletePatient({id: id}))
+    (appDispatch as AppDispatch)(deletePatient({id: id}))
   };
 
   const [addPatientOpen, setAddPatientOpen] = React.useState(false);
@@ -127,7 +129,7 @@ export default function PatientList() {
 
   const handleEditPatient = () => {
     // 使用 id 页面需要调整
-    appDispatch(editPatient({
+    (appDispatch as AppDispatch)(editPatient({
       id: willEditPatient.id,
       name: willEditPatient.name,
       age: willEditPatient.age,
@@ -189,6 +191,7 @@ export default function PatientList() {
     setWillEditPatient((prevInputValues) => ({
       ...prevInputValues,
       ["gender"]: value,
+      ["genderLabel"]: genderValueToLabel(String(value)),
     }));
     setGender(event.target.value);
   };
@@ -222,7 +225,7 @@ export default function PatientList() {
     setWillAddPatient((prevInputValues) => ({
       ...prevInputValues,
       ["gender"]: value,
-      ["genderLabel"]: genderValueToLabel(value),
+      ["genderLabel"]: genderValueToLabel(String(value)),
     }));
   };
 
@@ -266,7 +269,6 @@ export default function PatientList() {
                           labelId="gender"
                           id="gender"
                           label="性别"
-                          value={willAddPatient.gender}
                           onChange={handleAddPatientGenderChange}
                       >
                         <MenuItem value={10}>男</MenuItem>
