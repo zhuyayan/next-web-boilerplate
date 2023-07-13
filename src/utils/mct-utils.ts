@@ -16,12 +16,11 @@ export function getDefaultGenderValue(): string {
 }
 
 export function getDefaultGenderLabel(): string {
-  return "10"
+  return "男"
 }
 
 export function timeSampleFormat(time: string): string {
   let date = new Date(time);  // 或者任何日期对象
-
   let year = date.getFullYear();
   let month = (date.getMonth() + 1).toString().padStart(2, '0');
   let day = date.getDate().toString().padStart(2, '0');
