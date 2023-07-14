@@ -103,7 +103,6 @@ export default function StickyHeadTable(params: {PId:string,
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
-  // const [value, setValue] = React.useState(false)
   const [error, setError] = React.useState(false)
   const [timesError, setTimesError] = React.useState<string>('')
   const [bendError, setBendError] = React.useState<string>('')
@@ -130,7 +129,6 @@ export default function StickyHeadTable(params: {PId:string,
 
   const handleDeletePrescription = (id: number) => {
     appDispatch(deletePrescription({id: id}))
-    setRefreshFlag(prevFlag => !prevFlag);
   };
 
   const handleClickOpen = (row: Prescription) => {
