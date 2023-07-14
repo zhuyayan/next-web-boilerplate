@@ -35,7 +35,7 @@ import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
-import {useAppDispatch} from "@/redux/store";
+import {AppDispatch, useAppDispatch} from "@/redux/store";
 import { deletePrescription } from "@/redux/features/rehab/rehab-slice";
 
 

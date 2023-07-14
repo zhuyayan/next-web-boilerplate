@@ -281,6 +281,18 @@ function convertAPIStaffToMedicalStaff(apiStaff: any): MedicalStaff {
   };
 }
 
+function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescription {
+  return {
+    id: apiPrescription.id,
+    created_at: timeSampleFormat(apiPrescription.created_at),
+    part: BodyPartToNumMapping[apiPrescription.part],
+    mode: ModeToNumMapping[apiPrescription.mode],
+    zz: apiPrescription.zz,
+    u:apiPrescription.u,
+    v:apiPrescription.v,
+  }
+}
+
 export const fetchPatients = createAsyncThunk<Patient[], {page: number, size: number, id: number}, {}>('fetchPatients', async ({page, size, id}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id}});
   console.log("fetch patient async thunk: ", response.data.data.patients)
@@ -353,23 +365,18 @@ export const deleteStaff = createAsyncThunk<{ id: number }, { id: number }, {}>(
   return {id: id}
 });
 
-export const addPrescription = createAsyncThunk<number, { pid: number, x: number, y: number , zz: number, u: number, v: number},
+export const addPrescription = createAsyncThunk<Prescription, { pid: number, x: number, y: number , zz: number, u: number, v: number},
     {}>('addPrescription', async ({pid, x, y , zz, u, v}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('prescription',{pid, x, y , zz, u, v})
-  console.log("add prescription async thunk: ", response.data)
+  console.log("add prescription async thunk: ", response.data.data.prescriptions[0])
+  return convertAPIPrescriptionToPrescription(response.data.data.prescriptions[0])
 });
 
-function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescription {
-  return {
-    id: apiPrescription.id,
-    created_at: timeSampleFormat(apiPrescription.created_at),
-    part: BodyPartToNumMapping[apiPrescription.part],
-    mode: ModeToNumMapping[apiPrescription.mode],
-    zz: apiPrescription.zz,
-    u:apiPrescription.u,
-    v:apiPrescription.v,
-  }
-}
+export const editPrescription = createAsyncThunk<Prescription, {id: number, x: number, y: number, zz: number, u: number, v:number}, {}>('editPrescription', async ({id, x, y, zz, u, v}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('prescription', { id, x, y, zz, u, v});
+  console.log("edit prescription: ", response.data)
+  return convertAPIPrescriptionToPrescription(response.data.data.prescriptions[0])
+});
 
 export const fetchPrescriptionById = createAsyncThunk<Prescription[], { id: number}, {}>('fetchPrescriptionById', async ({ id}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('prescription', {params:{ page: 1, size: 10, id}});
@@ -410,12 +417,6 @@ export const fetchPrescriptionRecordById = createAsyncThunk<PrescriptionRecord[]
   let p = response.data.data.tasks.map(convertAPIPrescriptionRecordToPrescriptionRecord)
   console.log('prescription_record', p)
   return p
-});
-
-export const editPrescription = createAsyncThunk<number, {id: number, x: number, y: number, zz: number, u: number, v:number}, {}>('editPrescription', async ({id, x, y, zz, u, v}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('prescription', { id, x, y, zz, u, v});
-  console.log("edit prescription: ", response.data)
-  return response.data.code
 });
 
 const RehabSlice = createSlice({
@@ -507,6 +508,7 @@ const RehabSlice = createSlice({
           });
         })
         .addCase(addStaff.fulfilled,(state, action) => {
+          state.staff.unshift(action.payload)
           console.log("add_staff_action", action.payload)
         })
         .addCase(editStaff.fulfilled, (state, action) => {
@@ -541,9 +543,7 @@ const RehabSlice = createSlice({
         .addCase(sendPrescriptionToEquipment.fulfilled, (state, action) => {
           console.log("send prescription to equipment code -> ", action.payload)
         })
-        .addCase(editPrescription.fulfilled, (state, action) => {
-          console.log("edit prescription -> ", action.payload)
-        })
+
         .addCase(deletePrescription.fulfilled,(state,action)=>{
           // 重新分页查询
           state.prescription = state.prescription.filter((item) => {
@@ -552,7 +552,17 @@ const RehabSlice = createSlice({
           console.log('delete prescription action', action.payload)
         })
         .addCase(addPrescription.fulfilled, (state, action) => {
-
+          state.prescription.unshift(action.payload)
+        })
+        .addCase(editPrescription.fulfilled, (state, action) => {
+          const updatedPrescription = action.payload;
+          state.prescription = state.prescription.map((prescription) => {
+            if (prescription.id === updatedPrescription.id) {
+              return updatedPrescription;
+            }
+            return prescription;
+          });
+          console.log("edit prescription -> ", action.payload)
         })
         .addMatcher(rehabApi.endpoints?.getOnlineEquipments.matchFulfilled, (state, action) => {
           console.log("addMatcher rehabApi getOnlineEquipments fulfilled -> ", action.payload, action.type)
