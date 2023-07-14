@@ -242,7 +242,7 @@ export default function PatientList() {
         <Container>
           <br/>
           <Typography variant="h2" component="h1"
-                      sx={{fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>病人列表</Typography>
+                      sx={{fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>病人列表</Typography>
           <div>
             <Button  style={{float: 'right'}} startIcon={<AddCircleOutlineIcon/>} variant="outlined" onClick={handleAddPatientOpen}>
               添加病人
@@ -394,7 +394,8 @@ export default function PatientList() {
                     <Select
                         labelId="gender"
                         id="gender"
-                        value={willEditPatient.gender.toString()}
+                        // value={willEditPatient.gender.toString()}
+                        value={String(willEditPatient.gender)}
                         label="性别"
                         onChange={handleChange}
                     >
