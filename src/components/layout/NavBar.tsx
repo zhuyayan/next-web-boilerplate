@@ -70,7 +70,7 @@ export default function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const hospitalName = useSelector((state:RootState) => state.appBar.hospitalName);
+  const hospitalName = useSelector((state:RootState) => state.appBar.rsConfig.Hospital.Name);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
     console.log('handlePopoverOpen')
