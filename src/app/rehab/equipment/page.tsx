@@ -1,8 +1,8 @@
 "use client";
-import {Container, MenuItem, Typography} from '@mui/material';
+import {Container, Typography} from '@mui/material';
 import styled from 'styled-components';
-import {EquipmentOnline} from "@/redux/features/rehab/rehab-slice";
 import React from "react";
+import {RootState, useAppSelector} from "@/redux/store";
 
 const EquipmentList = styled.ul`
   list-style-type: none;
@@ -23,27 +23,15 @@ const EquipmentStatus = styled.div<{ $online: boolean }>`
   margin-right: 8px;
 `;
 
-export default function EquipmentManagement(params:{onlineEquipment: EquipmentOnline[]}) {
-  const equipmentList = [
-    { id: 1, name: '设备编号', online: true },
-    { id: 2, name: '设备编号', online: false },
-  ];
-
+export default function EquipmentManagement() {
+  const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
   return (
     <Container>
         <br/>
       <Typography variant="h4" component="h1" sx={{ fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>设备管理</Typography>
       <EquipmentList>
-        {/*{equipmentList.map((equipment) => (*/}
-        {/*  <EquipmentItem key={equipment.id}>*/}
-        {/*    <EquipmentStatus  $online/>*/}
-        {/*    <Typography>*/}
-        {/*        {equipment.name}*/}
-        {/*    </Typography>*/}
-        {/*  </EquipmentItem>*/}
-        {/*))}*/}
-          {params.onlineEquipment ? (
-              params.onlineEquipment.map((item) => (
+          {onlineEquipment ? (
+              onlineEquipment.map((item) => (
               <EquipmentItem key={item.sId} value={item.sId}>
                   <EquipmentStatus  $online/>
                   <Typography>

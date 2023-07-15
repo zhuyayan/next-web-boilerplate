@@ -17,6 +17,7 @@ import {
   timeSampleFormat
 } from "@/utils/mct-utils";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {string} from "postcss-selector-parser";
 
 export interface MedicalStaff {
   id: number;
@@ -60,6 +61,8 @@ let staffs: MedicalStaff[] = []
 let patients: Patient[] = []
 let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
+let onlineEquipment: EquipmentOnline[] = []
+
 
 let patient: Patient = {
   id: 0,
@@ -79,6 +82,7 @@ interface RehabState {
   rehabPatient: Patient
   prescription: Prescription[]
   prescriptionRecord: PrescriptionRecord[]
+  onlineEquipment: EquipmentOnline[]
 }
 
 const initialState: RehabState = {
@@ -87,6 +91,7 @@ const initialState: RehabState = {
   rehabPatient: patient,
   prescription: prescriptions,
   prescriptionRecord: prescriptionRecord,
+  onlineEquipment: onlineEquipment,
 }
 
 export type Channel = 'redux' | 'general'
@@ -569,6 +574,7 @@ const RehabSlice = createSlice({
         })
         .addMatcher(latestOnlineEquipmentReceived.match, (state, action) =>{
           console.log("latestOnlineEquipmentReceived.match -> ",state.prescriptionRecord, action)
+          state.onlineEquipment = action.payload
         })
   },
 })

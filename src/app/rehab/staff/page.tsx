@@ -63,7 +63,7 @@ export default function MedicalStaffManagement() {
   const [open, setOpen] = React.useState(false);
   const [openAddStaff, setOpenAddStaff] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
-  const [passwordsVisibility, setPasswordsVisibility] = React.useState({});
+  const [passwordsVisibility, setPasswordsVisibility] = React.useState<{[id: number]: boolean}>({});
   const [willEditStaff, setWillEditStaff] = React.useState<MedicalStaff>({
     id: 0,
     username: '',
@@ -154,7 +154,7 @@ export default function MedicalStaffManagement() {
     setPage(0);
   };
 // 切换密码隐藏状态函数
-  const handleTogglePasswordVisibility = (id) => {
+  const handleTogglePasswordVisibility = (id: number) => {
     setPasswordsVisibility((prevPasswordsVisibility) => ({
       ...prevPasswordsVisibility,
       [id]: !prevPasswordsVisibility[id],
