@@ -61,8 +61,9 @@ const Transition = React.forwardRef(function Transition(
 
 const MCTStyledButton = styled(Button)`
   &&:hover {
-    background-color: azure; // 设置 hover 状态下的背景颜色
+    background-color: #5ba2e8; // 设置 hover 状态下的背景颜色
   }
+
   color: white;
   display: block;
 `;
