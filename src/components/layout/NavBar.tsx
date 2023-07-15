@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import {useEffect, useRef} from "react";
 import {useDispatch} from "react-redux";
-import {setHeight} from "@/redux/features/layout-slice";
+import {fetchConfig, setHeight} from "@/redux/features/layout-slice";
 import {Dialog, Popover, Slide} from "@mui/material";
 import {RootState, useAppSelector} from "@/redux/store";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
@@ -22,6 +22,8 @@ import {TransitionProps} from "@mui/material/transitions";
 import Link from "next/link";
 import styled from "styled-components";
 import { useSelector } from 'react-redux';
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
 
 interface MCTMenu {
   name: string,
@@ -66,11 +68,16 @@ const MCTStyledButton = styled(Button)`
 `;
 
 export default function NavBar() {
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const appBarRef = useRef<HTMLDivElement>(null);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const hospitalName = useSelector((state:RootState) => state.appBar.rsConfig.Hospital.Name);
+
+  useEffect(() => {
+    thunkDispatch(fetchConfig())
+  },[thunkDispatch])
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
     console.log('handlePopoverOpen')

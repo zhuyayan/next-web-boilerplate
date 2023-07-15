@@ -3,6 +3,7 @@ import {Container, Typography} from '@mui/material';
 import styled from 'styled-components';
 import React from "react";
 import {RootState, useAppSelector} from "@/redux/store";
+import {useGetOnlineEquipmentsQuery} from "@/redux/features/rehab/rehab-slice";
 
 const EquipmentList = styled.ul`
   list-style-type: none;
@@ -25,6 +26,8 @@ const EquipmentStatus = styled.div<{ $online: boolean }>`
 
 export default function EquipmentManagement() {
   const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
+  const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
+
   return (
     <Container>
         <br/>
