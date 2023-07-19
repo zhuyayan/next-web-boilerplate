@@ -176,7 +176,10 @@ export default function MUITable({ params }: { params: { id: string } }) {
   //导出excel
   const handleExportExcel = () => {
     let sheetFilter = ["creat_at", "update_at", "state"];
-    let option = {};
+    let option: {
+      fileName?: string;
+      datas?: any;
+    } = {};
     option.fileName = '康复记录-' + rehabPatient.name;
     option.datas = [
       {

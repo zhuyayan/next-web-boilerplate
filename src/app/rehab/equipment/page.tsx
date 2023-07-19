@@ -53,10 +53,10 @@ export default function EquipmentManagement() {
                             设备管理
                         </Typography>
                         <EquipmentList>
-                            {equipmentList.map((equipment) => (
-                                <EquipmentItem key={equipment.id}>
+                            {onlineEquipment.map((item) => (
+                                <EquipmentItem key={item.sId} value={item.sId}>
                                     <EquipmentStatus  $online/>
-                                    <Typography>{equipment.name}</Typography>
+                                    <Typography>{item.clientId}</Typography>
                                 </EquipmentItem>
                             ))}
                         </EquipmentList>
@@ -178,11 +178,7 @@ export default function EquipmentManagement() {
                     </CardActions>
                 </Card>
             </Grid>
-
         </Grid>
-
     </Container>
-
-
   );
 }
