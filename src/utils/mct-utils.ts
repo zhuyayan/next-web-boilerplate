@@ -4,17 +4,23 @@ export function genderLabelToValue(label:string): string {
   }
   return "21"
 }
+export function genderValueToLabel(value: string): string {
+  if (value === "10") {
+    return "男";
+  }
+  return "女";
+}
+
 export function getDefaultGenderValue(): string {
   return "10"
 }
 
 export function getDefaultGenderLabel(): string {
-  return "10"
+  return "男"
 }
 
 export function timeSampleFormat(time: string): string {
   let date = new Date(time);  // 或者任何日期对象
-
   let year = date.getFullYear();
   let month = (date.getMonth() + 1).toString().padStart(2, '0');
   let day = date.getDate().toString().padStart(2, '0');

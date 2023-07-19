@@ -1,14 +1,47 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {AxiosResponse} from "axios/index";
+import MCTAxiosInstance from "@/utils/mct-request";
+import {Prescription} from "@/redux/features/rehab/rehab-slice";
 
+export interface RSConfig {
+    Hospital: {
+        Name: string
+    }
+}
+
+let rsConfig: RSConfig = {
+    Hospital: {
+        Name: ''
+    }
+}
 interface AppBarState {
     height: number
-    hospitalName: string
+    rsConfig: RSConfig
 }
 
 const initialState: AppBarState = {
     height: 64,
-    hospitalName: '上海市静安区彭浦社区卫服务中心'
+    rsConfig: rsConfig
 }
+
+function convertApiConfigToConfig(obj: any): RSConfig {
+    return {
+        Hospital: {
+            Name: obj.hospital.name
+        }
+    }
+}
+export const fetchConfig = createAsyncThunk<RSConfig>('fetchConfig', async ():Promise<any> => {
+    const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('config');
+    console.log("fetch config by async thunk: ", response.data.data)
+    return convertApiConfigToConfig(response.data.data)
+});
+
+export const putConfig = createAsyncThunk<RSConfig, {hospital: {name: string}}, {}>('putConfig', async (arg):Promise<any> => {
+    const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('config', arg);
+    console.log("put config by async thunk: ", response.data.data)
+    return convertApiConfigToConfig(response.data.data)
+});
 
 const appBarSlice = createSlice({
     name: 'appBar',
@@ -18,9 +51,15 @@ const appBarSlice = createSlice({
             state.height = action.payload;
         },
         setHospitalName: (state, action) => {
-            state.hospitalName = action.payload
+            state.rsConfig.Hospital.Name = action.payload
         }
     },
+    extraReducers: (builder) => {
+        builder.addCase(fetchConfig.fulfilled, (state, action) => {
+            state.rsConfig.Hospital.Name = action.payload.Hospital.Name
+            console.log("fetchConfig -> ", action.payload)
+        })
+    }
 })
 
 export const { setHeight, setHospitalName } = appBarSlice.actions;

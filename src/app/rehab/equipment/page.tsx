@@ -1,5 +1,5 @@
 "use client";
-import { Container, Typography } from '@mui/material';
+import {Container, Typography} from '@mui/material';
 import styled from 'styled-components';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -7,6 +7,11 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
+
+import React from "react";
+import {RootState, useAppSelector} from "@/redux/store";
+import {useGetOnlineEquipmentsQuery} from "@/redux/features/rehab/rehab-slice";
+
 
 const EquipmentList = styled.ul`
   list-style-type: none;
@@ -28,10 +33,8 @@ const EquipmentStatus = styled.div<{ $online: boolean }>`
 `;
 
 export default function EquipmentManagement() {
-  const equipmentList = [
-    { id: 1, name: '设备编号', online: true },
-    { id: 2, name: '设备编号', online: false },
-  ];
+  const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
+  const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
 
   return (
     <Container>

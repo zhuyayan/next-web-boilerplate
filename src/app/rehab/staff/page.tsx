@@ -6,7 +6,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
+  DialogTitle, IconButton,
   Table,
   TableBody,
   TableCell,
@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
   deleteStaff,
   fetchStaffs,
@@ -25,7 +27,7 @@ import {
 } from "@/redux/features/rehab/rehab-slice";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
-import {RootState, useAppSelector} from "@/redux/store";
+import {AppDispatch, RootState, useAppSelector} from "@/redux/store";
 import Box from "@mui/material/Box";
 import {Delete as DeleteIcon} from "@mui/icons-material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -39,12 +41,29 @@ const StyledDiv = styled.div`
   margin-top: 20px;
 `;
 
+const StyledTableRow = styled(TableRow)`
+  & td.MuiTableCell-root {
+  padding: 14px;
+  }`;
+
+const chineseLocalization = {
+  components: {
+    MuiTablePagination: {
+      labelRowsPerPage: '每页行数:',
+      backIconButtonText: '上一页',
+      nextIconButtonText: '下一页',
+    }
+  }
+};
+
 export default function MedicalStaffManagement() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const appDispatch = useAppDispatch()
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
   const [openAddStaff, setOpenAddStaff] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [passwordsVisibility, setPasswordsVisibility] = React.useState<{[id: number]: boolean}>({});
   const [willEditStaff, setWillEditStaff] = React.useState<MedicalStaff>({
     id: 0,
     username: '',
@@ -90,7 +109,7 @@ export default function MedicalStaffManagement() {
   };
 
   const handleDeleteMedicalStaff = (id: number) => {
-    appDispatch(deleteStaff({id: id}))
+    (appDispatch as AppDispatch)(deleteStaff({id: id}))
   };
 
   const handleClickOpen = () => {
@@ -118,7 +137,7 @@ export default function MedicalStaffManagement() {
     }
   }
   const handleEditRow = () => {
-    appDispatch(editStaff({ id: willEditStaff.id, name: willEditStaff.fullName, username: willEditStaff.username, password: willEditStaff.password }))
+    (appDispatch as AppDispatch)(editStaff({ id: willEditStaff.id, name: willEditStaff.fullName, username: willEditStaff.username, password: willEditStaff.password }))
     handleClose()
   }
 
@@ -134,11 +153,18 @@ export default function MedicalStaffManagement() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+// 切换密码隐藏状态函数
+  const handleTogglePasswordVisibility = (id: number) => {
+    setPasswordsVisibility((prevPasswordsVisibility) => ({
+      ...prevPasswordsVisibility,
+      [id]: !prevPasswordsVisibility[id],
+    }));
+  };
 
   return (
     <Container>
       <br/>
-      <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>医护用户管理</Typography>
+      <Typography variant="h2" component="h1" sx={{ fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>医护用户管理</Typography>
       <div>
         <Button style={{float: 'right'}} startIcon={<AddCircleOutlineIcon /> } variant="outlined" onClick={handleAddStaffClickOpen}>
           添加医护
@@ -187,9 +213,22 @@ export default function MedicalStaffManagement() {
               {medicalStaffList
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((medicalStaff) => (
-                  <TableRow key={medicalStaff.id}>
+                  <StyledTableRow key={medicalStaff.id}>
                     <TableCell align='center'>{medicalStaff.username}</TableCell>
-                    <TableCell align='center'>{medicalStaff.password}</TableCell>
+                    <TableCell align='center'>
+                      {/*{medicalStaff.password}*/}
+                      {passwordsVisibility[medicalStaff.id] ? (
+                          medicalStaff.password
+                      ) : (
+                          '*****   '
+                      )}
+                      <IconButton
+                          onClick={() => handleTogglePasswordVisibility(medicalStaff.id)}
+                          size='small'
+                      >
+                        {passwordsVisibility[medicalStaff.id] ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </TableCell>
                     <TableCell align='center'>{medicalStaff.fullName}</TableCell>
                     <TableCell align='center'>
                       <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
@@ -197,12 +236,21 @@ export default function MedicalStaffManagement() {
                         <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>删除</Button>
                       </ButtonGroup>
                     </TableCell>
-                  </TableRow>
+                  </StyledTableRow>
                 ))}
             </TableBody>
             </Table>
         </TableContainer>
         <TablePagination
+          labelRowsPerPage="每页行数:"
+          nextIconButtonProps={{
+            'aria-label': '下一页',
+            'title': '下一页'
+          }}
+          backIconButtonProps={{
+            'aria-label': '上一页',
+            'title': '上一页'
+          }}
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
           count={medicalStaffList.length}
