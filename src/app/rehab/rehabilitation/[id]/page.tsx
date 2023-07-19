@@ -39,6 +39,7 @@ import {
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
+import ExportJsonExcel from "js-export-excel";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -172,6 +173,25 @@ export default function MUITable({ params }: { params: { id: string } }) {
     }))
   };
 
+  //导出excel
+  const handleExportExcel = () => {
+    let sheetFilter = ["creat_at", "update_at", "state"];
+    let option = {};
+    option.fileName = '康复记录-' + rehabPatient.name;
+    option.datas = [
+      {
+        sheetData: record,
+        sheetName: '康复记录',
+        sheetFilter: sheetFilter,
+        sheetHeader: ['康复开始时间', '康复结束时间', '状态'],
+        columnWidths: [20,20,10]
+      },
+    ];
+
+    let toExcel = new ExportJsonExcel(option); //生成
+    toExcel.saveExcel(); //保存
+  }
+
   return (
     <>
       <Container>
@@ -221,10 +241,15 @@ export default function MUITable({ params }: { params: { id: string } }) {
             {/*处方*/}
           <Grid item xs={6} md={10}>
             <Card sx={{ padding: '10px' ,height: 365}}>
-              <CardHeader title='处方' titleTypographyProps={{ variant: 'h5' }} />
-                <Button style={{float: 'right'}} startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>
+              <Box>
+                <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h5' }} />
+                <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
+                  (共{prescription.length}条处方)
+                </Typography>
+              </Box>
+              <Button style={{float:'right'}} startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>
                   添加处方
-                </Button>
+              </Button>
               <Prescription PId={params.id} prescription={prescription} onlineEquipment={onlineData || []}/>
             </Card>
           </Grid>
@@ -241,7 +266,15 @@ export default function MUITable({ params }: { params: { id: string } }) {
           {/*康复记录*/}
             <Grid item xs={6} md={6}>
               <Card sx={{ height: 365 ,padding: '10px'}}>
-                <CardHeader title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
+                <Box>
+                  <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
+                  <Typography style={{display:'inline-block'}} variant="subtitle1" gutterBottom>
+                    (共{record.length}条康复记录，累计康复时长*小时)
+                  </Typography>
+                  <Button style={{display:'inline-block', float:'right'}} variant="outlined" onClick={handleExportExcel}>
+                    导出Excel
+                  </Button>
+                </Box>
                 <PrescriptionTable record={record} />
               </Card>
             </Grid>
