@@ -6,7 +6,8 @@ switch (process.env.NODE_ENV) {
         nextConfig = {
             env: {
                 NEXT_PUBLIC_BASE_API: 'http://192.168.2.33:56567/api/v1/',
-                NEXT_PUBLIC_WEBSOCKET_ADDR: 'ws://192.168.2.101:56567/api/v1/',
+                NEXT_PUBLIC_WEBSOCKET_ADDR: 'ws://192.168.2.33:56567/api/v1/',
+
             }
         };
         break;

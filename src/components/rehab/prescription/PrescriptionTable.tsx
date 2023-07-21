@@ -7,10 +7,11 @@ import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow, { TableRowProps } from '@mui/material/TableRow'
 import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/TableCell'
-import {Button} from "@mui/material";
+import {Button, ButtonGroup} from "@mui/material";
 import {
   PrescriptionRecord
 } from "@/redux/features/rehab/rehab-slice";
+//import ExportJsonExcel from "js-export-excel";
 
 
 const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({
@@ -34,18 +35,40 @@ const StyledTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
   }
 }))
 
+//生成excel
+// const handleOneExportExcel = () => {
+//   let sheetFilter = ["creat_at", "update_at", "state"];
+//   let option: {
+//     fileName?: string;
+//     datas?: any;
+//   } = {};
+//   option.fileName = '康复记录';
+//   option.datas = [
+//     {
+//       sheetData: ,
+//       sheetName: '康复记录',
+//       sheetFilter: sheetFilter,
+//       sheetHeader: ['康复开始时间', '康复结束时间', '状态'],
+//       columnWidths: [20,20,10]
+//     },
+//   ];
+//
+//   let toExcel = new ExportJsonExcel(option); //生成
+//   toExcel.saveExcel(); //保存
+// }
+
 const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 365 }}>
+        <TableContainer sx={{ maxHeight: 280 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>康复开始时间</StyledTableCell>
-                <StyledTableCell align='right'>康复结束时间</StyledTableCell>
-                <StyledTableCell align='right'>状态</StyledTableCell>
+                <StyledTableCell sx={{minWidth: 165}}>康复开始时间</StyledTableCell>
+                <StyledTableCell sx={{minWidth: 165}} align='right'>康复结束时间</StyledTableCell>
+                <StyledTableCell align='right' sx={{minWidth: 70}}>状态</StyledTableCell>
                 {/*<StyledTableCell align='right'>康复次数</StyledTableCell>*/}
-                <StyledTableCell align='center'>操作</StyledTableCell>
+                <StyledTableCell sx={{minWidth: 180}} align='center'>操作</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -57,10 +80,16 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
                     <StyledTableCell align='right'>{row.updated_at}</StyledTableCell>
                     {/*<StyledTableCell align='right'>{row.state}</StyledTableCell>*/}
                     <StyledTableCell align='right'>{row.state}</StyledTableCell>
-                    <StyledTableCell align='right'>
-                      <Button style={{height:'20px'}} variant="outlined" color="secondary">
-                        删除
-                      </Button>
+                    <StyledTableCell align='center'>
+                      <ButtonGroup style={{height: '20px'}} variant="outlined">
+                        <Button color="primary" style={{width: '65px'}}>
+                          导出
+                        </Button>
+                        <Button color="secondary" style={{width: '65px'}}>
+                          删除
+                        </Button>
+                      </ButtonGroup>
+
                     </StyledTableCell>
                   </StyledTableRow>
               ))}

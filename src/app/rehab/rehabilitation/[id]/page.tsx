@@ -40,6 +40,12 @@ import {
 } from "@/redux/features/rehab/rehab-slice";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
 import ExportJsonExcel from "js-export-excel";
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
+
+//弹出消息
+interface State extends SnackbarOrigin {
+  messageOpen: boolean;
+}
 
 const StyledDiv = styled.div`
   display: flex;
@@ -123,6 +129,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
 
   const handleClose = () => {
     setOpen(false);
+    handleMessageClose();
   };
   const handleSaveAddPrescription = () => {
     console.log(willAddPrescription)
@@ -137,6 +144,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
       v: willAddPrescription.v
     }))
     setOpen(false);
+    handleMessageClick({ vertical: 'top', horizontal: 'center' });
   };
 
   useEffect(() => {
@@ -195,6 +203,22 @@ export default function MUITable({ params }: { params: { id: string } }) {
     toExcel.saveExcel(); //保存
   }
 
+  //弹出信息
+  const [state, setState] = React.useState<State>({
+    messageOpen: false,
+    vertical: 'top',
+    horizontal: 'center',
+  });
+  const { vertical, horizontal, messageOpen } = state;
+
+  const handleMessageClick = (newState: SnackbarOrigin) => () => {
+    setState({ ...newState, messageOpen: true });
+  };
+
+  const handleMessageClose = () => {
+    setState({ ...state, messageOpen: false });
+  };
+
   return (
     <>
       <Container>
@@ -247,7 +271,13 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <Box>
                 <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h5' }} />
                 <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
-                  (共{prescription.length}条处方)
+                  (共
+                </Typography>
+                <Typography color="primary" style={{display:'inline-block'}} variant="h5" gutterBottom>
+                  {prescription.length}
+                </Typography>
+                <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
+                  条处方)
                 </Typography>
               </Box>
               <Button style={{float:'right'}} startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>
@@ -258,7 +288,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
           </Grid>
             <br/>
           {/*压力数据折线图*/}
-          <Grid item xs={6} md={6}>
+          <Grid item xs={6} md={5.5}>
             <Card sx={{ height: 365 ,padding: '10px'}}>
               <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
               {
@@ -267,14 +297,20 @@ export default function MUITable({ params }: { params: { id: string } }) {
             </Card>
           </Grid>
           {/*康复记录*/}
-            <Grid item xs={6} md={6}>
+            <Grid item xs={6} md={6.5}>
               <Card sx={{ height: 365 ,padding: '10px'}}>
                 <Box>
                   <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
                   <Typography style={{display:'inline-block'}} variant="subtitle1" gutterBottom>
-                    (共{record.length}条康复记录，累计康复时长*小时)
+                    (共
                   </Typography>
-                  <Button style={{display:'inline-block', float:'right'}} variant="outlined" onClick={handleExportExcel}>
+                  <Typography color="primary" style={{display:'inline-block'}} variant="h6" gutterBottom>
+                    {record.length}
+                  </Typography>
+                  <Typography style={{display:'inline-block'}} variant="subtitle1" gutterBottom>
+                    条康复记录，累计康复时长*小时)
+                  </Typography>
+                  <Button style={{display:'inline-block', float:'right', width: '110px'}} variant="outlined" onClick={handleExportExcel}>
                     导出Excel
                   </Button>
                 </Box>
@@ -364,6 +400,13 @@ export default function MUITable({ params }: { params: { id: string } }) {
               onClick={handleSaveAddPrescription}
               disabled={Boolean(error)}
           >确定</Button>
+          <Snackbar
+              anchorOrigin={{ vertical, horizontal }}
+              open={messageOpen}
+              onClose={handleClose}
+              message="删除成功"
+              key={vertical + horizontal}
+          />
         </DialogActions>
       </Dialog>
     </>

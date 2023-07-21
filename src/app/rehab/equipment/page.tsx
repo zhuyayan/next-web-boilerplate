@@ -8,10 +8,13 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 
-import React from "react";
+import React, {useEffect} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
-import {useGetOnlineEquipmentsQuery} from "@/redux/features/rehab/rehab-slice";
-
+import {fetchPatients, useGetOnlineEquipmentsQuery} from "@/redux/features/rehab/rehab-slice";
+import Box from "@mui/material/Box";
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
+import {useDispatch} from "react-redux";
 
 const EquipmentList = styled.ul`
   list-style-type: none;
@@ -33,8 +36,14 @@ const EquipmentStatus = styled.div<{ $online: boolean }>`
 `;
 
 export default function EquipmentManagement() {
-  const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
-  const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
+    const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+    const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
+    const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
+    const patientList = useAppSelector((state: RootState) => state.rehab.patient)
+
+    useEffect(() => {
+        thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
+    }, [thunkDispatch]);
 
   return (
     <Container>
@@ -45,16 +54,35 @@ export default function EquipmentManagement() {
                 <Card sx={{ maxWidth: 345 }}>
                     <CardMedia
                         sx={{ height: 140 }}
-                        image="/static/images/cards/contemplative-reptile.jpg"
+                        image="/images/shebei.jpg"
                         title="equipment"
                     />
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
                             设备管理
                         </Typography>
+                        <Box>
+                            <Typography variant="subtitle1" style={{display:'inline-block'}}>
+                                设备总数量:&emsp;
+                            </Typography>
+                            <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
+                                {onlineEquipment.length}台
+                            </Typography>
+                        </Box>
+
+                        <Box>
+                            <Typography variant="subtitle1" style={{display:'inline-block'}}>
+                                在线设备数量:&emsp;
+                            </Typography>
+                            <Typography variant="h5" color="green" style={{display:'inline-block'}}>
+                                {onlineEquipment.length}台
+                            </Typography>
+                        </Box>
+
                         <EquipmentList>
                             {onlineEquipment.map((item) => (
                                 <EquipmentItem key={item.sId} value={item.sId}>
+                                    &emsp;&emsp;
                                     <EquipmentStatus  $online/>
                                     <Typography>{item.clientId}</Typography>
                                 </EquipmentItem>
@@ -71,18 +99,30 @@ export default function EquipmentManagement() {
                 <Card sx={{ maxWidth: 345 }}>
                     <CardMedia
                         sx={{ height: 140 }}
-                        image="/static/images/cards/contemplative-reptile.jpg"
-                        title="doctor"
+                        image="/images/xunlian.jpg"
+                        title="xl"
                     />
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
-                            医生团队
+                            训练数据
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            集结百余位医生智慧，获得专家水平诊断和针对性
-                            处方，及时准确地完成康复训练，全新全意为病人
-                            服务
-                        </Typography>
+                        <Box>
+                            <Typography variant="subtitle1" style={{display:'inline-block'}}>
+                                训练总时长:&emsp;
+                            </Typography>
+                            <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
+                                {onlineEquipment.length}小时
+                            </Typography>
+                        </Box>
+
+                        <Box>
+                            <Typography variant="subtitle1" style={{display:'inline-block'}}>
+                                训练总次数:&emsp;
+                            </Typography>
+                            <Typography variant="h5" color="green" style={{display:'inline-block'}}>
+                                {onlineEquipment.length}次
+                            </Typography>
+                        </Box>
                     </CardContent>
                     <CardActions>
                         <Button size="small">分享</Button>
@@ -95,16 +135,30 @@ export default function EquipmentManagement() {
                 <Card sx={{ maxWidth: 345 }}>
                     <CardMedia
                         sx={{ height: 140 }}
-                        image="/static/images/cards/contemplative-reptile.jpg"
+                        image="/images/patient.jpg"
                         title="patient"
                     />
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
-                            治疗患者
+                            治疗患者数据
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            已有数百名患者使用，全心全意为患者的健康服务
-                        </Typography>
+                        <Box>
+                            <Typography variant="subtitle1" style={{display:'inline-block'}}>
+                                参与康复训练患者总数:&emsp;
+                            </Typography>
+                            <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
+                                {patientList.length}位
+                            </Typography>
+                        </Box>
+
+                        <Box>
+                            <Typography variant="subtitle1" style={{display:'inline-block'}}>
+                                本月活跃患者数量:&emsp;
+                            </Typography>
+                            <Typography variant="h5" color="green" style={{display:'inline-block'}}>
+                                {patientList.length}位
+                            </Typography>
+                        </Box>
                     </CardContent>
                     <CardActions>
                         <Button size="small">分享</Button>
@@ -113,34 +167,14 @@ export default function EquipmentManagement() {
                 </Card>
             </Grid>
 
-            <Grid item xs={4} md={4}>
-                <Card sx={{ maxWidth: 345 }}>
-                    <CardMedia
-                        sx={{ height: 140 }}
-                        image="/static/images/cards/contemplative-reptile.jpg"
-                        title="time"
-                    />
-                    <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
-                            训练时长
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            全部病人累计训练时长
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                        <Button size="small">分享</Button>
-                        <Button size="small">了解更多</Button>
-                    </CardActions>
-                </Card>
-            </Grid>
+
 
             <Grid item xs={4} md={4}>
                 <Card sx={{ maxWidth: 345 }}>
                     <CardMedia
                         sx={{ height: 140 }}
-                        image="/static/images/cards/contemplative-reptile.jpg"
-                        title="OS"
+                        image="/images/equipment.png"
+                        title="system"
                     />
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
@@ -161,7 +195,7 @@ export default function EquipmentManagement() {
                 <Card sx={{ maxWidth: 345 }}>
                     <CardMedia
                         sx={{ height: 140 }}
-                        image="/static/images/cards/contemplative-reptile.jpg"
+                        image="/images/system.jpg"
                         title="bug"
                     />
                     <CardContent>
@@ -169,7 +203,29 @@ export default function EquipmentManagement() {
                             故障联系
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            请联系技术人员
+                            请联系技术人员，联系方式：xxxxxxx
+                        </Typography>
+                    </CardContent>
+                    <CardActions>
+                        <Button size="small">分享</Button>
+                        <Button size="small">了解更多</Button>
+                    </CardActions>
+                </Card>
+            </Grid>
+
+            <Grid item xs={4} md={4}>
+                <Card sx={{ maxWidth: 345 }}>
+                    <CardMedia
+                        sx={{ height: 140 }}
+                        image="/images/help.jpg"
+                        title="help"
+                    />
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                            意见反馈
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            反馈方式：邮箱xxx
                         </Typography>
                     </CardContent>
                     <CardActions>
