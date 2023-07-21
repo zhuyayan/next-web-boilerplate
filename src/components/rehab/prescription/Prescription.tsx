@@ -38,7 +38,6 @@ import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeM
 import {AppDispatch, useAppDispatch} from "@/redux/store";
 import { deletePrescription } from "@/redux/features/rehab/rehab-slice";
 
-
 const StyledDiv = styled.div`
   display: flex;
   gap: 10px;
@@ -126,6 +125,7 @@ export default function StickyHeadTable(params: {PId:string,
     v: 3,
   })
   const [clientId, setClientId] = useState("")
+  const [openMessage, setOpenMessage] = React.useState(false);
 
   const handleDeletePrescription = (id: number) => {
     appDispatch(deletePrescription({id: id}))
@@ -232,7 +232,7 @@ export default function StickyHeadTable(params: {PId:string,
 
   return (<>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ height: 265 }}>
+        <TableContainer sx={{ height: 240 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>

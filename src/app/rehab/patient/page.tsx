@@ -340,13 +340,17 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.i18d}</TableCell>
                           <TableCell align='center'>
 
-                            <Link href={`/rehab/rehabilitation/` + patient.id} passHref>
-                              <Button style={{height: '23px'}} variant="outlined" color="primary">
-                                查看康复信息
-                              </Button>
-                            </Link>
+                            {/*<Link href={`/rehab/rehabilitation/` + patient.id} passHref>*/}
+                            {/*  */}
+                            {/*</Link>*/}
                             <ButtonGroup variant="outlined" aria-label="outlined button group"
                                          style={{height: '20px'}}>
+                              <Button
+                                  color="secondary"
+                                  onClick={()=> {window.location.href="rehabilitation/"+patient.id}}
+                              >
+                                查看康复信息
+                              </Button>
                               <Button
                                   color="primary"
                                   onClick={() => handleEditClickOpen(patient.id)}
