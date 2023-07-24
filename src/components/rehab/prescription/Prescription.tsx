@@ -197,6 +197,7 @@ export default function StickyHeadTable(params: {PId:string,
     if (inputValue !== '' && parseInt(inputValue) < 3) {
       setTimesError('输入的数字不能小于3');
     } else {
+      setTimesError('');
       setWillEditPrescription(prevState => ({
         ...prevState,
         zz: parseInt(inputValue)

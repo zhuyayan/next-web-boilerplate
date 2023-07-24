@@ -36,6 +36,13 @@ import {Delete as DeleteIcon} from "@mui/icons-material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {genderValueToLabel, getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
 import {string} from "postcss-selector-parser";
+import SearchIcon from '@mui/icons-material/Search';
+import InputBase from '@mui/material/InputBase';
+import { alpha } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import SmsIcon from '@mui/icons-material/Sms';
+import Tooltip from '@mui/material/Tooltip';
 
 
 const StyledDiv = styled.div`
@@ -49,6 +56,48 @@ const StyledButton = styled(Button)`
     background-color: #1976d1;
     color: #ffffff;
   }`;
+
+// const Search = styled('div')(({ theme }) => ({
+//   position: 'relative',
+//   borderRadius: theme.shape.borderRadius,
+//   backgroundColor: alpha(theme.palette.common.white, 0.15),
+//   '&:hover': {
+//     backgroundColor: alpha(theme.palette.common.white, 0.25),
+//   },
+//   marginLeft: 0,
+//   width: '100%',
+//   [theme.breakpoints.up('sm')]: {
+//     marginLeft: theme.spacing(1),
+//     width: 'auto',
+//   },
+// }));
+//
+// const SearchIconWrapper = styled('div')(({ theme }) => ({
+//   padding: theme.spacing(0, 2),
+//   height: '100%',
+//   position: 'absolute',
+//   pointerEvents: 'none',
+//   display: 'flex',
+//   alignItems: 'center',
+//   justifyContent: 'center',
+// }));
+//
+// const StyledInputBase = styled(InputBase)(({ theme }) => ({
+//   color: 'inherit',
+//   '& .MuiInputBase-input': {
+//     padding: theme.spacing(1, 1, 1, 0),
+//     // vertical padding + font size from searchIcon
+//     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+//     transition: theme.transitions.create('width'),
+//     width: '100%',
+//     [theme.breakpoints.up('sm')]: {
+//       width: '12ch',
+//       '&:focus': {
+//         width: '20ch',
+//       },
+//     },
+//   },
+// }));
 
 export default function PatientList() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
@@ -244,6 +293,15 @@ export default function PatientList() {
           <Typography variant="h2" component="h1"
                       sx={{fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>病人列表</Typography>
           <div>
+            {/*<Search>*/}
+            {/*  <SearchIconWrapper>*/}
+            {/*    <SearchIcon />*/}
+            {/*  </SearchIconWrapper>*/}
+            {/*  <StyledInputBase*/}
+            {/*      placeholder="Search…"*/}
+            {/*      inputProps={{ 'aria-label': 'search' }}*/}
+            {/*  />*/}
+            {/*</Search>*/}
             <Button  style={{float: 'right'}} startIcon={<AddCircleOutlineIcon/>} variant="outlined" onClick={handleAddPatientOpen}>
               添加病人
             </Button>
@@ -324,7 +382,7 @@ export default function PatientList() {
                   <TableCell sx={{m: 1, minWidth: 150}} align='center'>病史</TableCell>
                   <TableCell sx={{m: 1, minWidth: 100}} align='center'>主治医生</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>身份证号</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 400}} align='center'>操作</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 300}} align='center'>操作</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -343,25 +401,33 @@ export default function PatientList() {
                             {/*<Link href={`/rehab/rehabilitation/` + patient.id} passHref>*/}
                             {/*  */}
                             {/*</Link>*/}
-                            <ButtonGroup variant="outlined" aria-label="outlined button group"
-                                         style={{height: '20px'}}>
-                              <Button
-                                  color="secondary"
+
+                            <Tooltip title="查看详细信息">
+                              <IconButton
+                                  aria-label="more"
                                   onClick={()=> {window.location.href="rehabilitation/"+patient.id}}
                               >
-                                查看康复信息
-                              </Button>
-                              <Button
-                                  color="primary"
+                                <SmsIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="修改信息">
+                              <IconButton
+                                  aria-label="edit"
                                   onClick={() => handleEditClickOpen(patient.id)}
                               >
-                                修改
-                              </Button>
-                              <Button color="secondary" startIcon={<DeleteIcon/>}
-                                      onClick={() => handleDeletePatient(patient.id)}>
-                                删除
-                              </Button>
-                            </ButtonGroup>
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="删除">
+                              <IconButton
+                                  aria-label="delete"
+                                  onClick={() => handleDeletePatient(patient.id)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
 
                           </TableCell>
                         </TableRow>
@@ -370,6 +436,15 @@ export default function PatientList() {
             </Table>
           </TableContainer>
           <TablePagination
+              labelRowsPerPage="每页行数:"
+              nextIconButtonProps={{
+                'aria-label': '下一页',
+                'title': '下一页'
+              }}
+              backIconButtonProps={{
+                'aria-label': '上一页',
+                'title': '上一页'
+              }}
               rowsPerPageOptions={[10, 25, 100]}
               component="div"
               count={patientList.length}
