@@ -9,7 +9,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Button, ButtonGroup,
+  Button, ButtonGroup, Icon,
 } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
@@ -43,6 +43,24 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import SmsIcon from '@mui/icons-material/Sms';
 import Tooltip from '@mui/material/Tooltip';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+import InputAdornment from '@mui/material/InputAdornment';
+import AddIcon from '@mui/icons-material/Add';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 
 const StyledDiv = styled.div`
@@ -57,48 +75,6 @@ const StyledButton = styled(Button)`
     color: #ffffff;
   }`;
 
-// const Search = styled('div')(({ theme }) => ({
-//   position: 'relative',
-//   borderRadius: theme.shape.borderRadius,
-//   backgroundColor: alpha(theme.palette.common.white, 0.15),
-//   '&:hover': {
-//     backgroundColor: alpha(theme.palette.common.white, 0.25),
-//   },
-//   marginLeft: 0,
-//   width: '100%',
-//   [theme.breakpoints.up('sm')]: {
-//     marginLeft: theme.spacing(1),
-//     width: 'auto',
-//   },
-// }));
-//
-// const SearchIconWrapper = styled('div')(({ theme }) => ({
-//   padding: theme.spacing(0, 2),
-//   height: '100%',
-//   position: 'absolute',
-//   pointerEvents: 'none',
-//   display: 'flex',
-//   alignItems: 'center',
-//   justifyContent: 'center',
-// }));
-//
-// const StyledInputBase = styled(InputBase)(({ theme }) => ({
-//   color: 'inherit',
-//   '& .MuiInputBase-input': {
-//     padding: theme.spacing(1, 1, 1, 0),
-//     // vertical padding + font size from searchIcon
-//     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-//     transition: theme.transitions.create('width'),
-//     width: '100%',
-//     [theme.breakpoints.up('sm')]: {
-//       width: '12ch',
-//       '&:focus': {
-//         width: '20ch',
-//       },
-//     },
-//   },
-// }));
-
 export default function PatientList() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const appDispatch = useAppDispatch()
@@ -106,6 +82,7 @@ export default function PatientList() {
   const patientList = useAppSelector((state: RootState) => state.rehab.patient)
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
+  const [openDelPatient, setOpenDelPatient] = React.useState(false);
   const [openAddPatient, setOpenAddPatient] = React.useState(false);
   const [willEditPatient, setWillEditPatient] = useState<Patient>({
     id: 0,
@@ -151,8 +128,13 @@ export default function PatientList() {
     handleAddPatientClose()
   };
 
+
+  const handleClickDel = () => {
+    setOpenDelPatient(true);
+  }
   const handleDeletePatient = (id: number) => {
     (appDispatch as AppDispatch)(deletePatient({id: id}))
+    handleCloseDel()
   };
 
   const [addPatientOpen, setAddPatientOpen] = React.useState(false);
@@ -172,6 +154,9 @@ export default function PatientList() {
     }
   };
 
+  const handleCloseDel= () => {
+    setOpenDelPatient(false);
+  }
   const handleClose = () => {
     setOpen(false);
   };
@@ -287,24 +272,66 @@ export default function PatientList() {
     }));
   };
 
+  const [doctorName, setDoctorName] = React.useState<string[]>([]);
+
+  const handleSelectChange = (event: SelectChangeEvent<typeof doctorName>) => {
+    const {
+      target: { value },
+    } = event;
+    setDoctorName(
+        typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
     return (
         <Container>
-          <br/>
           <Typography variant="h2" component="h1"
                       sx={{fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>病人列表</Typography>
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
           <div>
-            {/*<Search>*/}
-            {/*  <SearchIconWrapper>*/}
-            {/*    <SearchIcon />*/}
-            {/*  </SearchIconWrapper>*/}
-            {/*  <StyledInputBase*/}
-            {/*      placeholder="Search…"*/}
-            {/*      inputProps={{ 'aria-label': 'search' }}*/}
-            {/*  />*/}
-            {/*</Search>*/}
-            <Button  style={{float: 'right'}} startIcon={<AddCircleOutlineIcon/>} variant="outlined" onClick={handleAddPatientOpen}>
-              添加病人
-            </Button>
+            <FormControl sx={{ m: 1, width: 240}}>
+              <InputLabel id="demo-multiple-checkbox-label">主治医生</InputLabel>
+              <Select
+                  labelId="demo-multiple-checkbox-label"
+                  id="demo-multiple-checkbox"
+                  multiple
+                  value={doctorName}
+                  onChange={handleSelectChange}
+                  input={<OutlinedInput label="主治医生" />}
+                  renderValue={(selected) => selected.join(', ')}
+                  MenuProps={MenuProps}
+              >
+                {medicalStaffList.map((medicalStaff) => (
+                    <MenuItem key={medicalStaff.id} value={medicalStaff.fullName}>
+                      <Checkbox checked={doctorName.indexOf(medicalStaff.fullName) > -1} />
+                      <ListItemText primary={medicalStaff.fullName} />
+                    </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ m: 1, width: 480}}>
+              <OutlinedInput
+                  sx={{ ml: 1, flex: 1 }}
+                  placeholder="输入病人姓名进行查询"
+                  inputProps={{ 'aria-label': '输入病人姓名进行查询' }}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  }
+              />
+            </FormControl>
+
+            <Tooltip title="添加病人">
+              <IconButton
+                  style={{float: 'right'}}
+                  aria-label="add"
+                  onClick={handleAddPatientOpen}
+              >
+                <AddCircleIcon sx={{ fontSize: 54 }} color="secondary"/>
+              </IconButton>
+            </Tooltip>
             <Dialog open={addPatientOpen} onClose={handleAddPatientClose}>
               <DialogTitle>添加病人</DialogTitle>
               <DialogContent>
@@ -370,8 +397,6 @@ export default function PatientList() {
               </DialogActions>
             </Dialog>
           </div>
-
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
           <TableContainer sx={{ maxHeight: 620}}>
             <Table>
               <TableHead>
@@ -405,6 +430,7 @@ export default function PatientList() {
                             <Tooltip title="查看详细信息">
                               <IconButton
                                   aria-label="more"
+                                  color="primary"
                                   onClick={()=> {window.location.href="rehabilitation/"+patient.id}}
                               >
                                 <SmsIcon fontSize="small" />
@@ -414,6 +440,7 @@ export default function PatientList() {
                             <Tooltip title="修改信息">
                               <IconButton
                                   aria-label="edit"
+                                  color="secondary"
                                   onClick={() => handleEditClickOpen(patient.id)}
                               >
                                 <EditIcon fontSize="small" />
@@ -423,11 +450,25 @@ export default function PatientList() {
                             <Tooltip title="删除">
                               <IconButton
                                   aria-label="delete"
-                                  onClick={() => handleDeletePatient(patient.id)}
+                                  // onClick={() => handleDeletePatient(patient.id)}
+                                  onClick = {handleClickDel}
                               >
                                 <DeleteIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
+
+                            <Dialog open={openDelPatient} onClose={handleCloseDel}>
+                              <DialogTitle>确认操作</DialogTitle>
+                              <DialogContent>
+                                <DialogContentText>
+                                  是否确认删除该条病人信息？
+                                </DialogContentText>
+                              </DialogContent>
+                              <DialogActions>
+                                <Button onClick={() => handleDeletePatient(patient.id)}>确认删除</Button>
+                                <Button onClick={handleCloseDel}>取消</Button>
+                              </DialogActions>
+                            </Dialog>
 
                           </TableCell>
                         </TableRow>

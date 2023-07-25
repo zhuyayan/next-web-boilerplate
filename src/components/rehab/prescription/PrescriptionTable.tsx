@@ -7,10 +7,17 @@ import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow, { TableRowProps } from '@mui/material/TableRow'
 import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/TableCell'
-import {Button, ButtonGroup} from "@mui/material";
+import {Button, ButtonGroup, IconButton} from "@mui/material";
 import {
+  deletePrescription,
   PrescriptionRecord
 } from "@/redux/features/rehab/rehab-slice";
+import Tooltip from "@mui/material/Tooltip";
+import EditIcon from "@mui/icons-material/Edit";
+import {Delete as DeleteIcon} from "@mui/icons-material";
+import React from "react";
+import DownloadIcon from "@mui/icons-material/Download";
+import {useAppDispatch} from "@/redux/store";
 //import ExportJsonExcel from "js-export-excel";
 
 
@@ -58,6 +65,14 @@ const StyledTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
 // }
 
 const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
+  const appDispatch = useAppDispatch()
+
+  // const handleDeletePrescriptionRecord = (id: number) => {
+  //   if (window.confirm('是否确认删除该条处方？')) {
+  //     appDispatch(deletePrescriptionRecord({id: id}))
+  //   }
+  // };
+
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 280 }}>
@@ -68,7 +83,7 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
                 <StyledTableCell sx={{minWidth: 165}} align='right'>康复结束时间</StyledTableCell>
                 <StyledTableCell align='right' sx={{minWidth: 70}}>状态</StyledTableCell>
                 {/*<StyledTableCell align='right'>康复次数</StyledTableCell>*/}
-                <StyledTableCell sx={{minWidth: 180}} align='center'>操作</StyledTableCell>
+                <StyledTableCell sx={{minWidth: 160}} align='center'>操作</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -81,14 +96,31 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
                     {/*<StyledTableCell align='right'>{row.state}</StyledTableCell>*/}
                     <StyledTableCell align='right'>{row.state}</StyledTableCell>
                     <StyledTableCell align='center'>
-                      <ButtonGroup style={{height: '20px'}} variant="outlined">
-                        <Button color="primary" style={{width: '65px'}}>
-                          导出
-                        </Button>
-                        <Button color="secondary" style={{width: '65px'}}>
-                          删除
-                        </Button>
-                      </ButtonGroup>
+                      {/*<ButtonGroup style={{height: '20px'}} variant="outlined">*/}
+                      {/*  <Button color="primary" style={{width: '65px'}}>*/}
+                      {/*    导出*/}
+                      {/*  </Button>*/}
+                      {/*  <Button color="secondary" style={{width: '65px'}}>*/}
+                      {/*    删除*/}
+                      {/*  </Button>*/}
+                      {/*</ButtonGroup>*/}
+                      <Tooltip title="导出">
+                        <IconButton
+                            aria-label="download"
+                            color="primary"
+                        >
+                          <DownloadIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="删除">
+                        <IconButton
+                            aria-label="delete"
+                            color="secondary"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
 
                     </StyledTableCell>
                   </StyledTableRow>
