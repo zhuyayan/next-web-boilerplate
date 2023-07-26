@@ -1,3 +1,6 @@
+import React from "react";
+import {MedicalStaff} from "@/redux/features/rehab/rehab-slice";
+
 export function genderLabelToValue(label:string): string {
   if (label == "男") {
     return "10"
@@ -90,3 +93,13 @@ export const StateToNumMapping: { [key: number]: string } = {
   5: "伸保持态",
   6: "弯曲保持态",
 };
+
+
+export function GetDefaultMedicalStaff() {
+  return {
+    id: 0,
+    username: '',
+    password: '',
+    fullName: '',
+  }
+}
