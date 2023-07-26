@@ -236,6 +236,35 @@ export default function MedicalStaffManagement() {
 
   return (
     <>
+      <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
+        <DialogTitle>添加医护</DialogTitle>
+        <DialogContent>
+          <Box>
+            <StyledDiv>
+              <TextField
+                  sx={{ m: 1, minWidth: 120 }} id="username"
+                  value={willAddStaff.username}
+                  onChange={handleAddMedicalStaff}
+                  label="用户名" variant="outlined" size="small"/>
+              <TextField
+                  sx={{ m: 1, minWidth: 120 }} id="password"
+                  value={willAddStaff.password}
+                  onChange={handleAddMedicalStaff}
+                  label="密码" variant="outlined" size="small"/>
+              <TextField
+                  sx={{ m: 1, minWidth: 120 }} id="fullName"
+                  value={willAddStaff.fullName}
+                  onChange={handleAddMedicalStaff}
+                  label="全名" variant="outlined" size="small"/>
+            </StyledDiv>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAddStaffClickClose}>取消</Button>
+          <Button onClick={handleSaveAddMedicalStaff}>确定</Button>
+        </DialogActions>
+      </Dialog>
+
       <MCTStyledDialog
           open={deleteDialogOpen}
           onClose={handleDeleteDialogClose}
@@ -261,6 +290,7 @@ export default function MedicalStaffManagement() {
           </Button>
         </DialogActions>
       </MCTStyledDialog>
+
       <Container>
         <Typography variant="h2" component="h1" sx={{ fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>医护管理</Typography>
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -285,41 +315,14 @@ export default function MedicalStaffManagement() {
                 <AddCircleIcon sx={{ fontSize: 54 }} color="secondary"/>
               </IconButton>
             </Tooltip>
-          <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
-              <DialogTitle>添加医护</DialogTitle>
-              <DialogContent>
-                <Box>
-                  <StyledDiv>
-                    <TextField
-                        sx={{ m: 1, minWidth: 120 }} id="username"
-                        value={willAddStaff.username}
-                        onChange={handleAddMedicalStaff}
-                        label="用户名" variant="outlined" size="small"/>
-                    <TextField
-                        sx={{ m: 1, minWidth: 120 }} id="password"
-                        value={willAddStaff.password}
-                        onChange={handleAddMedicalStaff}
-                        label="密码" variant="outlined" size="small"/>
-                    <TextField
-                        sx={{ m: 1, minWidth: 120 }} id="fullName"
-                        value={willAddStaff.fullName}
-                        onChange={handleAddMedicalStaff}
-                        label="全名" variant="outlined" size="small"/>
-                  </StyledDiv>
-                </Box>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleAddStaffClickClose}>取消</Button>
-                <Button onClick={handleSaveAddMedicalStaff}>确定</Button>
-              </DialogActions>
-            </Dialog>
+
           <TableContainer sx={{ maxHeight: 620}}>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell align='center'>名字</TableCell>
                   <TableCell align='center'>登录名</TableCell>
-                  <TableCell align='center'>密码</TableCell>
+                  <TableCell align='center' style={{width: 300}}>密码</TableCell>
                   <TableCell align='center'>操作</TableCell>
                 </TableRow>
               </TableHead>
@@ -357,7 +360,6 @@ export default function MedicalStaffManagement() {
                         <Tooltip title="删除">
                           <IconButton
                               aria-label="delete"
-                              color="secondary"
                               onClick={() => handleDeleteMedicalStaff(medicalStaff)}
                           >
                             <DeleteIcon fontSize="small" />
@@ -379,6 +381,7 @@ export default function MedicalStaffManagement() {
               'aria-label': '上一页',
               'title': '上一页'
             }}
+            labelDisplayedRows={({from, to, count}) => `${from}-${to} 共 ${count}`}
             rowsPerPageOptions={[10, 25, 100]}
             component="div"
             count={medicalStaffList.length}

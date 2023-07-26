@@ -303,7 +303,7 @@ export default function NavBar() {
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
+              <Tooltip title="设置">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar alt="Remy Sharp" src="/images/logo/MCTlogo.png" />
                 </IconButton>
@@ -330,7 +330,7 @@ export default function NavBar() {
                 {/*    </MenuItem>*/}
                 {/*))}*/}
                   <MenuItem key="Logout" onClick={handleLogout}>
-                      <Typography textAlign="center">Logout</Typography>
+                      <Typography textAlign="center">退出</Typography>
                   </MenuItem>
               </Menu>
             </Box>

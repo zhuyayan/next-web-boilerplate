@@ -42,9 +42,15 @@ import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeM
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 import {IconButton} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import SendAndArchiveIcon from '@mui/icons-material/SendAndArchive';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import DownloadIcon from '@mui/icons-material/Download';
+import CardMedia from "@mui/material/CardMedia";
+import CardActions from "@mui/material/CardActions";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -211,43 +217,99 @@ export default function MUITable({ params }: { params: { id: string } }) {
             <br />
           </Grid>
         </Grid>
-        {/*病人card*/}
-          <Grid container spacing={2}>
-            <Grid item xs={6} md={2}>
-              <Card sx={{ backgroundColor: '#ffffff', height: 365}} >
-                <CardHeader title='病人信息' titleTypographyProps={{ variant: 'h5' }} />
-                <br />
-                <CardContent>
-                  <Typography component="div">
-                    姓名：{rehabPatient.name}
-                  </Typography>
-                  <Divider />
+        <Grid container spacing={2}>
+            {/*病人card*/}
+          <Grid container item xs={6} md={12} spacing={2}>
+              <Grid item xs={6} md={6}>
+                <Card sx={{ backgroundColor: '#ffffff', height: 150}} >
+                  <CardHeader title=' ' titleTypographyProps={{ variant: 'h5' }} />
+                  <CardContent>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography component="div">
+                          姓名：{rehabPatient.name}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography component="div">
+                          年龄：{rehabPatient.age}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography component="div">
+                          性别：{rehabPatient.genderLabel}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Divider />
                     <br />
-                  <Typography component="div">
-                    年龄：{rehabPatient.age}<br/>
-                  </Typography>
-                  <Divider />
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography component="div">
+                          ID：{rehabPatient.i18d}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography component="div">
+                          病史：{rehabPatient.medicalHistory}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography component="div">
+                          主治医生：{rehabPatient.physician}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Divider />
                     <br />
-                  <Typography component="div">
-                    性别：{rehabPatient.genderLabel}<br/>
-                  </Typography>
-                  <Divider />
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Card sx={{height: 150}}>
+                  <AccessTimeFilledIcon color="secondary" sx={{fontSize: 50 }}/>
+                  <CardContent style={{ textAlign: 'center' }}>
+                    <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
+                      0小时 <br />
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      总训练时长
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
+                <Card sx={{height: 150}}>
+                  <AssessmentIcon color="secondary" sx={{ fontSize: 50 }}/>
+                  <CardContent style={{ textAlign: 'center' }}>
+                    <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
+                      {record.length}次
+                    </Typography>
                     <br />
-                  <Typography component="div">
-                    病史：{rehabPatient.medicalHistory}<br/>
-                  </Typography>
-                  <Divider />
+                    <Typography variant="body2" color="text.secondary">
+                      总训练次数
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Card sx={{height: 150}}>
+                  <TimerIcon color="secondary" sx={{ fontSize: 50 }}/>
+                  <CardContent style={{ textAlign: 'center' }}>
+                    <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
+                      4天
+                    </Typography>
                     <br />
-                  <Typography component="div">
-                    主治医生：{rehabPatient.physician}<br/>
-                  </Typography>
-                  <Divider />
-                </CardContent>
-              </Card>
+                    <Typography variant="body2" color="text.secondary">
+                      总训练天数
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
 
             {/*处方*/}
-          <Grid item xs={6} md={10}>
+          <Grid item xs={6} md={12}>
             <Card sx={{ padding: '10px' ,height: 365}}>
               <div>
                 <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h5' }} />
@@ -260,10 +322,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
                   条处方)
                 </Typography>
-
-                {/*<Button style={{float:'right'}} startIcon={<AddCircleOutlineIcon />} variant="outlined" onClick={handleClickOpen}>*/}
-                {/*    添加处方*/}
-                {/*</Button>*/}
                 <Tooltip title="添加处方">
                   <IconButton
                       style={{float: 'right'}}
@@ -279,7 +337,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
             </Card>
           </Grid>
             <br/>
-          {/*压力数据折线图*/}
+
+            {/*压力数据折线图*/}
           <Grid item xs={6} md={5.5}>
             <Card sx={{ height: 365 ,padding: '10px'}}>
               <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
@@ -288,7 +347,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
               }
             </Card>
           </Grid>
-          {/*康复记录*/}
+
+            {/*康复记录*/}
           <Grid item xs={6} md={6.5}>
             <Card sx={{ height: 365 ,padding: '10px'}}>
               <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />

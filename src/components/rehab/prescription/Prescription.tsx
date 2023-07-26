@@ -42,6 +42,8 @@ import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import {Delete as DeleteIcon} from "@mui/icons-material";
 import ShareIcon from '@mui/icons-material/Share';
+import ReplyAllIcon from '@mui/icons-material/ReplyAll';
+import SendAndArchiveIcon from '@mui/icons-material/SendAndArchive';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -286,7 +288,7 @@ export default function StickyHeadTable(params: {PId:string,
                             color="primary"
                             onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
                         >
-                          <ShareIcon fontSize="small" />
+                          <SendAndArchiveIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
 
