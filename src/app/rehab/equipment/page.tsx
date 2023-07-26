@@ -47,6 +47,7 @@ export default function EquipmentManagement() {
 
   return (
     <Container>
+        <br/>
         <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>数据汇总</Typography>
         <br/>
         <Grid container spacing={3}>

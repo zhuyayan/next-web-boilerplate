@@ -14,7 +14,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  FormControl,
+  FormControl, IconButton,
   InputLabel,
   MenuItem,
   Select
@@ -25,6 +25,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 
 import {
+  deleteStaff,
   editPrescription,
   EquipmentOnline,
   Prescription,
@@ -37,6 +38,10 @@ import {useDispatch} from "react-redux";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
 import {AppDispatch, useAppDispatch} from "@/redux/store";
 import { deletePrescription } from "@/redux/features/rehab/rehab-slice";
+import Tooltip from "@mui/material/Tooltip";
+import EditIcon from "@mui/icons-material/Edit";
+import {Delete as DeleteIcon} from "@mui/icons-material";
+import ShareIcon from '@mui/icons-material/Share';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -89,7 +94,7 @@ const columns: readonly Column[] = [
   {
     id: 'action',
     label: '操作',
-    minWidth: 220,
+    minWidth: 180,
     align: 'center',
   },
 ];
@@ -128,7 +133,9 @@ export default function StickyHeadTable(params: {PId:string,
   const [openMessage, setOpenMessage] = React.useState(false);
 
   const handleDeletePrescription = (id: number) => {
-    appDispatch(deletePrescription({id: id}))
+    if (window.confirm('是否确认删除该条处方？')) {
+      appDispatch(deletePrescription({id: id}))
+    }
   };
 
   const handleClickOpen = (row: Prescription) => {
@@ -197,6 +204,7 @@ export default function StickyHeadTable(params: {PId:string,
     if (inputValue !== '' && parseInt(inputValue) < 3) {
       setTimesError('输入的数字不能小于3');
     } else {
+      setTimesError('');
       setWillEditPrescription(prevState => ({
         ...prevState,
         zz: parseInt(inputValue)
@@ -232,7 +240,7 @@ export default function StickyHeadTable(params: {PId:string,
 
   return (<>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ height: 240 }}>
+        <TableContainer sx={{ height: 280 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -266,12 +274,41 @@ export default function StickyHeadTable(params: {PId:string,
                     <TableCell align='right'>{row.zz}</TableCell>
                     <TableCell align='right'>{row.u}</TableCell>
                     <TableCell align='right'>{row.v}</TableCell>
-                    <TableCell align='left'>
-                      <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
-                        <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>
-                        <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>
-                        <Button color="secondary" onClick={() => handleDeletePrescription(row.id)}>删除</Button>
-                      </ButtonGroup>
+                    <TableCell align='center'>
+                      {/*<ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>*/}
+                      {/*  <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>*/}
+                      {/*  <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>*/}
+                      {/*  <Button color="secondary" onClick={() => handleDeletePrescription(row.id)}>删除</Button>*/}
+                      {/*</ButtonGroup>*/}
+                      <Tooltip title="下发处方">
+                        <IconButton
+                            aria-label="edit"
+                            color="primary"
+                            onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
+                        >
+                          <ShareIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="修改处方">
+                        <IconButton
+                            aria-label="edit"
+                            color="secondary"
+                            onClick={(event) => {event.stopPropagation();handleClickModify(row)}}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="删除处方">
+                        <IconButton
+                            aria-label="delete"
+                            onClick={() => handleDeletePrescription(row.id)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
                     </TableCell>
                   </TableRow>
               ))}

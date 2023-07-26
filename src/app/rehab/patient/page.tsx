@@ -9,7 +9,13 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Button, ButtonGroup, Stack, Breadcrumbs, Tabs, Tab, Autocomplete, IconButton, Input, InputAdornment, OutlinedInput,
+  Button,
+  ButtonGroup,
+  Icon,
+  Stack, Breadcrumbs,
+  Tabs, Tab, Autocomplete,
+  IconButton, Input, InputAdornment,
+  OutlinedInput
 } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
@@ -37,6 +43,28 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {genderValueToLabel, getDefaultGenderLabel, getDefaultGenderValue} from "@/utils/mct-utils";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SearchIcon from '@mui/icons-material/Search';
+import {string} from "postcss-selector-parser";
+import InputBase from '@mui/material/InputBase';
+import { alpha } from '@mui/material/styles';
+import EditIcon from '@mui/icons-material/Edit';
+import SmsIcon from '@mui/icons-material/Sms';
+import Tooltip from '@mui/material/Tooltip';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+import AddIcon from '@mui/icons-material/Add';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 const StyledDiv = styled.div`
   display: flex;
@@ -57,6 +85,7 @@ export default function PatientList() {
   const patientList = useAppSelector((state: RootState) => state.rehab.patient)
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
+  const [openDelPatient, setOpenDelPatient] = React.useState(false);
   const [openAddPatient, setOpenAddPatient] = React.useState(false);
   const [willEditPatient, setWillEditPatient] = useState<Patient>({
     id: 0,
@@ -229,8 +258,13 @@ export default function PatientList() {
     handleAddPatientClose()
   };
 
+
+  const handleClickDel = () => {
+    setOpenDelPatient(true);
+  }
   const handleDeletePatient = (id: number) => {
     (appDispatch as AppDispatch)(deletePatient({id: id}))
+    handleCloseDel()
   };
 
   const [addPatientOpen, setAddPatientOpen] = React.useState(false);
@@ -250,6 +284,9 @@ export default function PatientList() {
     }
   };
 
+  const handleCloseDel= () => {
+    setOpenDelPatient(false);
+  }
   const handleClose = () => {
     setOpen(false);
   };
@@ -365,64 +402,183 @@ export default function PatientList() {
     }));
   };
 
+  const [doctorName, setDoctorName] = React.useState<string[]>([]);
+
+  const handleSelectChange = (event: SelectChangeEvent<typeof doctorName>) => {
+    const {
+      target: { value },
+    } = event;
+    setDoctorName(
+        typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
     return (
       <Container>
         <Box>
           <Stack direction="row" spacing={1}>
             <Box flexGrow={1}>
               <Typography variant="h2" component="h1" sx={{fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>病人列表</Typography>
-              <Breadcrumbs>
-                <Link color="inherit" href="/">
-                  MUI
-                </Link>
-                <Link
-                  color="inherit"
-                  href="/material-ui/getting-started/installation/">
-                  Core
-                </Link>
-              </Breadcrumbs>
+              {/*<Breadcrumbs>*/}
+              {/*  <Link color="inherit" href="/">*/}
+              {/*    MUI*/}
+              {/*  </Link>*/}
+              {/*  <Link*/}
+              {/*    color="inherit"*/}
+              {/*    href="/material-ui/getting-started/installation/">*/}
+              {/*    Core*/}
+              {/*  </Link>*/}
+              {/*</Breadcrumbs>*/}
+              <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+                <FormControl sx={{ m: 1, width: 240}}>
+                  <InputLabel id="demo-multiple-checkbox-label">主治医生</InputLabel>
+                  <Select
+                    labelId="demo-multiple-checkbox-label"
+                    id="demo-multiple-checkbox"
+                    multiple
+                    value={doctorName}
+                    onChange={handleSelectChange}
+                    input={<OutlinedInput label="主治医生" />}
+                    renderValue={(selected) => selected.join(', ')}
+                    MenuProps={MenuProps}
+                  >
+                    {medicalStaffList.map((medicalStaff) => (
+                      <MenuItem key={medicalStaff.id} value={medicalStaff.fullName}>
+                        <Checkbox checked={doctorName.indexOf(medicalStaff.fullName) > -1} />
+                        <ListItemText primary={medicalStaff.fullName} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl sx={{ m: 1, width: 480}}>
+                  <OutlinedInput
+                      sx={{ ml: 1, flex: 1 }}
+                      placeholder="输入病人姓名进行查询"
+                      inputProps={{ 'aria-label': '输入病人姓名进行查询' }}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      }
+                  />
+                </FormControl>
+                <Tooltip title="添加病人">
+                  <IconButton
+                      style={{float: 'right'}}
+                      aria-label="add"
+                      onClick={handleAddPatientOpen}>
+                    <AddCircleIcon sx={{ fontSize: 54 }} color="secondary"/>
+                  </IconButton>
+                </Tooltip>
+                <Dialog open={addPatientOpen} onClose={handleAddPatientClose}>
+                  <DialogTitle>添加病人</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      请正确填写病人各项信息
+                    </DialogContentText>
+                    <Box component="form">
+                      <StyledDiv>
+                        <TextField sx={{m: 1, minWidth: 110}}
+                                   id="name"
+                                   onChange={handleAddPatientInput}
+                                   label="姓名" variant="outlined" size="small"/>
+                        <TextField sx={{m: 1, minWidth: 80}}
+                                   id="age"
+                                   onChange={handleAddPatientAgeInput}
+                                   label="年龄" variant="outlined" size="small"/>
+                        <FormControl sx={{m: 1, minWidth: 120}} size="small">
+                          <InputLabel id="gender">性别</InputLabel>
+                          <Select
+                              labelId="gender"
+                              id="gender"
+                              label="性别"
+                              onChange={handleAddPatientGenderChange}
+                          >
+                            <MenuItem value={10}>男</MenuItem>
+                            <MenuItem value={21}>女</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </StyledDiv>
+                      <StyledDiv>
+                        <TextField sx={{m: 1, minWidth: 340}}
+                                   id="i18d"
+                                   value={willAddPatient.i18d}
+                                   onChange={handleAddPatientInput}
+                                   label="身份证号" variant="outlined" size="small"/>
+                        <FormControl sx={{m: 1, minWidth: 160}} size="small">
+                          <InputLabel id="physician">主治医生</InputLabel>
+                          <Select
+                              labelId="physician"
+                              id="physician"
+                              value={String(willAddPatient.physicianId)}
+                              label="主治医生"
+                              onChange={handleAddPatientPhysicianChange}
+                          >
+                            {medicalStaffList.map((medicalStaff) =>
+                                <MenuItem value={medicalStaff.id} key={medicalStaff.id}>{medicalStaff.fullName}</MenuItem>
+                            )}
+                          </Select>
+                        </FormControl>
+                      </StyledDiv>
+                      <TextField sx={{m: 1, minWidth: 400}}
+                                 id="medicalHistory"
+                                 value={willAddPatient.medicalHistory}
+                                 onChange={handleAddPatientInput}
+                                 label="病史" variant="outlined" size="small"
+                                 multiline
+                                 rows={4}/>
+                    </Box>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleAddPatientClose}>取消</Button>
+                    <Button onClick={handleAddPatient}>确定</Button>
+
+                  </DialogActions>
+                </Dialog>
+
+              </Paper>
             </Box>
-            <Box>
-              <Button  style={{float: 'right'}} startIcon={<AddCircleOutlineIcon/>} variant="outlined" onClick={handleAddPatientOpen}>
-                添加病人
-              </Button>
-            </Box>
+            {/*<Box>*/}
+            {/*  <Button  style={{float: 'right'}} startIcon={<AddCircleOutlineIcon/>} variant="outlined" onClick={handleAddPatientOpen}>*/}
+            {/*    添加病人*/}
+            {/*  </Button>*/}
+            {/*</Box>*/}
           </Stack>
         </Box>
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs aria-label="wrapped label tabs example">
-              <Tab
-                  value="one"
-                  label="Item One"
-                  wrapped
-              />
-              <Tab value="two" label="Item Two" />
-              <Tab value="three" label="Item Three" />
-            </Tabs>
+            {/*<Tabs aria-label="wrapped label tabs example">*/}
+            {/*  <Tab*/}
+            {/*      value="one"*/}
+            {/*      label="Item One"*/}
+            {/*      wrapped*/}
+            {/*  />*/}
+            {/*  <Tab value="two" label="Item Two" />*/}
+            {/*  <Tab value="three" label="Item Three" />*/}
+            {/*</Tabs>*/}
           </Box>
-          <Stack direction="row" spacing={1}>
-            <FormControl>
-              <Autocomplete
-                  disablePortal
-                  id="combo-box-demo"
-                  options={top100Films}
-                  sx={{ width: 300 }}
-                  renderInput={(params) => <TextField {...params} label="Movie" />}
-              />
-            </FormControl>
-            <Stack direction="row" spacing={1}>
-              <FormControl fullWidth sx={{ m: 1 }}>
-                <OutlinedInput
-                    id="outlined-adornment-amount"
-                    startAdornment={<SearchIcon/>}
-                />
-              </FormControl>
-              <IconButton aria-label="fingerprint" color="secondary">
-                <MoreHorizIcon color="primary"/>
-              </IconButton>
-            </Stack>
-          </Stack>
+          {/*<Stack direction="row" spacing={1}>*/}
+          {/*  <FormControl>*/}
+          {/*    <Autocomplete*/}
+          {/*        disablePortal*/}
+          {/*        id="combo-box-demo"*/}
+          {/*        options={top100Films}*/}
+          {/*        sx={{ width: 300 }}*/}
+          {/*        renderInput={(params) => <TextField {...params} label="Movie" />}*/}
+          {/*    />*/}
+          {/*  </FormControl>*/}
+          {/*  <Stack direction="row" spacing={1}>*/}
+          {/*    <FormControl fullWidth sx={{ m: 1 }}>*/}
+          {/*      <OutlinedInput*/}
+          {/*          id="outlined-adornment-amount"*/}
+          {/*          startAdornment={<SearchIcon/>}*/}
+          {/*      />*/}
+          {/*    </FormControl>*/}
+          {/*    <IconButton aria-label="fingerprint" color="secondary">*/}
+          {/*      <MoreHorizIcon color="primary"/>*/}
+          {/*    </IconButton>*/}
+          {/*  </Stack>*/}
+          {/*</Stack>*/}
           <TableContainer sx={{ maxHeight: 620}}>
             <Table>
               <TableHead>
@@ -433,7 +589,7 @@ export default function PatientList() {
                   <TableCell sx={{m: 1, minWidth: 150}} align='center'>病史</TableCell>
                   <TableCell sx={{m: 1, minWidth: 100}} align='center'>主治医生</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>身份证号</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 400}} align='center'>操作</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 300}} align='center'>操作</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -452,25 +608,49 @@ export default function PatientList() {
                             {/*<Link href={`/rehab/rehabilitation/` + patient.id} passHref>*/}
                             {/*  */}
                             {/*</Link>*/}
-                            <ButtonGroup variant="outlined" aria-label="outlined button group"
-                                         style={{height: '20px'}}>
-                              <Button
-                                  color="secondary"
+
+                            <Tooltip title="查看详细信息">
+                              <IconButton
+                                  aria-label="more"
+                                  color="primary"
                                   onClick={()=> {window.location.href="rehabilitation/"+patient.id}}
                               >
-                                查看康复信息
-                              </Button>
-                              <Button
-                                  color="primary"
+                                <SmsIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="修改信息">
+                              <IconButton
+                                  aria-label="edit"
+                                  color="secondary"
                                   onClick={() => handleEditClickOpen(patient.id)}
                               >
-                                修改
-                              </Button>
-                              <Button color="secondary" startIcon={<DeleteIcon/>}
-                                      onClick={() => handleDeletePatient(patient.id)}>
-                                删除
-                              </Button>
-                            </ButtonGroup>
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="删除">
+                              <IconButton
+                                  aria-label="delete"
+                                  // onClick={() => handleDeletePatient(patient.id)}
+                                  onClick = {handleClickDel}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Dialog open={openDelPatient} onClose={handleCloseDel}>
+                              <DialogTitle>确认操作</DialogTitle>
+                              <DialogContent>
+                                <DialogContentText>
+                                  是否确认删除该条病人信息？
+                                </DialogContentText>
+                              </DialogContent>
+                              <DialogActions>
+                                <Button onClick={() => handleDeletePatient(patient.id)}>确认删除</Button>
+                                <Button onClick={handleCloseDel}>取消</Button>
+                              </DialogActions>
+                            </Dialog>
 
                           </TableCell>
                         </TableRow>
@@ -480,14 +660,23 @@ export default function PatientList() {
           </TableContainer>
           <Box>
             <TablePagination
+                labelRowsPerPage="每页行数:"
+                nextIconButtonProps={{
+                  'aria-label': '下一页',
+                  'title': '下一页'
+            }}
+                backIconButtonProps={{
+                  'aria-label': '上一页',
+                  'title': '上一页'
+            }}
+                labelDisplayedRows={({from, to, count}) => `${from}-${to} 共 ${count}`}
                 rowsPerPageOptions={[10, 25, 100]}
                 component="div"
                 count={patientList.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+                onRowsPerPageChange={handleChangeRowsPerPage}/>
           </Box>
         </Paper>
         <Dialog open={open} onClose={handleClose}>
@@ -495,16 +684,18 @@ export default function PatientList() {
             <DialogContent>
               <Box component="form">
                 <StyledDiv>
-                  <TextField sx={{ m: 1, minWidth: 110 }}
-                             id="name"
-                             value={willEditPatient.name}
-                             onChange={handleEditPatientInput}
-                             label="姓名" variant="outlined" size="small"/>
-                  <TextField sx={{ m: 1, minWidth: 80 }}
-                             id="age"
-                             value={willEditPatient.age}
-                             onChange={handleEditPatientAgeInput}
-                             label="年龄" variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 110 }}
+                      id="name"
+                      value={willEditPatient.name}
+                      onChange={handleEditPatientInput}
+                      label="姓名" variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 80 }}
+                      id="age"
+                      value={willEditPatient.age}
+                      onChange={handleEditPatientAgeInput}
+                      label="年龄" variant="outlined" size="small"/>
                   <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="gender">性别</InputLabel>
                     <Select
@@ -521,11 +712,12 @@ export default function PatientList() {
                   </FormControl>
                 </StyledDiv>
                 <StyledDiv>
-                  <TextField sx={{ m: 1, minWidth: 340 }}
-                             id="i18d"
-                             value={willEditPatient.i18d}
-                             onChange={handleEditPatientInput}
-                             label="身份证号" variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 340 }}
+                      id="i18d"
+                      value={willEditPatient.i18d}
+                      onChange={handleEditPatientInput}
+                      label="身份证号" variant="outlined" size="small"/>
                   <FormControl sx={{ m: 1, minWidth: 160 }} size="small">
                     <InputLabel id="physician">主治医生</InputLabel>
                     <Select
@@ -541,13 +733,14 @@ export default function PatientList() {
                     </Select>
                   </FormControl>
                 </StyledDiv>
-                <TextField sx={{ m: 1, minWidth: 400 }}
-                           id="medicalHistory"
-                           value={willEditPatient.medicalHistory}
-                           onChange={handleEditPatientInput}
-                           label="病史" variant="outlined" size="small"
-                           multiline
-                           rows={4} />
+                <TextField
+                    sx={{ m: 1, minWidth: 400 }}
+                    id="medicalHistory"
+                    value={willEditPatient.medicalHistory}
+                    onChange={handleEditPatientInput}
+                    label="病史" variant="outlined" size="small"
+                    multiline
+                    rows={4} />
               </Box>
             </DialogContent>
             <DialogActions>

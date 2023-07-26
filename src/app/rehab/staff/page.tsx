@@ -23,7 +23,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
   deleteStaff,
   fetchStaffs,
-  MedicalStaff, addStaff, editStaff,
+  MedicalStaff, addStaff, editStaff, deletePatient,
 } from "@/redux/features/rehab/rehab-slice";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
@@ -34,6 +34,13 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useAppDispatch} from "@/redux/store";
+import Tooltip from "@mui/material/Tooltip";
+import EditIcon from "@mui/icons-material/Edit";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchIcon from "@mui/icons-material/Search";
+import FormControl from "@mui/material/FormControl";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -109,7 +116,10 @@ export default function MedicalStaffManagement() {
   };
 
   const handleDeleteMedicalStaff = (id: number) => {
-    (appDispatch as AppDispatch)(deleteStaff({id: id}))
+    if (window.confirm('是否确认删除该医护信息？')) {
+      (appDispatch as AppDispatch)(deleteStaff({id: id}))
+    }
+
   };
 
   const handleClickOpen = () => {
@@ -163,49 +173,64 @@ export default function MedicalStaffManagement() {
 
   return (
     <Container>
-      <br/>
-      <Typography variant="h2" component="h1" sx={{ fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>医护用户管理</Typography>
-      <div>
-        <Button style={{float: 'right'}} startIcon={<AddCircleOutlineIcon /> } variant="outlined" onClick={handleAddStaffClickOpen}>
-          添加医护
-        </Button>
-        <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
-          <DialogTitle>添加医护</DialogTitle>
-          <DialogContent>
-            <Box>
-              <StyledDiv>
-                <TextField
-                  sx={{ m: 1, minWidth: 120 }} id="username"
-                  value={willAddStaff.username}
-                  onChange={handleAddMedicalStaff}
-                  label="用户名" variant="outlined" size="small"/>
-                <TextField
-                  sx={{ m: 1, minWidth: 120 }} id="password"
-                  value={willAddStaff.password}
-                  onChange={handleAddMedicalStaff}
-                  label="密码" variant="outlined" size="small"/>
-                <TextField
-                  sx={{ m: 1, minWidth: 120 }} id="fullName"
-                  value={willAddStaff.fullName}
-                  onChange={handleAddMedicalStaff}
-                  label="全名" variant="outlined" size="small"/>
-              </StyledDiv>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleAddStaffClickClose}>取消</Button>
-            <Button onClick={handleSaveAddMedicalStaff}>确定</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+      <Typography variant="h2" component="h1" sx={{ fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>医护管理</Typography>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <FormControl sx={{ m: 1, width: 640}}>
+            <OutlinedInput
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="输入病人姓名进行查询"
+                inputProps={{ 'aria-label': '输入病人姓名进行查询' }}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                }
+            />
+          </FormControl>
+        <Tooltip title="添加医护">
+            <IconButton
+                style={{float: 'right'}}
+                aria-label="add"
+                onClick={handleAddStaffClickOpen}
+            >
+              <AddCircleIcon sx={{ fontSize: 54 }} color="secondary"/>
+            </IconButton>
+          </Tooltip>
+        <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
+            <DialogTitle>添加医护</DialogTitle>
+            <DialogContent>
+              <Box>
+                <StyledDiv>
+                  <TextField
+                      sx={{ m: 1, minWidth: 120 }} id="username"
+                      value={willAddStaff.username}
+                      onChange={handleAddMedicalStaff}
+                      label="用户名" variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 120 }} id="password"
+                      value={willAddStaff.password}
+                      onChange={handleAddMedicalStaff}
+                      label="密码" variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 120 }} id="fullName"
+                      value={willAddStaff.fullName}
+                      onChange={handleAddMedicalStaff}
+                      label="全名" variant="outlined" size="small"/>
+                </StyledDiv>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleAddStaffClickClose}>取消</Button>
+              <Button onClick={handleSaveAddMedicalStaff}>确定</Button>
+            </DialogActions>
+          </Dialog>
         <TableContainer sx={{ maxHeight: 620}}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell align='center'>用户名</TableCell>
+                <TableCell align='center'>名字</TableCell>
+                <TableCell align='center'>登录名</TableCell>
                 <TableCell align='center'>密码</TableCell>
-                <TableCell align='center'>全名</TableCell>
                 <TableCell align='center'>操作</TableCell>
               </TableRow>
             </TableHead>
@@ -214,6 +239,7 @@ export default function MedicalStaffManagement() {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((medicalStaff) => (
                   <StyledTableRow key={medicalStaff.id}>
+                    <TableCell align='center'>{medicalStaff.fullName}</TableCell>
                     <TableCell align='center'>{medicalStaff.username}</TableCell>
                     <TableCell align='center'>
                       {/*{medicalStaff.password}*/}
@@ -229,12 +255,26 @@ export default function MedicalStaffManagement() {
                         {passwordsVisibility[medicalStaff.id] ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </TableCell>
-                    <TableCell align='center'>{medicalStaff.fullName}</TableCell>
                     <TableCell align='center'>
-                      <ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>
-                        <Button color="primary" onClick={() => handleEditRowOpen(medicalStaff.id)}>修改</Button>
-                        <Button color="secondary" startIcon={<DeleteIcon/>}  onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}>删除</Button>
-                      </ButtonGroup>
+                      <Tooltip title="修改信息">
+                        <IconButton
+                            aria-label="edit"
+                            color="primary"
+                            onClick={() => handleEditRowOpen(medicalStaff.id)}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="删除">
+                        <IconButton
+                            aria-label="delete"
+                            color="secondary"
+                            onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   </StyledTableRow>
                 ))}
