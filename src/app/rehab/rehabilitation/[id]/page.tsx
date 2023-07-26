@@ -310,11 +310,11 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   <Typography style={{display:'inline-block'}} variant="subtitle1" gutterBottom>
                     条康复记录，累计康复时长*小时)
                   </Typography>
-                  <Button style={{display:'inline-block', float:'right', width: '110px'}} variant="outlined" onClick={handleExportExcel}>
-                    导出Excel
-                  </Button>
+                  {/*<Button style={{display:'inline-block', float:'right', width: '110px'}} variant="outlined" onClick={handleExportExcel}>*/}
+                  {/*  导出Excel*/}
+                  {/*</Button>*/}
                 </Box>
-                <PrescriptionTable record={record} />
+                <PrescriptionTable record={record} pid={params.id}/>
               </Card>
             </Grid>
         </Grid>

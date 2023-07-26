@@ -13,6 +13,7 @@ MCTAxiosInstance.interceptors.request.use((config)=>{
 
 MCTAxiosInstance.interceptors.response.use((response) => {
   const { code } = response.data
+  console.log(response.headers['content-type'])
   if (code === 0) {
     console.log('操作成功')
   } else {

@@ -18,6 +18,7 @@ import {
 } from "@/utils/mct-utils";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {string} from "postcss-selector-parser";
+import {saveAs} from "file-saver";
 
 export interface MedicalStaff {
   id: number;
@@ -422,6 +423,32 @@ export const fetchPrescriptionRecordById = createAsyncThunk<PrescriptionRecord[]
   let p = response.data.data.tasks.map(convertAPIPrescriptionRecordToPrescriptionRecord)
   console.log('prescription_record', p)
   return p
+});
+
+export const exportTaskPressureData = createAsyncThunk<{}, {tId: number, pId: number}, {}>('exportPressureData', async ({tId, pId}):Promise<any> => {
+  try {
+    const response = await MCTAxiosInstance.get('record', {
+      responseType: 'blob',
+      params: {t_id:tId, p_id: pId}
+    });
+
+    // Create a Blob from the response data
+    const fileBlob = new Blob([response.data], { type: response.headers['content-type'] });
+    const contentDispositionHeader = response.headers['content-disposition'];
+    console.log('Headers -> ', response.headers)
+    console.log('contentDispositionHeader -> ', contentDispositionHeader)
+    let filename = 'downloadedFile'; // Default filename if the header doesn't have one
+    if (contentDispositionHeader) {
+      const match = contentDispositionHeader.match(/filename=(?<filename>[^;]+)/);
+      if (match && match.groups && match.groups.filename) {
+        filename = match.groups.filename;
+      }
+    }
+    const decodedFileName = decodeURIComponent(filename)
+    saveAs(fileBlob, decodedFileName);
+  } catch (error) {
+    throw new Error('File download failed.');
+  }
 });
 
 const RehabSlice = createSlice({

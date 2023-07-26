@@ -9,8 +9,12 @@ import TableRow, { TableRowProps } from '@mui/material/TableRow'
 import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/TableCell'
 import {Button, ButtonGroup} from "@mui/material";
 import {
-  PrescriptionRecord
+  exportTaskPressureData,
+  PrescriptionRecord, sendPrescriptionToEquipment
 } from "@/redux/features/rehab/rehab-slice";
+import {ThunkDispatch} from "redux-thunk";
+import {AnyAction} from "redux";
+import {useDispatch} from "react-redux";
 //import ExportJsonExcel from "js-export-excel";
 
 
@@ -57,7 +61,12 @@ const StyledTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
 //   toExcel.saveExcel(); //保存
 // }
 
-const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
+const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) => {
+  const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  function handleExport(row: PrescriptionRecord) {
+    appThunkDispatch(exportTaskPressureData({pId: Number(params.pid), tId: row.id}))
+  }
+
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 280 }}>
@@ -82,23 +91,21 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[]}) => {
                     <StyledTableCell align='right'>{row.state}</StyledTableCell>
                     <StyledTableCell align='center'>
                       <ButtonGroup style={{height: '20px'}} variant="outlined">
-                        <Button color="primary" style={{width: '65px'}}>
+                        <Button color="primary" style={{width: '65px'}}
+                                onClick={(event)=>{event.stopPropagation(); handleExport(row);}}>
                           导出
                         </Button>
                         <Button color="secondary" style={{width: '65px'}}>
                           删除
                         </Button>
                       </ButtonGroup>
-
                     </StyledTableCell>
                   </StyledTableRow>
               ))}
-
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
-
   )
 }
 export default PrescriptionTable
