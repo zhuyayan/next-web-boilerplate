@@ -93,7 +93,8 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
                       <Tooltip title="删除">
                         <IconButton
                           aria-label="delete"
-                          color="secondary">
+                          // color="secondary"
+                        >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>

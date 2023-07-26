@@ -72,12 +72,6 @@ const StyledDiv = styled.div`
   margin-top: 20px;
 `;
 
-const StyledButton = styled(Button)`
-  && {
-    background-color: #1976d1;
-    color: #ffffff;
-  }`;
-
 export default function PatientList() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const appDispatch = useAppDispatch()
@@ -632,6 +626,7 @@ export default function PatientList() {
                             <Tooltip title="删除">
                               <IconButton
                                   aria-label="delete"
+                                  // color="secondary"
                                   // onClick={() => handleDeletePatient(patient.id)}
                                   onClick = {handleClickDel}
                               >

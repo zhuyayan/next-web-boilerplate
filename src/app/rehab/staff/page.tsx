@@ -269,7 +269,7 @@ export default function MedicalStaffManagement() {
                       <Tooltip title="删除">
                         <IconButton
                             aria-label="delete"
-                            color="secondary"
+                            // color="secondary"
                             onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}
                         >
                           <DeleteIcon fontSize="small" />
