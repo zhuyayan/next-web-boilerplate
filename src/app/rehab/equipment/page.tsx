@@ -15,6 +15,10 @@ import Box from "@mui/material/Box";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
+import ApexCharts from "apexcharts"
+import moment from "moment";
+// moment().format('YYYY-MM-DD HH:MM:SS')
+
 
 const EquipmentList = styled.ul`
   list-style-type: none;
@@ -40,10 +44,11 @@ export default function EquipmentManagement() {
     const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
     const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
     const patientList = useAppSelector((state: RootState) => state.rehab.patient)
-
     useEffect(() => {
         thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
     }, [thunkDispatch]);
+
+
 
   return (
     <Container>
@@ -59,9 +64,10 @@ export default function EquipmentManagement() {
                         title="equipment"
                     />
                     <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
-                            设备管理
-                        </Typography>
+                        {/*<Typography gutterBottom variant="h5" component="div">*/}
+                        {/*    设备管理*/}
+                        {/*</Typography>*/}
+
                         <Box>
                             <Typography variant="subtitle1" style={{display:'inline-block'}}>
                                 设备总数量:&emsp;
@@ -90,10 +96,10 @@ export default function EquipmentManagement() {
                             ))}
                         </EquipmentList>
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">设备配置</Button>
-                        <Button size="small">详细信息</Button>
-                    </CardActions>
+                    {/*<CardActions>*/}
+                    {/*    <Button size="small">设备配置</Button>*/}
+                    {/*    <Button size="small">详细信息</Button>*/}
+                    {/*</CardActions>*/}
                 </Card>
             </Grid>
             <Grid item xs={4} md={4}>
@@ -125,10 +131,10 @@ export default function EquipmentManagement() {
                             </Typography>
                         </Box>
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">分享</Button>
-                        <Button size="small">了解更多</Button>
-                    </CardActions>
+                    {/*<CardActions>*/}
+                    {/*    <Button size="small">分享</Button>*/}
+                    {/*    <Button size="small">了解更多</Button>*/}
+                    {/*</CardActions>*/}
                 </Card>
             </Grid>
 
@@ -141,7 +147,7 @@ export default function EquipmentManagement() {
                     />
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
-                            治疗患者数据
+                            患者数据
                         </Typography>
                         <Box>
                             <Typography variant="subtitle1" style={{display:'inline-block'}}>
@@ -161,10 +167,10 @@ export default function EquipmentManagement() {
                             </Typography>
                         </Box>
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">分享</Button>
-                        <Button size="small">了解更多</Button>
-                    </CardActions>
+                    {/*<CardActions>*/}
+                    {/*    <Button size="small">分享</Button>*/}
+                    {/*    <Button size="small">了解更多</Button>*/}
+                    {/*</CardActions>*/}
                 </Card>
             </Grid>
 
@@ -185,10 +191,10 @@ export default function EquipmentManagement() {
                             当前系统情况良好
                         </Typography>
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">分享</Button>
-                        <Button size="small">了解更多</Button>
-                    </CardActions>
+                    {/*<CardActions>*/}
+                    {/*    <Button size="small">分享</Button>*/}
+                    {/*    <Button size="small">了解更多</Button>*/}
+                    {/*</CardActions>*/}
                 </Card>
             </Grid>
 
@@ -207,10 +213,10 @@ export default function EquipmentManagement() {
                             请联系技术人员，联系方式：xxxxxxx
                         </Typography>
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">分享</Button>
-                        <Button size="small">了解更多</Button>
-                    </CardActions>
+                    {/*<CardActions>*/}
+                    {/*    <Button size="small">分享</Button>*/}
+                    {/*    <Button size="small">了解更多</Button>*/}
+                    {/*</CardActions>*/}
                 </Card>
             </Grid>
 
@@ -229,10 +235,10 @@ export default function EquipmentManagement() {
                             反馈方式：邮箱xxx
                         </Typography>
                     </CardContent>
-                    <CardActions>
-                        <Button size="small">分享</Button>
-                        <Button size="small">了解更多</Button>
-                    </CardActions>
+                    {/*<CardActions>*/}
+                    {/*    <Button size="small">分享</Button>*/}
+                    {/*    <Button size="small">了解更多</Button>*/}
+                    {/*</CardActions>*/}
                 </Card>
             </Grid>
         </Grid>

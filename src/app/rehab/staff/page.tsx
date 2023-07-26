@@ -230,7 +230,7 @@ export default function MedicalStaffManagement() {
               <TableRow>
                 <TableCell align='center'>名字</TableCell>
                 <TableCell align='center'>登录名</TableCell>
-                <TableCell align='center'>密码</TableCell>
+                <TableCell align='center' style={{width: 300}}>密码</TableCell>
                 <TableCell align='center'>操作</TableCell>
               </TableRow>
             </TableHead>
@@ -269,7 +269,6 @@ export default function MedicalStaffManagement() {
                       <Tooltip title="删除">
                         <IconButton
                             aria-label="delete"
-                            // color="secondary"
                             onClick={() => handleDeleteMedicalStaff(medicalStaff.id)}
                         >
                           <DeleteIcon fontSize="small" />
@@ -291,6 +290,7 @@ export default function MedicalStaffManagement() {
             'aria-label': '上一页',
             'title': '上一页'
           }}
+          labelDisplayedRows={({from, to, count}) => `${from}-${to} 共 ${count}`}
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
           count={medicalStaffList.length}
