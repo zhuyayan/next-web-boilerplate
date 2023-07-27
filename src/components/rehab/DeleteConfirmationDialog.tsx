@@ -17,6 +17,31 @@ const RedButton = styled(Button)`
   }
 `;
 
+const MCTStyledDialog = styled(Dialog)`
+  & .MuiDialog-paper {
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    width: 80vw;
+    max-width: 500px;
+  }
+  & .MuiDialogTitle-root {
+    padding: 1px;
+  }
+  & .MuiBackdrop-root {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  & .MuiDialogContent-root {
+    padding: 1px;
+  }
+  & .MuiDialogContentText-root {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  & .MuiDialogTitle-root {
+    
+  }
+`;
+
 interface DeleteConfirmationDialogProps {
     open: boolean;
     onClose: () => void;
@@ -33,12 +58,9 @@ const DeleteConfirmationDialog:
       deleteItemName,
     }) => {
   return (
-    <Dialog
+    <MCTStyledDialog
       open={open}
       onClose={onClose}
-      slotProps={{
-        backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}
-    }}
       PaperProps={{ elevation: 0 }}>
             <DialogTitle>确认操作</DialogTitle>
             <DialogContent>
@@ -58,7 +80,7 @@ const DeleteConfirmationDialog:
                     取消
                 </Button>
             </DialogActions>
-        </Dialog>
+        </MCTStyledDialog>
     );
 };
 
