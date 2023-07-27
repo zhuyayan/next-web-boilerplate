@@ -51,6 +51,8 @@ import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import DownloadIcon from '@mui/icons-material/Download';
 import CardMedia from "@mui/material/CardMedia";
 import CardActions from "@mui/material/CardActions";
+import SmsIcon from "@mui/icons-material/Sms";
+import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -211,9 +213,18 @@ export default function MUITable({ params }: { params: { id: string } }) {
       <Container>
         <Grid container spacing={8}>
           <Grid item xs={12} md={12}>
-              <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333' }}>
+              <Typography style={{display:'inline-block'}} variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333' }}>
                 康复管理
               </Typography>
+              <Tooltip title="返回病人列表">
+                <IconButton
+                    aria-label="back"
+                    color="primary"
+                    onClick={()=> {window.location.href="/rehab/patient"}}
+                >
+                  <AssignmentReturnIcon fontSize="medium" />
+                </IconButton>
+              </Tooltip>
             <br />
           </Grid>
         </Grid>
