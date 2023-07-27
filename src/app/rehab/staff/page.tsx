@@ -42,6 +42,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import FormControl from "@mui/material/FormControl";
 import DialogContentText from "@mui/material/DialogContentText";
 import {GetDefaultMedicalStaff} from "@/utils/mct-utils";
+import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog'
 
 const StyledDiv = styled.div`
   display: flex;
@@ -265,31 +266,37 @@ export default function MedicalStaffManagement() {
         </DialogActions>
       </Dialog>
 
-      <MCTStyledDialog
+      {/*<MCTStyledDialog*/}
+      {/*    open={deleteDialogOpen}*/}
+      {/*    onClose={handleDeleteDialogClose}*/}
+      {/*    aria-labelledby="alert-dialog-title"*/}
+      {/*    aria-describedby="alert-dialog-description"*/}
+      {/*>*/}
+      {/*  <DialogTitle id="alert-dialog-title">{"确认操作"}</DialogTitle>*/}
+      {/*  <DialogContent>*/}
+      {/*    <DialogContentText id="alert-dialog-description">*/}
+      {/*      {`是否确认删除 `}*/}
+      {/*      <span style={{fontWeight: 'bold'}}>*/}
+      {/*        {`[${staffToBeDeleted.fullName}]`}*/}
+      {/*      </span>*/}
+      {/*      {` 的账户信息？`}*/}
+      {/*    </DialogContentText>*/}
+      {/*  </DialogContent>*/}
+      {/*  <DialogActions>*/}
+      {/*    <RedButton variant="contained" onClick={confirmStaffDeletion} color="error" size="small">*/}
+      {/*      删除*/}
+      {/*    </RedButton>*/}
+      {/*    <Button variant="outlined" onClick={handleDeleteDialogClose} size="small">*/}
+      {/*      取消*/}
+      {/*    </Button>*/}
+      {/*  </DialogActions>*/}
+      {/*</MCTStyledDialog>*/}
+      <DeleteConfirmationDialog
           open={deleteDialogOpen}
           onClose={handleDeleteDialogClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"确认操作"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`是否确认删除 `}
-            <span style={{fontWeight: 'bold'}}>
-              {`[${staffToBeDeleted.fullName}]`}
-            </span>
-            {` 的账户信息？`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <RedButton variant="contained" onClick={confirmStaffDeletion} color="error" size="small">
-            删除
-          </RedButton>
-          <Button variant="outlined" onClick={handleDeleteDialogClose} size="small">
-            取消
-          </Button>
-        </DialogActions>
-      </MCTStyledDialog>
+          onConfirm={confirmStaffDeletion}
+          deleteItemName={`[${staffToBeDeleted.fullName}]`}
+      />
 
       <Container>
         <Typography variant="h2" component="h1" sx={{ fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>医护管理</Typography>
@@ -297,8 +304,8 @@ export default function MedicalStaffManagement() {
           <FormControl sx={{ m: 1, width: 640}}>
               <OutlinedInput
                   sx={{ ml: 1, flex: 1 }}
-                  placeholder="输入病人姓名进行查询"
-                  inputProps={{ 'aria-label': '输入病人姓名进行查询' }}
+                  placeholder="输入用户姓名进行查询"
+                  inputProps={{ 'aria-label': '输入用户姓名进行查询' }}
                   startAdornment={
                     <InputAdornment position="start">
                       <SearchIcon />
@@ -320,10 +327,10 @@ export default function MedicalStaffManagement() {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell align='center'>名字</TableCell>
-                  <TableCell align='center'>登录名</TableCell>
+                  <TableCell align='center' style={{width: 300}}>名字</TableCell>
+                  <TableCell align='center' style={{width: 300}}>登录名</TableCell>
                   <TableCell align='center' style={{width: 300}}>密码</TableCell>
-                  <TableCell align='center'>操作</TableCell>
+                  <TableCell align='center' style={{width: 300}}>操作</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

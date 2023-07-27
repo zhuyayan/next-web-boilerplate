@@ -133,6 +133,7 @@ export default function StickyHeadTable(params: {PId:string,
   })
   const [clientId, setClientId] = useState("")
   const [openMessage, setOpenMessage] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleDeletePrescription = (id: number) => {
     if (window.confirm('是否确认删除该条处方？')) {
@@ -320,7 +321,7 @@ export default function StickyHeadTable(params: {PId:string,
       </Paper>
         <Dialog open={open} onClose={handleClose}
           slotProps={{
-            backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.06)'}}}}
+            backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
           PaperProps={{ elevation: 0 }}>
             <DialogContent>
               <DialogContentText>
@@ -358,7 +359,7 @@ export default function StickyHeadTable(params: {PId:string,
           <Dialog
             open={openModify} onClose={handleCloseModify}
             slotProps={{
-              backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.06)'}}}}
+              backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
             PaperProps={{ elevation: 0 }}>
             <DialogTitle>修改处方</DialogTitle>
             <DialogContent>

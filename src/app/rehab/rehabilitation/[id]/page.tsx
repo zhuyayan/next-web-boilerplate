@@ -47,15 +47,18 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
-import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
-import DownloadIcon from '@mui/icons-material/Download';
-import CardMedia from "@mui/material/CardMedia";
-import CardActions from "@mui/material/CardActions";
+
 
 const StyledDiv = styled.div`
   display: flex;
   gap: 10px;
   margin-top: 20px;
+`;
+
+const StatisticsCard = styled.div`
+  background-color: rgb(182, 212, 246);
+  height: 150px;
+  padding: 10px;
 `;
 
 export default function MUITable({ params }: { params: { id: string } }) {
@@ -221,21 +224,21 @@ export default function MUITable({ params }: { params: { id: string } }) {
             {/*病人card*/}
           <Grid container item xs={6} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
-                <Card sx={{ backgroundColor: '#ffffff', height: 150}} >
+                <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 150}} >
                   <CardHeader title=' ' titleTypographyProps={{ variant: 'h5' }} />
                   <CardContent>
                     <Grid container spacing={2}>
-                      <Grid item xs={6}>
+                      <Grid item xs={5}>
                         <Typography component="div">
                           姓名：{rehabPatient.name}
                         </Typography>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid item xs={3.5}>
                         <Typography component="div">
                           年龄：{rehabPatient.age}
                         </Typography>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid item xs={3.5}>
                         <Typography component="div">
                           性别：{rehabPatient.genderLabel}
                         </Typography>
@@ -244,17 +247,17 @@ export default function MUITable({ params }: { params: { id: string } }) {
                     <Divider />
                     <br />
                     <Grid container spacing={2}>
-                      <Grid item xs={6}>
+                      <Grid item xs={5}>
                         <Typography component="div">
                           ID：{rehabPatient.i18d}
                         </Typography>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid item xs={3.5}>
                         <Typography component="div">
                           病史：{rehabPatient.medicalHistory}
                         </Typography>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid item xs={3.5}>
                         <Typography component="div">
                           主治医生：{rehabPatient.physician}
                         </Typography>
@@ -266,45 +269,61 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 </Card>
               </Grid>
               <Grid item xs={6} md={2}>
-                <Card sx={{height: 150}}>
-                  <AccessTimeFilledIcon color="secondary" sx={{fontSize: 50 }}/>
-                  <CardContent style={{ textAlign: 'center' }}>
-                    <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
-                      0小时 <br />
+                <StatisticsCard>
+                  <Typography style={{ float:"left" }}>
+                    <AccessTimeFilledIcon style={{ color: '#69acee', fontSize: 50 }}/>
+                  </Typography>
+                  <CardContent style={{ textAlign: 'right' }}>
+                    <Typography variant="h3" color="primary" style={{display:'inline-block'}}>
+                      0 <br />
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       总训练时长
                     </Typography>
+                    <Divider style={{padding:'5px'}}/>
+                    <Typography sx={{ fontSize: 6 }} color="text.secondary">
+                      时间 / 分钟
+                    </Typography>
                   </CardContent>
-                </Card>
+                </StatisticsCard>
               </Grid>
               <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
-                <Card sx={{height: 150}}>
-                  <AssessmentIcon color="secondary" sx={{ fontSize: 50 }}/>
-                  <CardContent style={{ textAlign: 'center' }}>
-                    <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
-                      {record.length}次
+                <StatisticsCard>
+                  <Typography sx={{ float:"left" }}>
+                    <AssessmentIcon  sx={{ color: '#0a94a1', fontSize: 50 }}/>
+                  </Typography>
+                  <CardContent sx={{ textAlign: 'right' }}>
+                    <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
+                      {record.length}
                     </Typography>
-                    <br />
                     <Typography variant="body2" color="text.secondary">
                       总训练次数
                     </Typography>
+                    <Divider sx={{padding:'5px'}}/>
+                    <Typography sx={{ fontSize: 6 }} color="text.secondary">
+                      次数 / 次
+                    </Typography>
                   </CardContent>
-                </Card>
+                </StatisticsCard>
               </Grid>
               <Grid item xs={6} md={2}>
-                <Card sx={{height: 150}}>
-                  <TimerIcon color="secondary" sx={{ fontSize: 50 }}/>
-                  <CardContent style={{ textAlign: 'center' }}>
-                    <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
-                      4天
+                <StatisticsCard>
+                  <Typography sx={{ float:"left" }}>
+                    <TimerIcon  sx={{ color: '#7442f6', fontSize: 50 }}/>
+                  </Typography>
+                  <CardContent sx={{ textAlign: 'right' }}>
+                    <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
+                      4
                     </Typography>
-                    <br />
                     <Typography variant="body2" color="text.secondary">
                       总训练天数
                     </Typography>
+                    <Divider sx={{padding:'5px'}}/>
+                    <Typography sx={{ fontSize: 6 }} color="text.secondary">
+                      时间 / 天
+                    </Typography>
                   </CardContent>
-                </Card>
+                </StatisticsCard>
               </Grid>
             </Grid>
 
@@ -361,23 +380,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <Typography style={{display:'inline-block'}} variant="subtitle1" gutterBottom>
                 条康复记录，累计康复时长*小时)
               </Typography>
-              {/*<Button style={{display:'inline-block', float:'right', width: '110px'}} variant="outlined" onClick={handleExportExcel}>*/}
-              {/*  导出Excel*/}
-              {/*</Button>*/}
-{/*<<<<<<< HEAD*/}
-{/*                </Box>*/}
-{/*                <PrescriptionTable record={record} pid={params.id}/>*/}
-{/*=======*/}
-{/*              <Tooltip title="导出Excel">*/}
-{/*                <IconButton*/}
-{/*                  style={{float: 'right'}}*/}
-{/*                  aria-label="downExcel"*/}
-{/*                  onClick={handleExportExcel}>*/}
-{/*                  <DownloadForOfflineIcon sx={{ fontSize: 48 }} color="primary"/>*/}
-{/*                </IconButton>*/}
-{/*              </Tooltip>*/}
                 <PrescriptionTable record={record} pid={params.id}/>
-{/*>>>>>>> b947107066843c58258ffd1e7099b1137367af03*/}
               </Card>
             </Grid>
         </Grid>

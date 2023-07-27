@@ -1,5 +1,6 @@
 import React from "react";
 import {MedicalStaff} from "@/redux/features/rehab/rehab-slice";
+import {string} from "postcss-selector-parser";
 
 export function genderLabelToValue(label:string): string {
   if (label == "男") {
@@ -101,5 +102,19 @@ export function GetDefaultMedicalStaff() {
     username: '',
     password: '',
     fullName: '',
+  }
+}
+
+export function GetDefaultPatient() {
+  return {
+    id: 0,
+    name: '',
+    age: 0,
+    gender: '',
+    genderLabel: '',
+    medicalHistory: '',
+    physician:'',
+    physicianId:0,
+    i18d:'',
   }
 }
