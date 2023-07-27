@@ -17,11 +17,13 @@ import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts'
-import moment from "moment";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import Divider from "@mui/material/Divider";
 // moment().format('YYYY-MM-DD HH:MM:SS')
+
+//图表
+const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 
 const EquipmentList = styled.ul`
@@ -43,6 +45,7 @@ const EquipmentStatus = styled.div<{ $online: boolean }>`
   margin-right: 8px;
 `;
 
+
 export default function EquipmentManagement() {
     const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
     const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
@@ -52,8 +55,7 @@ export default function EquipmentManagement() {
         thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
     }, [thunkDispatch]);
 
-    //图表
-    const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
+
     const series = [1, 2];
     const xlseries = [100, 75];
 
@@ -236,7 +238,7 @@ export default function EquipmentManagement() {
                         <br/>
                         <Box>
                             <Typography variant="subtitle1" style={{display:'inline-block'}}>
-                                本月活跃患者数量:&emsp;
+                                活跃数量:&emsp;
                             </Typography>
                             <Typography variant="h5" color="green" style={{display:'inline-block'}}>
                                 {patientList.length}
@@ -286,7 +288,7 @@ export default function EquipmentManagement() {
                             故障联系
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            请联系技术人员，联系方式：xxxxxxx
+                            联系方式：123-1234-5678
                         </Typography>
                     </CardContent>
                     {/*<CardActions>*/}
@@ -308,7 +310,7 @@ export default function EquipmentManagement() {
                             意见反馈
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            反馈方式：邮箱xxx
+                            邮箱：abc@qq.com
                         </Typography>
                     </CardContent>
                     {/*<CardActions>*/}
