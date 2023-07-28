@@ -69,7 +69,7 @@ const DeleteConfirmationDialog:
                     <span style={{ fontWeight: 'bold' }}>
             {`[${deleteItemName}]`}
           </span>
-                    {` 的账户信息？`}
+                    {` 的信息？`}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>

@@ -66,7 +66,12 @@ let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
 let onlineEquipment: EquipmentOnline[] = []
 let equipmentAll: equipmentAll[] = []
-let systemInformation: systemInformation
+let sysInfo: systemInformation = {
+  cpu_usage: "",
+  total_memory_gb: "",
+  used_memory_gb: "",
+  disk_usage: "",
+}
 
 
 let patient: Patient = {
@@ -100,7 +105,7 @@ const initialState: RehabState = {
   prescriptionRecord: prescriptionRecord,
   onlineEquipment: onlineEquipment,
   equipmentAll: equipmentAll,
-  systemInformation: systemInformation = {},
+  systemInformation: sysInfo,
 }
 
 export type Channel = 'redux' | 'general'

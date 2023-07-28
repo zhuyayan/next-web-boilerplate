@@ -118,3 +118,15 @@ export function GetDefaultPatient() {
     i18d:'',
   }
 }
+
+export function GetDefaultPrescription() {
+  return {
+    id: 0,
+    created_at: '',
+    part: '',
+    mode: '',
+    zz: 0,
+    u: 0,
+    v: 0,
+  }
+}

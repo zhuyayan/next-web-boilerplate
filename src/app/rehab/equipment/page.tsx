@@ -19,12 +19,13 @@ import {
 import Box from "@mui/material/Box";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts'
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import Divider from "@mui/material/Divider";
+import { Title } from '@/components/rehab/styles';
 // moment().format('YYYY-MM-DD HH:MM:SS')
 
 //图表
@@ -58,6 +59,8 @@ export default function EquipmentManagement() {
     const systemInformation = useAppSelector((state: RootState) => state.rehab.systemInformation)
     const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
     const patientList = useAppSelector((state: RootState) => state.rehab.patient)
+    const Phone = useSelector((state:RootState) => state.appBar.rsConfig.AfterSalesInfo.Phone);
+    const Email = useSelector((state:RootState) => state.appBar.rsConfig.AfterSalesInfo.Email);
     useEffect(() => {
         thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
         thunkDispatch(getEquipmentAll({page: 1, size: 1000}))
@@ -126,7 +129,7 @@ export default function EquipmentManagement() {
 
   return (
     <Container>
-        <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>数据汇总</Typography>
+        <Title>数据汇总</Title>
         <Grid container spacing={3}>
             <Grid item xs={4} md={4}>
                 <Card sx={{ maxWidth: 345 }}>
@@ -306,7 +309,7 @@ export default function EquipmentManagement() {
                             故障联系
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            联系方式：123-1234-5678
+                            联系方式：{Phone}
                         </Typography>
                     </CardContent>
                     {/*<CardActions>*/}
@@ -328,7 +331,7 @@ export default function EquipmentManagement() {
                             意见反馈
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            邮箱：abc@qq.com
+                            邮箱：{Email}
                         </Typography>
                     </CardContent>
                     {/*<CardActions>*/}

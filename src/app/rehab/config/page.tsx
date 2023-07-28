@@ -12,10 +12,11 @@ import {Container} from "@mui/material";
 
 import { useDispatch } from 'react-redux';
 import {RootState, useAppSelector} from "@/redux/store";
-import {fetchConfig, putConfig} from "@/redux/features/layout-slice";
+import {fetchConfig, putConfig, putEmailConfig, putPhoneConfig} from "@/redux/features/layout-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import * as React from "react";
+import { Title } from '@/components/rehab/styles';
 
 const StyledButton = styled(Button)`
   && {
@@ -27,9 +28,15 @@ export default function ConfigManagement() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const dispatch = useDispatch()
   const [hospitalNameTmp, setHospitalNameTmp] = React.useState<string>('')
+  const [phoneNumberTmp, setPhoneNumberTmp] = React.useState<string>('')
+  const [emailTmp, setEmailTmp] = React.useState<string>('')
+
   const hospitalName = useAppSelector((state: RootState) => state.appBar.rsConfig.Hospital.Name)
+  const phoneNumber = useAppSelector((state: RootState) => state.appBar.rsConfig.AfterSalesInfo.Phone)
+  const email = useAppSelector((state: RootState) => state.appBar.rsConfig.AfterSalesInfo.Email)
   const handleSubmit = () => {
-    thunkDispatch(putConfig({hospital:{name: hospitalNameTmp}}))
+    console.log("handleSubmit",email, phoneNumber, hospitalNameTmp)
+    thunkDispatch(putConfig({after_sales_info: {email: emailTmp, phone_number: phoneNumberTmp}, hospital:{name: hospitalNameTmp}}))
   }
 
   useEffect(() => {
@@ -40,20 +47,54 @@ export default function ConfigManagement() {
   useEffect(() => {
     setHospitalNameTmp(hospitalName)
   }, [hospitalName])
+  useEffect(() => {
+    setPhoneNumberTmp(phoneNumber)
+  }, [phoneNumber])
+  useEffect(() => {
+    setEmailTmp(email)
+  }, [email])
 
   function handleHospitalNameChange(e: ChangeEvent<HTMLInputElement>) {
+    console.log('handleHospitalNameChange', e.target.value)
     setHospitalNameTmp(e.target.value)
+  }
+  function handlePhoneNumberChange(e: ChangeEvent<HTMLInputElement>) {
+    console.log('handlePhoneNumberChange', e.target.value)
+    setPhoneNumberTmp(e.target.value)
+  }
+  function handleEmailChange(e: ChangeEvent<HTMLInputElement>) {
+    console.log('handleEmailChange', e.target.value)
+    setEmailTmp(e.target.value)
   }
 
   return (
     <Container>
+      <Title>配置管理</Title>
       <Card>
-        <CardHeader title='配置管理' titleTypographyProps={{ variant: 'h6' }} />
+        {/*<CardHeader title='配置管理' titleTypographyProps={{ variant: 'h6' }} />*/}
         <CardContent>
           {/*<form onSubmit={handleSubmit}>*/}
             <Grid container spacing={5}>
               <Grid item xs={12}>
-                <TextField fullWidth label='Title' value={hospitalNameTmp} placeholder='请输入要改的医院名称' onChange={handleHospitalNameChange} />
+                <TextField sx={{ width: '50%' }}
+                           label='医院抬头'
+                           value={hospitalNameTmp}
+                           placeholder='请输入要改的医院名称'
+                           onChange={handleHospitalNameChange} />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField sx={{ width: '50%' }}
+                           label='联系方式'
+                           value={phoneNumberTmp}
+                           placeholder='请输入要改的联系方式'
+                           onChange={handlePhoneNumberChange} />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField sx={{ width: '50%' }}
+                           label='邮箱'
+                           value={emailTmp}
+                           placeholder='请输入要改的联系邮箱'
+                           onChange={handleEmailChange} />
               </Grid>
               <Grid item xs={12}>
                 <Box

@@ -32,16 +32,16 @@ interface MCTMenu {
 
 const pages: MCTMenu[] = [
   {
+    name: "病人",
+    path: "/rehab/patient",
+  },
+  {
     name: "用户",
     path: "/rehab/staff",
   },
   {
-    name: "设备",
+    name: "统计",
     path: "/rehab/equipment",
-  },
-  {
-    name: "病人",
-    path: "/rehab/patient",
   },
   {
     name: "配置",
