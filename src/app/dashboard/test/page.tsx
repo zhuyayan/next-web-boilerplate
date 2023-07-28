@@ -15,6 +15,9 @@ import ShareIcon from '@mui/icons-material/Share';
 import { useRef, useEffect } from "react";
 import { AutoFixed } from "./auto-fixed";
 
+import Link from '@mui/material/Link';
+import Footer from "@/components/layout/Footer";
+
 const actions = [
   { icon: <FileCopyIcon />, name: 'Copy' },
   { icon: <SaveIcon />, name: 'Save' },
@@ -87,10 +90,28 @@ export default function Test() {
     },
     labels: ['参与患者数', '活跃患者数'],
   }
+
+  // const {Footer} = Layout;
   return (
       <>
-        <ReactApexChart options={eqoptions} type="donut" series={series} height={200} />
-        <ReactApexChart options={xloptions} type="radialBar" series={xlseries} height={200}/>
+        {/*<Footer style={{textAlign: 'center', position: "sticky", bottom: "0"}} className={"blog-footer"}>*/}
+        {/*  <div>*/}
+        {/*    <span onClick={this.showAbout}>关于我们</span>*/}
+        {/*    <About visible={this.state.aboutVisible}></About>*/}
+        {/*    <span className="span-line">|</span>*/}
+        {/*    <Link to="/about">联系我们</Link>*/}
+        {/*    <span className="span-line">|</span>*/}
+        {/*    <Link to="/about">免责声明</Link>*/}
+        {/*    <div className="company">*/}
+        {/*      <p className="J-company-name"> © 2022 - &nbsp;*/}
+        {/*        <a href="http://www.miibeian.gov.cn/" target="_blank" rel="noopener noreferrer"*/}
+        {/*           ga_event="click_about">鲁ICP备18122390号</a><br/>*/}
+        {/*      </p>*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*</Footer>*/}
+        {/*<ReactApexChart options={eqoptions} type="donut" series={series} height={200} />*/}
+        {/*<ReactApexChart options={xloptions} type="radialBar" series={xlseries} height={200}/>*/}
         {/*<Box sx={{ height: 320, transform: 'translateZ(0px)', flexGrow: 1 }}>*/}
         {/*  <SpeedDial*/}
         {/*      ariaLabel="SpeedDial basic example"*/}
@@ -111,7 +132,7 @@ export default function Test() {
         <div>
           {/*<AutoFixed top="0px" height="20px">*/}
           {/*  <div style={{ backgroundColor: "#bababa" }}>*/}
-          {/*    我是悬浮内容，距离顶部 0px ，一直吸顶*/}
+          {/*    <ReactApexChart options={xloptions} type="radialBar" series={xlseries} height={200}/>*/}
           {/*  </div>*/}
           {/*</AutoFixed>*/}
           {/*<div style={{ height: "300px" }}>我是占位 1，高度300px</div>*/}
@@ -128,7 +149,7 @@ export default function Test() {
           {/*    fixedStyle={{ color: "red" }}*/}
           {/*>*/}
           {/*  <div style={{ backgroundColor: "#bababa" }}>*/}
-          {/*    我是悬浮内容，距离顶部为 20px 吸顶*/}
+          {/*    <ReactApexChart options={xloptions} type="radialBar" series={xlseries} height={200}/>*/}
           {/*  </div>*/}
           {/*</AutoFixed>*/}
           {/*<div style={{ height: "500px" }}>我是占位 2，高度500px</div>*/}
@@ -145,16 +166,17 @@ export default function Test() {
           {/*    fixedStyle={{ color: "red" }}*/}
           {/*>*/}
           {/*  <div style={{ backgroundColor: "#bababa" }}>*/}
-          {/*    我是悬浮内容，距离底部 20px吸底*/}
+          {/*    <ReactApexChart options={xloptions} type="radialBar" series={xlseries} height={200}/>*/}
           {/*  </div>*/}
           {/*</AutoFixed>*/}
           {/*<div style={{ height: "300px" }}>我是占位 3，高度300px</div>*/}
-          <AutoFixed top="10px" height="20px">
-            {/*<div style={{ backgroundColor: "#bababa" }}>*/}
-            {/*  我是悬浮内容，距离底部为 0px，一直吸底。*/}
-            {/*</div>*/}
-            <ReactApexChart options={xloptions} type="radialBar" series={xlseries} height={200}/>
-          </AutoFixed>
+          {/*<AutoFixed alwaysFixed={true} bottom="0px" height="20px">*/}
+          {/*  <div style={{ backgroundColor: "#bababa" }}>*/}
+          {/*    我是悬浮内容，距离底部为 0px，一直吸底。*/}
+          {/*  </div>*/}
+
+          {/*</AutoFixed>*/}
+          <Footer style={{height: '50px'}} />
         </div>
       </>
 

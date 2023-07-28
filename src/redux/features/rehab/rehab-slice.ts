@@ -58,11 +58,20 @@ export interface PrescriptionRecord {
   updated_at: string
 }
 
+// export interface  systemInformation
+
 let staffs: MedicalStaff[] = []
 let patients: Patient[] = []
 let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
 let onlineEquipment: EquipmentOnline[] = []
+let equipmentAll: equipmentAll[] = []
+let sysInfo: systemInformation = {
+  cpu_usage: "",
+  total_memory_gb: "",
+  used_memory_gb: "",
+  disk_usage: "",
+}
 
 
 let patient: Patient = {
@@ -85,6 +94,8 @@ interface RehabState {
   prescription: Prescription[]
   prescriptionRecord: PrescriptionRecord[]
   onlineEquipment: EquipmentOnline[]
+  equipmentAll: equipmentAll[]
+  systemInformation: systemInformation
 }
 
 const initialState: RehabState = {
@@ -95,6 +106,8 @@ const initialState: RehabState = {
   prescription: prescriptions,
   prescriptionRecord: prescriptionRecord,
   onlineEquipment: onlineEquipment,
+  equipmentAll: equipmentAll,
+  systemInformation: sysInfo,
 }
 
 export type Channel = 'redux' | 'general'
@@ -177,6 +190,18 @@ export interface RealTimeTrainData {
 export interface EquipmentOnline {
   sId: number
   clientId: string
+}
+
+export interface equipmentAll {
+  sId: number
+  clientId: string
+}
+
+export interface  systemInformation {
+  cpu_usage: string
+  total_memory_gb: string
+  used_memory_gb: string
+  disk_usage: string
 }
 
 export function isRealTimeTrainData(data: any): data is RealTimeTrainData {
@@ -306,17 +331,53 @@ export const asyncSysTime = createAsyncThunk<any, {date_time: string}>("asyncSys
   return response.data
 })
 
-export const fetchPatients = createAsyncThunk<Patient[], {page: number, size: number, id: number, patient_name?: string, staff_ids?: Array<number>, start_time?: string, end_time?: string}, {}>('fetchPatients', async ({page, size, id,patient_name, staff_ids, start_time,end_time }):Promise<any> => {
+export const fetchPatients = createAsyncThunk<Patient[],
+    {page: number, size: number, id: number, patient_name?: string, staff_ids?: Array<number>, start_time?: string, end_time?: string},
+    {}>('fetchPatients', async ({page, size, id,patient_name, staff_ids, start_time,end_time }):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id, patient_name, staff_ids, start_time, end_time}});
   console.log("fetch patient async thunk: ", response.data.data.patients)
   return response.data.data.patients.map(convertAPIPatientToPatient)
 });
 
-export const activePatients = createAsyncThunk<Patient[], {page: number, size: number, id: number, patient_name?: string, staff_ids?: Array<number>, start_time?: string, end_time?: string}, {}>('activePatients', async ({page, size, id,patient_name, staff_ids, start_time,end_time }):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id, patient_name, staff_ids, start_time, end_time}});
+function convertAPIEquipmentAll(apiEquipmentAll: any): equipmentAll {
+  return {
+    sId: apiEquipmentAll.sId,
+    clientId: apiEquipmentAll.clientId,
+  }
+}
+function convertAPISystemInformation(apiSystemInformation: any): systemInformation {
+  return {
+    cpu_usage: apiSystemInformation.cpu_usage,
+    total_memory_gb: apiSystemInformation.total_memory_gb,
+    used_memory_gb: apiSystemInformation.used_memory_gb,
+    disk_usage: apiSystemInformation.disk_usage,
+  }
+}
+
+export const activePatients = createAsyncThunk<Patient[],
+    {page: number, size: number, id: number, patient_name?: string, staff_ids?: Array<number>, start_time?: string, end_time?: string}, {}>
+('activePatients', async ({page, size, id,patient_name, staff_ids, start_time,end_time }):Promise<any> =>
+{
+  const response: AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {
+    params: {
+      page,
+      size,
+      id,
+      patient_name,
+      staff_ids,
+      start_time,
+      end_time
+    }
+  });
   console.log("fetch patient async thunk: ", response.data.data.patients)
   return response.data.data.patients.map(convertAPIPatientToPatient)
 });
+
+// export const fetchPatients = createAsyncThunk<Patient[], {page: number, size: number, id: number}, {}>('fetchPatients', async ({page, size, id}):Promise<any> => {
+//   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id}});
+//   console.log("fetch patient async thunk: ", response.data.data.patients)
+//   return response.data.data.patients.map(convertAPIPatientToPatient)
+// });
 
 // 查找病人
 export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fetchPatientById', async ({ id}):Promise<any> => {
@@ -355,10 +416,10 @@ export const deletePrescription = createAsyncThunk<{id: number}, {id: number}, {
 });
 
 // 查找医护
-export const fetchStaffs = createAsyncThunk<MedicalStaff[], {page: number, size: number, id: number}, {}>(
+export const fetchStaffs = createAsyncThunk<MedicalStaff[], {page: number, size: number, id: number, staff_name?: string}, {}>(
   'fetchStaff',
-  async ({page, size, id}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('staff',{ params:{ page, size, id}})
+  async ({page, size, id, staff_name}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('staff',{ params:{ page, size, id, staff_name}})
   console.log("fetch staff async thunk: ", response.data.data.staffs)
   return response.data.data.staffs.map(convertAPIStaffToMedicalStaff)
 });
@@ -418,6 +479,24 @@ export const sendPrescriptionToEquipment = createAsyncThunk<number, {prescriptio
   console.log("send prescription to equipment: ", response.data)
   return response.data.code
 });
+
+//获取系统信息
+export const getSystemInformation = createAsyncThunk<systemInformation, {page: number, size: number}, {}>(
+    'getSystemInformation',
+    async ({page, size}):Promise<any> => {
+      const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('system',{ params:{ page, size}})
+      console.log("fetch systemInformation async thunk: ", response.data.data.systemInformations)
+      return response.data.data
+    });
+
+//获取全部设备信息
+export const getEquipmentAll = createAsyncThunk<equipmentAll[], {page: number, size: number}>(
+    "getEquipmentAll",
+    async ({page, size})=>{
+      const response: AxiosResponse<any, any> = await MCTAxiosInstance.get('equipment', { params:{ page, size } })
+      console.log("getEquipmentAll", response.data.data.equipment)
+      return response.data.data.equipment.map(convertAPIEquipmentAll)
+    });
 
 function convertAPIPrescriptionRecordToPrescriptionRecord(apiPrescriptionRecord: any): PrescriptionRecord {
   return {
@@ -611,6 +690,12 @@ const RehabSlice = createSlice({
         }).addCase(activePatients.fulfilled,(state, action)=>{
           state.activePatient = action.payload
           console.log('activePatients', action.payload)
+        })
+        .addCase(getSystemInformation.fulfilled, (state, action)=> {
+          state.systemInformation = action.payload
+        })
+        .addCase(getEquipmentAll.fulfilled, (state, action) => {
+          state.equipmentAll = action.payload
         })
         .addMatcher(rehabApi.endpoints?.getOnlineEquipments.matchFulfilled, (state, action) => {
           console.log("addMatcher rehabApi getOnlineEquipments fulfilled -> ", action.payload, action.type)

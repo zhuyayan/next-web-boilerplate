@@ -10,22 +10,21 @@ import Grid from '@mui/material/Grid';
 
 import React, {useEffect, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
-import {activePatients, fetchPatients, useGetOnlineEquipmentsQuery} from "@/redux/features/rehab/rehab-slice";
+import {activePatients, getEquipmentAll, fetchPatients, useGetOnlineEquipmentsQuery, getSystemInformation} from "@/redux/features/rehab/rehab-slice";
 import Box from "@mui/material/Box";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts'
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import Divider from "@mui/material/Divider";
 import {GetCurrentDateTime, GetOneMonthAgoDateTime, GetOneWeekAgoDateTime} from "@/utils/mct-utils";
-// moment().format('YYYY-MM-DD HH:MM:SS')
+import { Title } from '@/components/rehab/styles';
 
 //图表
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
-
 
 const EquipmentList = styled.ul`
   list-style-type: none;
@@ -50,24 +49,41 @@ const EquipmentStatus = styled.div<{ $online: boolean }>`
 export default function EquipmentManagement() {
     const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
     const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
+    const equipmentList = useAppSelector((state: RootState) => state.rehab.equipmentAll)
+    const systemInformation = useAppSelector((state: RootState) => state.rehab.systemInformation)
     const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
     const patientList = useAppSelector((state: RootState) => state.rehab.patient)
+
     const activePatientList = useAppSelector((state: RootState) => state.rehab.activePatient)
+    const Phone = useSelector((state:RootState) => state.appBar.rsConfig.AfterSalesInfo.Phone);
+    const Email = useSelector((state:RootState) => state.appBar.rsConfig.AfterSalesInfo.Email);
     const [activePatientCount, setActivePatientCount] = React.useState(0);
     useEffect(() => {
         thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
         thunkDispatch(activePatients({page: 1, size: 1000, id: 0, start_time: GetOneMonthAgoDateTime(), end_time: GetCurrentDateTime()}))
+        thunkDispatch(getEquipmentAll({page: 1, size: 1000}))
+        thunkDispatch(getSystemInformation({page: 1, size: 100}))
     }, [thunkDispatch]);
 
     useEffect(() => {
         console.log("activePatientList", activePatientList.length)
+        console.log("equipmentList", equipmentList)
         setActivePatientCount(activePatientList.length)
         setPatientSeries([patientList.length, (activePatientList.length / patientList.length)*100])
-    }, [patientList,activePatientList]);
+        setEquipmentSeries([onlineEquipment.length, equipmentList.length - onlineEquipment.length])
+    }, [patientList,activePatientList, equipmentList, onlineEquipment]);
+    //
+    // useEffect(() => {
+    //     thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
+    //     thunkDispatch(getEquipmentAll({page: 1, size: 1000}))
+    //     thunkDispatch(getSystemInformation({page: 1, size: 100}))
+    // }, [thunkDispatch]);
+    //
 
-    const series = [1, 2];
-    const xlseries = [100, 75];
+    // const series = [onlineEquipment.length, equipmentAll.length - onlineEquipment.length];
+
     const [patientSeries, setPatientSeries] = useState([100, 75]);
+    const [equipmentSeries, setEquipmentSeries] = useState([100, 75]);
     const onHoverTooltipFormatter = (val: number,opts: { seriesIndex: number, dataPointIndex: number, w: any }) => {
         console.log("onHoverTooltipFormatter")
         return `${val}`;
@@ -126,7 +142,7 @@ export default function EquipmentManagement() {
 
   return (
     <Container>
-        <Typography variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333'}}>数据汇总</Typography>
+        <Title>数据汇总</Title>
         <Grid container spacing={3}>
             <Grid item xs={4} md={4}>
                 <Card sx={{ maxWidth: 345 }}>
@@ -140,7 +156,7 @@ export default function EquipmentManagement() {
                             设备状况
                         </Typography>
                         <Divider />
-                        <ReactApexChart options={options} type="donut" series={series} height={200} />
+                        <ReactApexChart options={options} type="donut" series={equipmentSeries} height={200} />
                         <Divider />
                         <br/>
                         <Box>
@@ -148,7 +164,7 @@ export default function EquipmentManagement() {
                                 设备数量:&emsp;
                             </Typography>
                             <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
-                                {onlineEquipment.length}
+                                {equipmentList.length}
                             </Typography>
                         </Box>
 
@@ -274,9 +290,18 @@ export default function EquipmentManagement() {
                         <Typography gutterBottom variant="h5" component="div">
                             系统情况
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            当前系统情况良好
-                        </Typography>
+                        <br/>
+                        <Typography variant="body1" color="text.secondary">CPU使用率:&emsp;{Number(systemInformation.cpu_usage).toFixed(2)}%</Typography>
+                        <Divider/>
+                        <br/>
+                        <Typography variant="body1" color="text.secondary">总内存(GB):&emsp;{Number(systemInformation.total_memory_gb).toFixed(2)}</Typography>
+                        <Divider/>
+                        <br/>
+                        <Typography variant="body1" color="text.secondary">占用内存(GB):&emsp;{Number(systemInformation.used_memory_gb).toFixed(2)}</Typography>
+                        <Divider/>
+                        <br/>
+                        <Typography variant="body1" color="text.secondary">磁盘利用率:&emsp;{Number(systemInformation.disk_usage).toFixed(2)}%</Typography>
+                        <Divider/>
                     </CardContent>
                     {/*<CardActions>*/}
                     {/*    <Button size="small">分享</Button>*/}
@@ -297,7 +322,7 @@ export default function EquipmentManagement() {
                             故障联系
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            联系方式：123-1234-5678
+                            联系方式：{Phone}
                         </Typography>
                     </CardContent>
                     {/*<CardActions>*/}
@@ -319,7 +344,7 @@ export default function EquipmentManagement() {
                             意见反馈
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            邮箱：abc@qq.com
+                            邮箱：{Email}
                         </Typography>
                     </CardContent>
                     {/*<CardActions>*/}

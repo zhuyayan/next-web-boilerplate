@@ -42,7 +42,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import FormControl from "@mui/material/FormControl";
 import DialogContentText from "@mui/material/DialogContentText";
 import {GetDefaultMedicalStaff} from "@/utils/mct-utils";
-import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog'
+import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog';
+import { Title } from '@/components/rehab/styles';
 
 const StyledDiv = styled.div`
   display: flex;
@@ -65,17 +66,6 @@ const chineseLocalization = {
   }
 };
 
-/*background-color: ${props => props.theme.palette.error.main};  Use your desired red color */
-const RedButton = styled(Button)` 
-  &.MuiButton-contained {
-    background-color: rgb(255, 51, 10);
-    color: #fff;
-  }
-  &.MuiButton-contained:hover {
-    background-color: rgb(185, 38, 11);
-  }
-`;
-
 export default function MedicalStaffManagement() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const appDispatch = useAppDispatch()
@@ -97,10 +87,17 @@ export default function MedicalStaffManagement() {
     fullName: '',
   })
 
+  //获取输入框值
+  const [inputValue, setInputValue] = useState('');
+  const inputChangeValue = (name: string) => {
+    setInputValue(name)
+    thunkDispatch(fetchStaffs({page: 1, size: 1000, id: 0, staff_name: inputValue}))
+  };
+
   useEffect(() => {
-    thunkDispatch(fetchStaffs({page: 1, size: 100, id: 0}))
+    thunkDispatch(fetchStaffs({page: 1, size: 1000, id: 0, staff_name: inputValue}))
     initiateDeleteMedicalStaff()
-  }, [thunkDispatch]);
+  }, [inputValue, thunkDispatch]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -212,75 +209,17 @@ export default function MedicalStaffManagement() {
 
   return (
     <>
-      <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
-        <DialogTitle>添加医护</DialogTitle>
-        <DialogContent>
-          <Box>
-            <StyledDiv>
-              <TextField
-                  sx={{ m: 1, minWidth: 120 }} id="username"
-                  value={willAddStaff.username}
-                  onChange={handleAddMedicalStaff}
-                  label="用户名" variant="outlined" size="small"/>
-              <TextField
-                  sx={{ m: 1, minWidth: 120 }} id="password"
-                  value={willAddStaff.password}
-                  onChange={handleAddMedicalStaff}
-                  label="密码" variant="outlined" size="small"/>
-              <TextField
-                  sx={{ m: 1, minWidth: 120 }} id="fullName"
-                  value={willAddStaff.fullName}
-                  onChange={handleAddMedicalStaff}
-                  label="全名" variant="outlined" size="small"/>
-            </StyledDiv>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleAddStaffClickClose}>取消</Button>
-          <Button onClick={handleSaveAddMedicalStaff}>确定</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/*<MCTStyledDialog*/}
-      {/*    open={deleteDialogOpen}*/}
-      {/*    onClose={handleDeleteDialogClose}*/}
-      {/*    aria-labelledby="alert-dialog-title"*/}
-      {/*    aria-describedby="alert-dialog-description"*/}
-      {/*>*/}
-      {/*  <DialogTitle id="alert-dialog-title">{"确认操作"}</DialogTitle>*/}
-      {/*  <DialogContent>*/}
-      {/*    <DialogContentText id="alert-dialog-description">*/}
-      {/*      {`是否确认删除 `}*/}
-      {/*      <span style={{fontWeight: 'bold'}}>*/}
-      {/*        {`[${staffToBeDeleted.fullName}]`}*/}
-      {/*      </span>*/}
-      {/*      {` 的账户信息？`}*/}
-      {/*    </DialogContentText>*/}
-      {/*  </DialogContent>*/}
-      {/*  <DialogActions>*/}
-      {/*    <RedButton variant="contained" onClick={confirmStaffDeletion} color="error" size="small">*/}
-      {/*      删除*/}
-      {/*    </RedButton>*/}
-      {/*    <Button variant="outlined" onClick={handleDeleteDialogClose} size="small">*/}
-      {/*      取消*/}
-      {/*    </Button>*/}
-      {/*  </DialogActions>*/}
-      {/*</MCTStyledDialog>*/}
-      <DeleteConfirmationDialog
-          open={deleteDialogOpen}
-          onClose={handleDeleteDialogClose}
-          onConfirm={confirmStaffDeletion}
-          deleteItemName={`${staffToBeDeleted.fullName}`}
-      />
-
       <Container>
-        <Typography variant="h2" component="h1" sx={{ fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>医护管理</Typography>
+        <Title>医护管理</Title>
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
           <FormControl sx={{ m: 1, width: 640}}>
               <OutlinedInput
                   sx={{ ml: 1, flex: 1 }}
                   placeholder="输入用户姓名进行查询"
                   inputProps={{ 'aria-label': '输入用户姓名进行查询' }}
+                  onChange={e => {
+                    inputChangeValue(e.target.value);
+                  }}
                   startAdornment={
                     <InputAdornment position="start">
                       <SearchIcon />
@@ -371,39 +310,76 @@ export default function MedicalStaffManagement() {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}/>
-          <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>修改</DialogTitle>
-            <DialogContent>
-              <Box component="form">
-                <StyledDiv>
-                  <TextField
-                    sx={{ m: 1, minWidth: 120 }}
-                    id="username"
-                    value={willEditStaff.username}
-                    onChange={handleInputChange}
-                    label="用户名" variant="outlined" size="small"/>
-                  <TextField
-                    sx={{ m: 1, minWidth: 120 }}
-                    id="password"
-                    value={willEditStaff.password}
-                    onChange={handleInputChange}
-                    label="密码" variant="outlined" size="small"/>
-                  <TextField
-                    sx={{ m: 1, minWidth: 120 }}
-                    id="fullName"
-                    value={willEditStaff.fullName}
-                    onChange={handleInputChange}
-                    label="全名" variant="outlined" size="small"/>
-                  </StyledDiv>
-                </Box>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose}>取消</Button>
-              <Button onClick={handleEditRow}>确定</Button>
-            </DialogActions>
-          </Dialog>
         </Paper>
       </Container>
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        onConfirm={confirmStaffDeletion}
+        deleteItemName={`${staffToBeDeleted.fullName}`}
+      />
+
+      <Dialog open={openAddStaff} onClose={handleAddStaffClickClose}>
+        <DialogTitle>添加医护</DialogTitle>
+        <DialogContent>
+          <Box>
+            <StyledDiv>
+              <TextField
+                sx={{ m: 1, minWidth: 120 }} id="username"
+                value={willAddStaff.username}
+                onChange={handleAddMedicalStaff}
+                label="用户名" variant="outlined" size="small"/>
+              <TextField
+                sx={{ m: 1, minWidth: 120 }} id="password"
+                value={willAddStaff.password}
+                onChange={handleAddMedicalStaff}
+                label="密码" variant="outlined" size="small"/>
+              <TextField
+                sx={{ m: 1, minWidth: 120 }} id="fullName"
+                value={willAddStaff.fullName}
+                onChange={handleAddMedicalStaff}
+                label="全名" variant="outlined" size="small"/>
+            </StyledDiv>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAddStaffClickClose}>取消</Button>
+          <Button onClick={handleSaveAddMedicalStaff}>确定</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>修改</DialogTitle>
+        <DialogContent>
+          <Box component="form">
+            <StyledDiv>
+              <TextField
+                sx={{ m: 1, minWidth: 120 }}
+                id="username"
+                value={willEditStaff.username}
+                onChange={handleInputChange}
+                label="用户名" variant="outlined" size="small"/>
+              <TextField
+                sx={{ m: 1, minWidth: 120 }}
+                id="password"
+                value={willEditStaff.password}
+                onChange={handleInputChange}
+                label="密码" variant="outlined" size="small"/>
+              <TextField
+                sx={{ m: 1, minWidth: 120 }}
+                id="fullName"
+                value={willEditStaff.fullName}
+                onChange={handleInputChange}
+                label="全名" variant="outlined" size="small"/>
+            </StyledDiv>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>取消</Button>
+          <Button onClick={handleEditRow}>确定</Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

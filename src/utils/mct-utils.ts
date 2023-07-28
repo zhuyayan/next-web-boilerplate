@@ -127,3 +127,14 @@ export function GetOneWeekAgoDateTime():string {
 export function GetOneMonthAgoDateTime():string {
   return moment().subtract(1, 'months').format('YYYY-MM-DD HH:mm:ss');
 }
+export function GetDefaultPrescription() {
+  return {
+    id: 0,
+    created_at: '',
+    part: '',
+    mode: '',
+    zz: 0,
+    u: 0,
+    v: 0,
+  }
+}

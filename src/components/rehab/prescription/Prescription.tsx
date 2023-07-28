@@ -25,7 +25,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 
 import {
-  deleteStaff,
   editPrescription,
   EquipmentOnline,
   Prescription,
@@ -35,15 +34,21 @@ import {ChangeEvent, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
+import {
+  BodyPartToNumMapping,
+  GetDefaultPatient,
+  ModeToNumMapping,
+  NumToBodyPartMapping,
+  NumToModeMapping
+} from "@/utils/mct-utils";
 import {AppDispatch, useAppDispatch} from "@/redux/store";
 import { deletePrescription } from "@/redux/features/rehab/rehab-slice";
 import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import {Delete as DeleteIcon} from "@mui/icons-material";
-import ShareIcon from '@mui/icons-material/Share';
-import ReplyAllIcon from '@mui/icons-material/ReplyAll';
 import SendAndArchiveIcon from '@mui/icons-material/SendAndArchive';
+import DeleteConfirmationDialog from "@/components/rehab/DeleteConfirmationDialog";
+import {GetDefaultPrescription} from "@/utils/mct-utils";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -132,14 +137,8 @@ export default function StickyHeadTable(params: {PId:string,
     v: 3,
   })
   const [clientId, setClientId] = useState("")
-  const [openMessage, setOpenMessage] = React.useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  const handleDeletePrescription = (id: number) => {
-    if (window.confirm('是否确认删除该条处方？')) {
-      appDispatch(deletePrescription({id: id}))
-    }
-  };
+  const [openDelPrescription, setOpenDelPrescription] = React.useState(false);
+  const [prescriptionToBeDeleted, setPrescriptionToBeDeleted] = useState<Prescription>(GetDefaultPrescription());
 
   const handleClickOpen = (row: Prescription) => {
     setOpen(true);
@@ -151,6 +150,19 @@ export default function StickyHeadTable(params: {PId:string,
     setWillEditPrescription(row)
     setOpenModify(true);
   };
+
+  const handleDeletePrescription = (id: number) => {
+    (appDispatch as AppDispatch)(deletePrescription({id: id}))
+    handleCloseDel()
+  };
+  const handleClickDel = async (prescription: Prescription) => {
+    setPrescriptionToBeDeleted(prescription)
+    setOpenDelPrescription(true);
+  }
+  const handleCloseDel= () => {
+    setOpenDelPrescription(false);
+    setPrescriptionToBeDeleted(GetDefaultPrescription())
+  }
 
   const handleChange = (event: SelectChangeEvent) => {
     setDevice(event.target.value);
@@ -306,7 +318,8 @@ export default function StickyHeadTable(params: {PId:string,
                       <Tooltip title="删除处方">
                         <IconButton
                             aria-label="delete"
-                            onClick={() => handleDeletePrescription(row.id)}
+                            // onClick={() => handleDeletePrescription(row.id)}
+                            onClick={() => handleClickDel(row)}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -319,59 +332,67 @@ export default function StickyHeadTable(params: {PId:string,
           </Table>
         </TableContainer>
       </Paper>
-        <Dialog open={open} onClose={handleClose}
-          slotProps={{
-            backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
-          PaperProps={{ elevation: 0 }}>
-            <DialogContent>
-              <DialogContentText>
-                请选择要下发至哪台康复仪
-              </DialogContentText>
-              <StyledDiv>
-                <Box>
-                  <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                    <InputLabel id="device">康复仪设备</InputLabel>
-                    <Select
-                        labelId="device"
-                        id="device"
-                        value={device}
-                        label="device"
-                        onChange={handleChange}
-                        name="device"
-                    >
-                      {params.onlineEquipment ? (
-                          params.onlineEquipment.map((item) => (
-                              <MenuItem key={item.sId} value={item.sId}>
-                                {item.clientId}
-                              </MenuItem>
-                          ))
-                      ) : null}
-                    </Select>
-                  </FormControl>
-                </Box>
-              </StyledDiv>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose}>取消</Button>
-              <Button onClick={handleSendCommand}>确定</Button>
-            </DialogActions>
-          </Dialog>
-          <Dialog
-            open={openModify} onClose={handleCloseModify}
-            slotProps={{
+
+      <DeleteConfirmationDialog
+        open={openDelPrescription}
+        onClose={handleCloseDel}
+        onConfirm={() => handleDeletePrescription(prescriptionToBeDeleted.id)}
+        deleteItemName={prescriptionToBeDeleted.created_at}
+      />
+      <Dialog
+        open={open} onClose={handleClose}
+        slotProps={{
+          backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
+        PaperProps={{ elevation: 0 }}>
+        <DialogContent>
+          <DialogContentText>
+            请选择要下发至哪台康复仪
+          </DialogContentText>
+          <StyledDiv>
+            <Box>
+              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                <InputLabel id="device">康复仪设备</InputLabel>
+                <Select
+                  labelId="device"
+                  id="device"
+                  value={device}
+                  label="device"
+                  onChange={handleChange}
+                  name="device"
+                >
+                  {params.onlineEquipment ? (
+                    params.onlineEquipment.map((item) => (
+                      <MenuItem key={item.sId} value={item.sId}>
+                        {item.clientId}
+                      </MenuItem>
+                    ))
+                  ) : null}
+                </Select>
+              </FormControl>
+            </Box>
+          </StyledDiv>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>取消</Button>
+          <Button onClick={handleSendCommand}>确定</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openModify} onClose={handleCloseModify}
+        slotProps={{
               backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
-            PaperProps={{ elevation: 0 }}>
-            <DialogTitle>修改处方</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                请正确修改处方各项信息
-              </DialogContentText>
-              <StyledDiv>
-                <Box>
-                  <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                    <InputLabel id="demo-select-small-label">训练模式</InputLabel>
-                    <Select
-                        labelId="demo-select-small-label"
+        PaperProps={{ elevation: 0 }}>
+        <DialogTitle>修改处方</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            请正确修改处方各项信息
+          </DialogContentText>
+          <StyledDiv>
+            <Box>
+              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                <InputLabel id="demo-select-small-label">训练模式</InputLabel>
+                <Select
+                  labelId="demo-select-small-label"
                         id="demo-select-small"
                         value={String(NumToModeMapping[willEditPrescription.mode])}
                         label="Age1"

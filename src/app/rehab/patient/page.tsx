@@ -39,28 +39,22 @@ import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {AccountCircle, Delete as DeleteIcon} from "@mui/icons-material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {
   genderValueToLabel,
   getDefaultGenderLabel,
-  getDefaultGenderValue, GetDefaultMedicalStaff,
+  getDefaultGenderValue,
   GetDefaultPatient
 } from "@/utils/mct-utils";
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SearchIcon from '@mui/icons-material/Search';
-import {string} from "postcss-selector-parser";
-import InputBase from '@mui/material/InputBase';
-import { alpha } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import SmsIcon from '@mui/icons-material/Sms';
 import Tooltip from '@mui/material/Tooltip';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-
-import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog'
 import {filter} from "d3-array";
+import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog';
+import { Title } from '@/components/rehab/styles';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -323,7 +317,7 @@ export default function PatientList() {
         <Box>
           <Stack direction="row" spacing={1}>
             <Box flexGrow={1}>
-              <Typography variant="h2" component="h1" sx={{fontSize: '2.0rem', fontWeight: 'bold', color: '#333'}}>病人列表</Typography>
+              <Title>病人列表</Title>
               <Paper sx={{ width: '100%', overflow: 'hidden' }}>
                 <FormControl sx={{ m: 1, width: 240}}>
                   <InputLabel id="demo-multiple-checkbox-label">主治医生</InputLabel>
@@ -376,72 +370,6 @@ export default function PatientList() {
                     <AddCircleIcon sx={{ fontSize: 54 }} color="secondary"/>
                   </IconButton>
                 </Tooltip>
-                <Dialog open={addPatientOpen} onClose={handleAddPatientClose}>
-                  <DialogTitle>添加病人</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      请正确填写病人各项信息
-                    </DialogContentText>
-                    <Box component="form">
-                      <StyledDiv>
-                        <TextField sx={{m: 1, minWidth: 110}}
-                                   id="name"
-                                   onChange={handleAddPatientInput}
-                                   label="姓名" variant="outlined" size="small"/>
-                        <TextField sx={{m: 1, minWidth: 80}}
-                                   id="age"
-                                   onChange={handleAddPatientAgeInput}
-                                   label="年龄" variant="outlined" size="small"/>
-                        <FormControl sx={{m: 1, minWidth: 120}} size="small">
-                          <InputLabel id="gender">性别</InputLabel>
-                          <Select
-                              labelId="gender"
-                              id="gender"
-                              label="性别"
-                              onChange={handleAddPatientGenderChange}
-                          >
-                            <MenuItem value={10}>男</MenuItem>
-                            <MenuItem value={21}>女</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </StyledDiv>
-                      <StyledDiv>
-                        <TextField sx={{m: 1, minWidth: 340}}
-                                   id="i18d"
-                                   value={willAddPatient.i18d}
-                                   onChange={handleAddPatientInput}
-                                   label="身份证号" variant="outlined" size="small"/>
-                        <FormControl sx={{m: 1, minWidth: 160}} size="small">
-                          <InputLabel id="physician">主治医生</InputLabel>
-                          <Select
-                              labelId="physician"
-                              id="physician"
-                              value={String(willAddPatient.physicianId)}
-                              label="主治医生"
-                              onChange={handleAddPatientPhysicianChange}
-                          >
-                            {medicalStaffList.map((medicalStaff) =>
-                                <MenuItem value={medicalStaff.id} key={medicalStaff.id}>{medicalStaff.fullName}</MenuItem>
-                            )}
-                          </Select>
-                        </FormControl>
-                      </StyledDiv>
-                      <TextField sx={{m: 1, minWidth: 400}}
-                                 id="medicalHistory"
-                                 value={willAddPatient.medicalHistory}
-                                 onChange={handleAddPatientInput}
-                                 label="病史" variant="outlined" size="small"
-                                 multiline
-                                 rows={4}/>
-                    </Box>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleAddPatientClose}>取消</Button>
-                    <Button onClick={handleAddPatient}>确定</Button>
-
-                  </DialogActions>
-                </Dialog>
-
               </Paper>
             </Box>
             {/*<Box>*/}
@@ -453,38 +381,7 @@ export default function PatientList() {
         </Box>
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            {/*<Tabs aria-label="wrapped label tabs example">*/}
-            {/*  <Tab*/}
-            {/*      value="one"*/}
-            {/*      label="Item One"*/}
-            {/*      wrapped*/}
-            {/*  />*/}
-            {/*  <Tab value="two" label="Item Two" />*/}
-            {/*  <Tab value="three" label="Item Three" />*/}
-            {/*</Tabs>*/}
           </Box>
-          {/*<Stack direction="row" spacing={1}>*/}
-          {/*  <FormControl>*/}
-          {/*    <Autocomplete*/}
-          {/*        disablePortal*/}
-          {/*        id="combo-box-demo"*/}
-          {/*        options={top100Films}*/}
-          {/*        sx={{ width: 300 }}*/}
-          {/*        renderInput={(params) => <TextField {...params} label="Movie" />}*/}
-          {/*    />*/}
-          {/*  </FormControl>*/}
-          {/*  <Stack direction="row" spacing={1}>*/}
-          {/*    <FormControl fullWidth sx={{ m: 1 }}>*/}
-          {/*      <OutlinedInput*/}
-          {/*          id="outlined-adornment-amount"*/}
-          {/*          startAdornment={<SearchIcon/>}*/}
-          {/*      />*/}
-          {/*    </FormControl>*/}
-          {/*    <IconButton aria-label="fingerprint" color="secondary">*/}
-          {/*      <MoreHorizIcon color="primary"/>*/}
-          {/*    </IconButton>*/}
-          {/*  </Stack>*/}
-          {/*</Stack>*/}
           <TableContainer sx={{ maxHeight: 620}}>
             <Table>
               <TableHead>
@@ -557,7 +454,6 @@ export default function PatientList() {
                             {/*    <Button onClick={handleCloseDel}>取消</Button>*/}
                             {/*  </DialogActions>*/}
                             {/*</Dialog>*/}
-
                           </TableCell>
                         </TableRow>
                     ))}
