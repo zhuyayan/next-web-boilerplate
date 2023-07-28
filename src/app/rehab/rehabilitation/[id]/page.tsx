@@ -39,20 +39,15 @@ import {
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
-import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 import {IconButton} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import SendAndArchiveIcon from '@mui/icons-material/SendAndArchive';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
-import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
-import DownloadIcon from '@mui/icons-material/Download';
-import CardMedia from "@mui/material/CardMedia";
-import CardActions from "@mui/material/CardActions";
-import SmsIcon from "@mui/icons-material/Sms";
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
+
+import { Title } from '@/components/rehab/styles';
 
 
 const StyledDiv = styled.div`
@@ -220,19 +215,20 @@ export default function MUITable({ params }: { params: { id: string } }) {
       <Container>
         <Grid container spacing={8}>
           <Grid item xs={12} md={12}>
-              <Typography style={{display:'inline-block'}} variant="h2" component="h1" sx={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333' }}>
-                康复管理
-              </Typography>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Title>康复管理</Title>
               <Tooltip title="返回病人列表">
                 <IconButton
-                    aria-label="back"
-                    color="primary"
-                    onClick={()=> {window.location.href="/rehab/patient"}}
+                  style={{ marginLeft: 'auto' }}
+                  aria-label="back"
+                  color="primary"
+                  onClick={()=> {window.location.href="/rehab/patient"}}
                 >
                   <AssignmentReturnIcon fontSize="medium" />
                 </IconButton>
               </Tooltip>
-            <br />
+              <br />
+            </div>
           </Grid>
         </Grid>
         <Grid container spacing={2}>

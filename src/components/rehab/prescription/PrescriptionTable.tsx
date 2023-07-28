@@ -7,19 +7,15 @@ import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow, { TableRowProps } from '@mui/material/TableRow'
 import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/TableCell'
-import {Button, ButtonGroup, IconButton} from "@mui/material";
+import {Button, IconButton} from "@mui/material";
 import {
   exportTaskPressureData,
-  PrescriptionRecord, sendPrescriptionToEquipment,
-  deletePrescription
+  PrescriptionRecord,
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import {useAppDispatch} from "@/redux/store";
 import Tooltip from "@mui/material/Tooltip";
-import EditIcon from "@mui/icons-material/Edit";
-import {Delete as DeleteIcon} from "@mui/icons-material";
 import React from "react";
 import DownloadIcon from "@mui/icons-material/Download";
 
@@ -73,29 +69,20 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
                     {/*<StyledTableCell align='right'>{row.state}</StyledTableCell>*/}
                     <StyledTableCell align='right'>{row.state}</StyledTableCell>
                     <StyledTableCell align='center'>
-                      {/*<ButtonGroup style={{height: '20px'}} variant="outlined">*/}
-                      {/*  <Button color="primary" style={{width: '65px'}}*/}
-                      {/*          onClick={(event)=>{event.stopPropagation(); handleExport(row);}}>*/}
-                      {/*    导出*/}
-                      {/*  </Button>*/}
-                      {/*  <Button color="secondary" style={{width: '65px'}}>*/}
-                      {/*    删除*/}
-                      {/*  </Button>*/}
-                      {/*</ButtonGroup>*/}
-
                       <Tooltip title="导出">
                         <IconButton
                           aria-label="download"
-                          color="primary">
+                          color="primary"
+                          onClick={(event)=>{event.stopPropagation(); handleExport(row);}}>
                           <DownloadIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="删除">
-                        <IconButton
-                          aria-label="delete">
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      {/*<Tooltip title="删除">*/}
+                      {/*  <IconButton*/}
+                      {/*    aria-label="delete">*/}
+                      {/*    <DeleteIcon fontSize="small" />*/}
+                      {/*  </IconButton>*/}
+                      {/*</Tooltip>*/}
                     </StyledTableCell>
                   </StyledTableRow>
               ))}
