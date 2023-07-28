@@ -176,7 +176,7 @@ export default function Test() {
           {/*  </div>*/}
 
           {/*</AutoFixed>*/}
-          <Footer style={{height: '50px'}} />
+          {/*<Footer style={{height: '50px'}} />*/}
         </div>
       </>
 
