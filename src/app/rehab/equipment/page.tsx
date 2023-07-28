@@ -10,7 +10,12 @@ import Grid from '@mui/material/Grid';
 
 import React, {useEffect} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
-import {fetchPatients, useGetOnlineEquipmentsQuery} from "@/redux/features/rehab/rehab-slice";
+import {
+    getEquipmentAll,
+    fetchPatients,
+    useGetOnlineEquipmentsQuery,
+    getSystemInformation
+} from "@/redux/features/rehab/rehab-slice";
 import Box from "@mui/material/Box";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
@@ -49,14 +54,18 @@ const EquipmentStatus = styled.div<{ $online: boolean }>`
 export default function EquipmentManagement() {
     const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
     const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
+    const equipmentAll = useAppSelector((state: RootState) => state.rehab.equipmentAll)
+    const systemInformation = useAppSelector((state: RootState) => state.rehab.systemInformation)
     const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
     const patientList = useAppSelector((state: RootState) => state.rehab.patient)
     useEffect(() => {
         thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
+        thunkDispatch(getEquipmentAll({page: 1, size: 1000}))
+        thunkDispatch(getSystemInformation({page: 1, size: 100}))
     }, [thunkDispatch]);
 
-
-    const series = [1, 2];
+    
+    const series = [onlineEquipment.length, equipmentAll.length - onlineEquipment.length];
     const xlseries = [100, 75];
 
     const onHoverTooltipFormatter = (val: number,opts: { seriesIndex: number, dataPointIndex: number, w: any }) => {
@@ -139,7 +148,7 @@ export default function EquipmentManagement() {
                                 设备数量:&emsp;
                             </Typography>
                             <Typography variant="h5" color="primary" style={{display:'inline-block'}}>
-                                {onlineEquipment.length}
+                                {equipmentAll.length}
                             </Typography>
                         </Box>
 
@@ -265,9 +274,18 @@ export default function EquipmentManagement() {
                         <Typography gutterBottom variant="h5" component="div">
                             系统情况
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            当前系统情况良好
-                        </Typography>
+                        <br/>
+                        <Typography variant="body1" color="text.secondary">CPU使用率:&emsp;{Number(systemInformation.cpu_usage).toFixed(2)}%</Typography>
+                        <Divider/>
+                        <br/>
+                        <Typography variant="body1" color="text.secondary">总内存(GB):&emsp;{Number(systemInformation.total_memory_gb).toFixed(2)}</Typography>
+                        <Divider/>
+                        <br/>
+                        <Typography variant="body1" color="text.secondary">占用内存(GB):&emsp;{Number(systemInformation.used_memory_gb).toFixed(2)}</Typography>
+                        <Divider/>
+                        <br/>
+                        <Typography variant="body1" color="text.secondary">磁盘利用率:&emsp;{Number(systemInformation.disk_usage).toFixed(2)}%</Typography>
+                        <Divider/>
                     </CardContent>
                     {/*<CardActions>*/}
                     {/*    <Button size="small">分享</Button>*/}

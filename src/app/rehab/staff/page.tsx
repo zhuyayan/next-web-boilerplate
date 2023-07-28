@@ -97,10 +97,17 @@ export default function MedicalStaffManagement() {
     fullName: '',
   })
 
+  //获取输入框值
+  const [inputValue, setInputValue] = useState('');
+  const inputChangeValue = (name: string) => {
+    setInputValue(name)
+    thunkDispatch(fetchStaffs({page: 1, size: 1000, id: 0, staff_name: inputValue}))
+  };
+
   useEffect(() => {
-    thunkDispatch(fetchStaffs({page: 1, size: 100, id: 0}))
+    thunkDispatch(fetchStaffs({page: 1, size: 1000, id: 0, staff_name: inputValue}))
     initiateDeleteMedicalStaff()
-  }, [thunkDispatch]);
+  }, [inputValue, thunkDispatch]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -281,6 +288,9 @@ export default function MedicalStaffManagement() {
                   sx={{ ml: 1, flex: 1 }}
                   placeholder="输入用户姓名进行查询"
                   inputProps={{ 'aria-label': '输入用户姓名进行查询' }}
+                  onChange={e => {
+                    inputChangeValue(e.target.value);
+                  }}
                   startAdornment={
                     <InputAdornment position="start">
                       <SearchIcon />
