@@ -12,7 +12,7 @@ import {Container} from "@mui/material";
 
 import { useDispatch } from 'react-redux';
 import {RootState, useAppSelector} from "@/redux/store";
-import {fetchConfig, putConfig, putEmailConfig, putPhoneConfig} from "@/redux/features/layout-slice";
+import {fetchConfig, putConfig } from "@/redux/features/layout-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import * as React from "react";

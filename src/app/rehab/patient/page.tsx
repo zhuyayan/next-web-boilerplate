@@ -277,18 +277,21 @@ export default function PatientList() {
 
   const [filterDoctor, setFilterDoctor] = React.useState<MedicalStaff[]>([]);
 
-  const handleSelectChange = (event: SelectChangeEvent<typeof filterDoctor>) => {
-    console.log(event.target)
-    const {
-      target: { value },
-    } = event;
-    if(Array.isArray(value)) {
-      setFilterDoctor(value as MedicalStaff[])
-    }
+  const handleSelectChange = (event: SelectChangeEvent<number[]>) => {
+    console.log("event-target", event.target.value)
+    const selectedIds = event.target.value as number[]
+    const selectedDoctors = medicalStaffList.filter((medicalStaff) =>
+        selectedIds.includes(medicalStaff.id)
+    );
+    console.log('selectedDoctors', selectedDoctors)
+    setFilterDoctor(selectedDoctors);
   };
-  const handleSelectRenderValue = (medicalStaff: MedicalStaff[]): string => {
-    console.log("handleSelectRenderValue", medicalStaff)
-    return medicalStaff.map(staff => staff.fullName).join(', ');
+  const handleSelectRenderValue = (medicalStaffIds: number[]): string => {
+    console.log("handleSelectRenderValue", medicalStaffIds)
+    const selectedNames = medicalStaffList
+        .filter(medicalStaff => medicalStaffIds.includes(medicalStaff.id))
+        .map(medicalStaff => medicalStaff.fullName);
+    return selectedNames.join(', ')
   }
   const [searchText, setSearchText] = useState('');
 
@@ -326,15 +329,15 @@ export default function PatientList() {
                     id="demo-multiple-checkbox"
                     name="filterDoctor"
                     multiple
-                    value={filterDoctor}
+                    value={filterDoctor.map(doctor => doctor.id)}
                     onChange={handleSelectChange}
                     input={<OutlinedInput label="主治医生" />}
                     renderValue={handleSelectRenderValue}
                     MenuProps={MenuProps}
                   >
                     {medicalStaffList.map((medicalStaff) => (
-                      <MenuItem key={medicalStaff.id} value={medicalStaff}>
-                        <Checkbox checked={filterDoctor.indexOf(medicalStaff) > -1} />
+                      <MenuItem key={medicalStaff.id} value={medicalStaff.id}>
+                        <Checkbox checked={filterDoctor.some(doctor => doctor.id === medicalStaff.id)} />
                         <ListItemText primary={medicalStaff.fullName} />
                       </MenuItem>
                     ))}
