@@ -80,6 +80,7 @@ let patient: Patient = {
 interface RehabState {
   staff: MedicalStaff[]
   patient: Patient[]
+  activePatient: Patient[]
   rehabPatient: Patient
   prescription: Prescription[]
   prescriptionRecord: PrescriptionRecord[]
@@ -89,6 +90,7 @@ interface RehabState {
 const initialState: RehabState = {
   staff: staffs,
   patient: patients,
+  activePatient: [],
   rehabPatient: patient,
   prescription: prescriptions,
   prescriptionRecord: prescriptionRecord,
@@ -299,8 +301,19 @@ function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescriptio
   }
 }
 
-export const fetchPatients = createAsyncThunk<Patient[], {page: number, size: number, id: number}, {}>('fetchPatients', async ({page, size, id}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id}});
+export const asyncSysTime = createAsyncThunk<any, {date_time: string}>("asyncSysTime", async ({date_time})=>{
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('datetime',{date_time})
+  return response.data
+})
+
+export const fetchPatients = createAsyncThunk<Patient[], {page: number, size: number, id: number, patient_name?: string, staff_ids?: Array<number>, start_time?: string, end_time?: string}, {}>('fetchPatients', async ({page, size, id,patient_name, staff_ids, start_time,end_time }):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id, patient_name, staff_ids, start_time, end_time}});
+  console.log("fetch patient async thunk: ", response.data.data.patients)
+  return response.data.data.patients.map(convertAPIPatientToPatient)
+});
+
+export const activePatients = createAsyncThunk<Patient[], {page: number, size: number, id: number, patient_name?: string, staff_ids?: Array<number>, start_time?: string, end_time?: string}, {}>('activePatients', async ({page, size, id,patient_name, staff_ids, start_time,end_time }):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id, patient_name, staff_ids, start_time, end_time}});
   console.log("fetch patient async thunk: ", response.data.data.patients)
   return response.data.data.patients.map(convertAPIPatientToPatient)
 });
@@ -595,6 +608,9 @@ const RehabSlice = createSlice({
             return prescription;
           });
           console.log("edit prescription -> ", action.payload)
+        }).addCase(activePatients.fulfilled,(state, action)=>{
+          state.activePatient = action.payload
+          console.log('activePatients', action.payload)
         })
         .addMatcher(rehabApi.endpoints?.getOnlineEquipments.matchFulfilled, (state, action) => {
           console.log("addMatcher rehabApi getOnlineEquipments fulfilled -> ", action.payload, action.type)

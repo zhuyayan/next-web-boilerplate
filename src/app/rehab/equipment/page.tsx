@@ -8,9 +8,9 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
-import {fetchPatients, useGetOnlineEquipmentsQuery} from "@/redux/features/rehab/rehab-slice";
+import {activePatients, fetchPatients, useGetOnlineEquipmentsQuery} from "@/redux/features/rehab/rehab-slice";
 import Box from "@mui/material/Box";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
@@ -20,6 +20,7 @@ import { ApexOptions } from 'apexcharts'
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import Divider from "@mui/material/Divider";
+import {GetCurrentDateTime, GetOneMonthAgoDateTime, GetOneWeekAgoDateTime} from "@/utils/mct-utils";
 // moment().format('YYYY-MM-DD HH:MM:SS')
 
 //图表
@@ -51,14 +52,22 @@ export default function EquipmentManagement() {
     const onlineEquipment = useAppSelector((state: RootState) => state.rehab.onlineEquipment)
     const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
     const patientList = useAppSelector((state: RootState) => state.rehab.patient)
+    const activePatientList = useAppSelector((state: RootState) => state.rehab.activePatient)
+    const [activePatientCount, setActivePatientCount] = React.useState(0);
     useEffect(() => {
         thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
+        thunkDispatch(activePatients({page: 1, size: 1000, id: 0, start_time: GetOneMonthAgoDateTime(), end_time: GetCurrentDateTime()}))
     }, [thunkDispatch]);
 
+    useEffect(() => {
+        console.log("activePatientList", activePatientList.length)
+        setActivePatientCount(activePatientList.length)
+        setPatientSeries([patientList.length, (activePatientList.length / patientList.length)*100])
+    }, [patientList,activePatientList]);
 
     const series = [1, 2];
     const xlseries = [100, 75];
-
+    const [patientSeries, setPatientSeries] = useState([100, 75]);
     const onHoverTooltipFormatter = (val: number,opts: { seriesIndex: number, dataPointIndex: number, w: any }) => {
         console.log("onHoverTooltipFormatter")
         return `${val}`;
@@ -87,7 +96,7 @@ export default function EquipmentManagement() {
         labels: ['在线', '离线'],
     }
 
-    const xloptions: ApexOptions= {
+    const xlOptions: ApexOptions= {
         chart: {
             height: 200,
             type: 'radialBar',
@@ -224,7 +233,7 @@ export default function EquipmentManagement() {
                             患者数据
                         </Typography>
                         <Divider />
-                        <ReactApexChart options={xloptions} type="radialBar" series={xlseries} height={200}/>
+                        <ReactApexChart options={xlOptions} type="radialBar" series={patientSeries} height={200}/>
                         <Divider />
                         {/*<Box>*/}
                         {/*    <Typography variant="subtitle1" style={{display:'inline-block'}}>*/}
@@ -241,7 +250,7 @@ export default function EquipmentManagement() {
                                 活跃数量:&emsp;
                             </Typography>
                             <Typography variant="h5" color="green" style={{display:'inline-block'}}>
-                                {patientList.length}
+                                {activePatientCount}
                             </Typography>
                         </Box>
                     </CardContent>

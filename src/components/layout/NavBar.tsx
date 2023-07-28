@@ -24,6 +24,8 @@ import styled from "styled-components";
 import { useSelector } from 'react-redux';
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
+import {asyncSysTime} from "@/redux/features/rehab/rehab-slice";
+import {GetCurrentDateTime} from "@/utils/mct-utils";
 
 interface MCTMenu {
   name: string,
@@ -78,6 +80,7 @@ export default function NavBar() {
 
   useEffect(() => {
     thunkDispatch(fetchConfig())
+    thunkDispatch(asyncSysTime({date_time: GetCurrentDateTime()}))
   },[thunkDispatch])
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {

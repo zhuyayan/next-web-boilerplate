@@ -60,6 +60,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog'
+import {filter} from "d3-array";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -278,18 +279,46 @@ export default function PatientList() {
     }));
   };
 
-  const [doctorName, setDoctorName] = React.useState<string[]>([]);
+  // const [doctorName, setDoctorName] = React.useState<string[]>([]);
 
-  const handleSelectChange = (event: SelectChangeEvent<typeof doctorName>) => {
+  const [filterDoctor, setFilterDoctor] = React.useState<MedicalStaff[]>([]);
+
+  const handleSelectChange = (event: SelectChangeEvent<typeof filterDoctor>) => {
+    console.log(event.target)
     const {
       target: { value },
     } = event;
-    setDoctorName(
-        typeof value === 'string' ? value.split(',') : value,
-    );
+    if(Array.isArray(value)) {
+      setFilterDoctor(value as MedicalStaff[])
+    }
+  };
+  const handleSelectRenderValue = (medicalStaff: MedicalStaff[]): string => {
+    console.log("handleSelectRenderValue", medicalStaff)
+    return medicalStaff.map(staff => staff.fullName).join(', ');
+  }
+  const [searchText, setSearchText] = useState('');
+
+  const handleSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+    console.log(event.target.value);
   };
 
-    return (
+  function filterByPatientName() {
+    let ids = filterDoctor.map(staff => staff.id);
+    let params: { page: number, size: number, id: number, staff_ids: number[], patient_name?: string } = { page: 1, size: 1000, id: 0, staff_ids: ids };
+    if (searchText !== "") {
+      params.patient_name = searchText;
+    }
+    thunkDispatch(fetchPatients(params));
+  }
+  function resetFilterPatient() {
+    setSearchText("")
+    setFilterDoctor([])
+    let params: { page: number, size: number, id: number } = { page: 1, size: 1000, id: 0 };
+    thunkDispatch(fetchPatients(params));
+  }
+
+  return (
       <Container>
         <Box>
           <Stack direction="row" spacing={1}>
@@ -301,16 +330,17 @@ export default function PatientList() {
                   <Select
                     labelId="demo-multiple-checkbox-label"
                     id="demo-multiple-checkbox"
+                    name="filterDoctor"
                     multiple
-                    value={doctorName}
+                    value={filterDoctor}
                     onChange={handleSelectChange}
                     input={<OutlinedInput label="主治医生" />}
-                    renderValue={(selected) => selected.join(', ')}
+                    renderValue={handleSelectRenderValue}
                     MenuProps={MenuProps}
                   >
                     {medicalStaffList.map((medicalStaff) => (
-                      <MenuItem key={medicalStaff.id} value={medicalStaff.fullName}>
-                        <Checkbox checked={doctorName.indexOf(medicalStaff.fullName) > -1} />
+                      <MenuItem key={medicalStaff.id} value={medicalStaff}>
+                        <Checkbox checked={filterDoctor.indexOf(medicalStaff) > -1} />
                         <ListItemText primary={medicalStaff.fullName} />
                       </MenuItem>
                     ))}
@@ -326,7 +356,17 @@ export default function PatientList() {
                           <SearchIcon />
                         </InputAdornment>
                       }
+                      value={searchText}
+                      onChange={handleSearchInputChange}
                   />
+                </FormControl>
+                <FormControl sx={{ m: 1, width: 30}}>
+                  <Button
+                      onClick={filterByPatientName}
+                  >查找</Button>
+                  <Button
+                      onClick={resetFilterPatient}
+                  >重置</Button>
                 </FormControl>
                 <Tooltip title="添加病人">
                   <IconButton

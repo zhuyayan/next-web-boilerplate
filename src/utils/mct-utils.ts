@@ -1,7 +1,4 @@
-import React from "react";
-import {MedicalStaff} from "@/redux/features/rehab/rehab-slice";
-import {string} from "postcss-selector-parser";
-
+import moment from 'moment';
 export function genderLabelToValue(label:string): string {
   if (label == "男") {
     return "10"
@@ -117,4 +114,16 @@ export function GetDefaultPatient() {
     physicianId:0,
     i18d:'',
   }
+}
+
+export function GetCurrentDateTime():string {
+  return moment().format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function GetOneWeekAgoDateTime():string {
+  return moment().subtract(1, 'weeks').format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function GetOneMonthAgoDateTime():string {
+  return moment().subtract(1, 'months').format('YYYY-MM-DD HH:mm:ss');
 }
