@@ -2,7 +2,6 @@
 import React, {useState, useEffect, ChangeEvent} from 'react';
 import {
   Container,
-  Typography,
   TableContainer,
   Table,
   TableHead,
@@ -10,16 +9,12 @@ import {
   TableCell,
   TableBody,
   Button,
-  ButtonGroup,
-  Icon,
-  Stack, Breadcrumbs,
-  Tabs, Tab, Autocomplete,
-  IconButton, Input, InputAdornment,
+  Stack,
+  IconButton, InputAdornment,
   OutlinedInput
 } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
-import Link from 'next/link';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -38,7 +33,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import {AccountCircle, Delete as DeleteIcon} from "@mui/icons-material";
+import {Delete as DeleteIcon} from "@mui/icons-material";
 import {
   genderValueToLabel,
   getDefaultGenderLabel,
@@ -52,7 +47,6 @@ import Tooltip from '@mui/material/Tooltip';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import {filter} from "d3-array";
 import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog';
 import { Title } from '@/components/rehab/styles';
 
@@ -357,14 +351,13 @@ export default function PatientList() {
                       onChange={handleSearchInputChange}
                   />
                 </FormControl>
-                <FormControl sx={{ m: 1, width: 30}}>
-                  <Button
-                      onClick={filterByPatientName}
-                  >查找</Button>
-                  <Button
-                      onClick={resetFilterPatient}
-                  >重置</Button>
+                <FormControl sx={{ m: 2}}>
+                  <Stack direction="row" spacing={1}>
+                    <Button onClick={filterByPatientName}>查找</Button>
+                    <Button onClick={resetFilterPatient}>重置</Button>
+                  </Stack>
                 </FormControl>
+
                 <Tooltip title="添加病人">
                   <IconButton
                       style={{float: 'right'}}

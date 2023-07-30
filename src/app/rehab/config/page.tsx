@@ -1,11 +1,10 @@
 "use client";
-import {ChangeEvent, FormEvent, useEffect, useState} from 'react';
+import {ChangeEvent, useEffect} from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import styled from "styled-components";
 import {Container} from "@mui/material";
@@ -40,7 +39,6 @@ export default function ConfigManagement() {
   }
 
   useEffect(() => {
-    console.log(111)
     thunkDispatch(fetchConfig())
   },[thunkDispatch])
 

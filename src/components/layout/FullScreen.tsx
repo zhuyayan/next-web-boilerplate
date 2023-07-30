@@ -11,9 +11,9 @@ const StyledFullScreenContainer = styled.div`
 export default function FullScreenContainer({children}:{children:React.ReactNode}){
   return (
       <>
-        <StyledFullScreenContainer>
+        {/*<StyledFullScreenContainer>*/}
           {children}
-        </StyledFullScreenContainer>
+        {/*</StyledFullScreenContainer>*/}
       </>
   )
 }

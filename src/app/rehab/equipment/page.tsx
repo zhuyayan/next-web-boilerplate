@@ -2,10 +2,8 @@
 import {Container, Typography} from '@mui/material';
 import styled from 'styled-components';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 
 import React, {useEffect, useState} from "react";
@@ -17,8 +15,6 @@ import {AnyAction} from "redux";
 import {useDispatch, useSelector} from "react-redux";
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts'
-import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
-import AssessmentIcon from "@mui/icons-material/Assessment";
 import Divider from "@mui/material/Divider";
 import {GetCurrentDateTime, GetOneMonthAgoDateTime, GetOneWeekAgoDateTime} from "@/utils/mct-utils";
 import { Title } from '@/components/rehab/styles';
@@ -72,15 +68,6 @@ export default function EquipmentManagement() {
         setPatientSeries([patientList.length, (activePatientList.length / patientList.length)*100])
         setEquipmentSeries([onlineEquipment.length, equipmentList.length - onlineEquipment.length])
     }, [patientList,activePatientList, equipmentList, onlineEquipment]);
-    //
-    // useEffect(() => {
-    //     thunkDispatch(fetchPatients({page: 1, size: 1000, id: 0}))
-    //     thunkDispatch(getEquipmentAll({page: 1, size: 1000}))
-    //     thunkDispatch(getSystemInformation({page: 1, size: 100}))
-    // }, [thunkDispatch]);
-    //
-
-    // const series = [onlineEquipment.length, equipmentAll.length - onlineEquipment.length];
 
     const [patientSeries, setPatientSeries] = useState([100, 75]);
     const [equipmentSeries, setEquipmentSeries] = useState([100, 75]);
@@ -263,7 +250,7 @@ export default function EquipmentManagement() {
                         <br/>
                         <Box>
                             <Typography variant="subtitle1" style={{display:'inline-block'}}>
-                                活跃数量:&emsp;
+                                活跃人数:&emsp;
                             </Typography>
                             <Typography variant="h5" color="green" style={{display:'inline-block'}}>
                                 {activePatientCount}
@@ -276,8 +263,6 @@ export default function EquipmentManagement() {
                     {/*</CardActions>*/}
                 </Card>
             </Grid>
-
-
 
             <Grid item xs={4} md={4}>
                 <Card sx={{ maxWidth: 345 }}>

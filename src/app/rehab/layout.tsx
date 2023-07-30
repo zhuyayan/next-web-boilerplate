@@ -17,7 +17,7 @@ export default function RehabLayout({children}:{children:React.ReactNode}){
                   <div className="w-full bg-gray-100 sm:h-screen">
                     <NavBar />
                     <div>{children}</div>
-                    <Footer />
+                    {/*<Footer />*/}
                   </div>
                 </div>
               </FullScreenContainer>
