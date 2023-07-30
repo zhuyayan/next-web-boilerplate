@@ -41,3 +41,5 @@ yarn.ps1
 yarnpkg
 yarnpkg.cmd
 yarnpkg.ps1
+
+next.config.dev.js
