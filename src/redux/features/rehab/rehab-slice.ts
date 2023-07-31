@@ -10,9 +10,9 @@ import {WritableDraft} from "immer/dist/types/types-external";
 import MCTAxiosInstance from "@/utils/mct-request";
 import {
   BodyPartToNumMapping,
-  genderLabelToValue,
+  genderLabelToValue, GetCurrentDate,
   getDefaultGenderLabel,
-  getDefaultGenderValue,
+  getDefaultGenderValue, GetOneYearAgoDate, GetOneYearAgoDateTime,
   ModeToNumMapping,
   timeSampleFormat
 } from "@/utils/mct-utils";
@@ -72,7 +72,14 @@ let sysInfo: systemInformation = {
   used_memory_gb: "",
   disk_usage: "",
 }
-
+let dateCount: DateCount[] = []
+let patientDuration: PatientDuration = {
+  id: 0,
+  name: "",
+  sec_duration: 0,
+  hour_duration: 0,
+  data_count: dateCount,
+}
 
 let patient: Patient = {
   id: 0,
@@ -96,6 +103,7 @@ interface RehabState {
   onlineEquipment: EquipmentOnline[]
   equipmentAll: equipmentAll[]
   systemInformation: systemInformation
+  patientDuration: PatientDuration
 }
 
 const initialState: RehabState = {
@@ -108,6 +116,7 @@ const initialState: RehabState = {
   onlineEquipment: onlineEquipment,
   equipmentAll: equipmentAll,
   systemInformation: sysInfo,
+  patientDuration: patientDuration
 }
 
 export type Channel = 'redux' | 'general'
@@ -517,6 +526,26 @@ export const fetchPrescriptionRecordById = createAsyncThunk<PrescriptionRecord[]
   return p
 });
 
+interface DateCount {
+  date: string;
+  count: number;
+}
+
+interface PatientDuration {
+  id: number;
+  name: string;
+  sec_duration: number;
+  hour_duration: number;
+  data_count: DateCount[];
+}
+export const fetchPatientStatisticsById = createAsyncThunk<PatientDuration, { id: number}, {}>('fetchPatientStatisticsById', async ({ id}):Promise<any> => {
+  let start_date = GetOneYearAgoDate()
+  let end_date = GetCurrentDate()
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('rehab/duration', {params:{ start_date: start_date, end_date: end_date, id}});
+  console.log("fetch fetchPatientStatisticsById by id async thunk: ", response.data.data)
+  return response.data.data
+});
+
 export const exportTaskPressureData = createAsyncThunk<{}, {tId: number, pId: number}, {}>('exportPressureData', async ({tId, pId}):Promise<any> => {
   try {
     const response = await MCTAxiosInstance.get('record', {
@@ -690,6 +719,9 @@ const RehabSlice = createSlice({
         }).addCase(activePatients.fulfilled,(state, action)=>{
           state.activePatient = action.payload
           console.log('activePatients', action.payload)
+        })
+        .addCase(fetchPatientStatisticsById.fulfilled, (state, action) => {
+          state.patientDuration = action.payload
         })
         .addCase(getSystemInformation.fulfilled, (state, action)=> {
           state.systemInformation = action.payload

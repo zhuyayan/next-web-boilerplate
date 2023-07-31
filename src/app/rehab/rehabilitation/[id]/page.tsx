@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Container from '@mui/material/Container';
 import Prescription from "@/components/rehab/prescription/Prescription";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
@@ -25,16 +24,20 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
-import {ChangeEvent, useEffect} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
-import {ThunkDispatch} from "redux-thunk";
+import thunk, {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import {fetchPrescriptionByPId, Prescription as PrescriptionEntity} from "@/redux/features/rehab/rehab-slice";
+import {
+  fetchPatientStatisticsById,
+  fetchPrescriptionByPId,
+  Prescription as PrescriptionEntity
+} from "@/redux/features/rehab/rehab-slice";
 import {
   addPrescription,
   fetchPatientById,
-  fetchPrescriptionById, fetchPrescriptionRecordById,
+  fetchPrescriptionRecordById,
   useGetOnlineEquipmentsQuery,
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
@@ -48,6 +51,7 @@ import Tooltip from "@mui/material/Tooltip";
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
 
 import { Title } from '@/components/rehab/styles';
+import {stat} from "fs";
 
 
 const StyledDiv = styled.div`
@@ -66,6 +70,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
   const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
+  const patientDuration = useAppSelector((state:RootState) => state.rehab.patientDuration)
   const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
@@ -74,6 +79,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const [timesError, setTimesError] = React.useState<string>('')
   const [bendError, setBendError] = React.useState<string>('')
   const [stretchError, setStretchError] = React.useState<string>('')
+  const [trainMinus, setTrainMinus] = useState<string>('')
+  const [trainDays, setTrainDays] = useState<number>(0)
 
   const [willAddPrescription, setWillAddPrescription] = React.useState<PrescriptionEntity>({
     id: 0,
@@ -84,6 +91,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
     u: 3,
     v: 3,
   })
+
 
   const handleAddPrescriptionTimes = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -159,16 +167,15 @@ export default function MUITable({ params }: { params: { id: string } }) {
     thunkDispatch(fetchPrescriptionByPId({pid: parseInt(params.id)}))
     thunkDispatch(fetchPatientById({id: parseInt(params.id)}))
     thunkDispatch(fetchPrescriptionRecordById({id: parseInt(params.id)}))
+    thunkDispatch(fetchPatientStatisticsById({id: parseInt(params.id)}))
     console.log("patient id: ", params.id)
   },[params.id, thunkDispatch])
 
   useEffect(() => {
-    console.log('trainData ->', trainData)
-  }, [trainData])
-
-  useEffect(() => {
-    console.log('onlineData ->', onlineData)
-  }, [onlineData])
+    setTrainDays(patientDuration.data_count.length)
+    setTrainMinus((patientDuration.sec_duration/60).toFixed(0))
+    console.log("1111111111111", patientDuration)
+  }, [patientDuration])
 
   const handleAddPrescriptionModeChange = (event: SelectChangeEvent) => {
     console.log(event.target)
@@ -187,28 +194,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
       part: BodyPartToNumMapping[parseInt(event.target.value)]
     }))
   };
-
-  //导出excel
-  const handleExportExcel = () => {
-    let sheetFilter = ["creat_at", "update_at", "state"];
-    let option: {
-      fileName?: string;
-      datas?: any;
-    } = {};
-    option.fileName = '康复记录-' + rehabPatient.name;
-    option.datas = [
-      {
-        sheetData: record,
-        sheetName: '康复记录',
-        sheetFilter: sheetFilter,
-        sheetHeader: ['康复开始时间', '康复结束时间', '状态'],
-        columnWidths: [20,20,10]
-      },
-    ];
-
-    // let toExcel = new ExportJsonExcel(option); //生成
-    // toExcel.saveExcel(); //保存
-  }
 
   return (
     <>
@@ -286,7 +271,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   </Typography>
                   <CardContent style={{ textAlign: 'right' }}>
                     <Typography variant="h3" color="primary" style={{display:'inline-block'}}>
-                      0 <br />
+                      {trainMinus}<br />
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       总训练时长
@@ -324,7 +309,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   </Typography>
                   <CardContent sx={{ textAlign: 'right' }}>
                     <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
-                      4
+                      {trainDays}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       总训练天数
@@ -337,7 +322,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 </StatisticsCard>
               </Grid>
             </Grid>
-
             {/*处方*/}
           <Grid item xs={6} md={12}>
             <Card sx={{ padding: '10px' ,height: 365}}>
@@ -382,15 +366,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
           <Grid item xs={6} md={6.5}>
             <Card sx={{ height: 365 ,padding: '10px'}}>
               <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-              <Typography style={{display:'inline-block'}} variant="subtitle1" gutterBottom>
-                (共
-              </Typography>
-              <Typography color="primary" style={{display:'inline-block'}} variant="h6" gutterBottom>
-                {record.length}
-              </Typography>
-              <Typography style={{display:'inline-block'}} variant="subtitle1" gutterBottom>
-                条康复记录，累计康复时长*小时)
-              </Typography>
                 <PrescriptionTable record={record} pid={params.id}/>
               </Card>
             </Grid>

@@ -120,12 +120,24 @@ export function GetCurrentDateTime():string {
   return moment().format('YYYY-MM-DD HH:mm:ss');
 }
 
+export function GetCurrentDate():string {
+  return moment().format('YYYY-MM-DD');
+}
+
 export function GetOneWeekAgoDateTime():string {
   return moment().subtract(1, 'weeks').format('YYYY-MM-DD HH:mm:ss');
 }
 
 export function GetOneMonthAgoDateTime():string {
   return moment().subtract(1, 'months').format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function GetOneYearAgoDateTime():string {
+  return moment().subtract(1, 'years').format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function GetOneYearAgoDate():string {
+  return moment().subtract(1, 'years').format('YYYY-MM-DD');
 }
 export function GetDefaultPrescription() {
   return {
