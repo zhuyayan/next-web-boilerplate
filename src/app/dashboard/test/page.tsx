@@ -12,11 +12,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import PrintIcon from '@mui/icons-material/Print';
 import ShareIcon from '@mui/icons-material/Share';
 
-import { useRef, useEffect } from "react";
+import {useRef, useEffect, useState} from "react";
 import { AutoFixed } from "./auto-fixed";
 
 import Link from '@mui/material/Link';
 import Footer from "@/components/layout/Footer";
+import {Alert, Button, Snackbar} from "@mui/material";
 
 const actions = [
   { icon: <FileCopyIcon />, name: 'Copy' },
@@ -92,8 +93,36 @@ export default function Test() {
   }
 
   // const {Footer} = Layout;
+
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  function handleSnackbarClose() {
+    setOpen(false);
+  }
+
   return (
       <>
+        <Button onClick={handleClick}>Open simple snackbar</Button>
+        <Snackbar
+          anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+          onClose={handleSnackbarClose}
+          open={open} autoHideDuration={3000}>
+          <Alert onClose={handleClose} severity="success">
+            This is a success message!
+          </Alert>
+        </Snackbar>
         {/*<Footer style={{textAlign: 'center', position: "sticky", bottom: "0"}} className={"blog-footer"}>*/}
         {/*  <div>*/}
         {/*    <span onClick={this.showAbout}>关于我们</span>*/}
