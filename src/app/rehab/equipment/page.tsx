@@ -272,7 +272,7 @@ export default function EquipmentManagement() {
                         title="system"
                     />
                     <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
+                        <Typography gutterBottom variant="h6" component="div">
                             系统情况
                         </Typography>
                         <br/>
@@ -287,6 +287,7 @@ export default function EquipmentManagement() {
                         <br/>
                         <Typography variant="body1" color="text.secondary">磁盘利用率:&emsp;{Number(systemInformation.disk_usage).toFixed(2)}%</Typography>
                         <Divider/>
+                        <br/>
                     </CardContent>
                     {/*<CardActions>*/}
                     {/*    <Button size="small">分享</Button>*/}
@@ -303,7 +304,7 @@ export default function EquipmentManagement() {
                         title="bug"
                     />
                     <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
+                        <Typography gutterBottom variant="h6" component="div">
                             故障联系
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -325,7 +326,7 @@ export default function EquipmentManagement() {
                         title="help"
                     />
                     <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
+                        <Typography gutterBottom variant="h6" component="div">
                             意见反馈
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
