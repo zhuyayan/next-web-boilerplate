@@ -26,7 +26,6 @@ import Select, {SelectChangeEvent} from '@mui/material/Select';
 import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
 import {ChangeEvent, useEffect, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
-import thunk, {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
 import {
@@ -51,7 +50,7 @@ import Tooltip from "@mui/material/Tooltip";
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
 
 import { Title } from '@/components/rehab/styles';
-import {stat} from "fs";
+import {ThunkDispatch} from "redux-thunk";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -154,9 +153,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
       pid: parseInt(params.id),
       x: NumToBodyPartMapping[willAddPrescription.part],
       y: NumToModeMapping[willAddPrescription.mode],
-      zz: willAddPrescription.zz,
-      u: willAddPrescription.u,
-      v: willAddPrescription.v
+      zz: Number(willAddPrescription.zz),
+      u: Number(willAddPrescription.u),
+      v: Number(willAddPrescription.v)
     }))
     setOpen(false);
   };

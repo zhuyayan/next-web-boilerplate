@@ -25,7 +25,6 @@ const StyledButton = styled(Button)`
 
 export default function ConfigManagement() {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
-  const dispatch = useDispatch()
   const [hospitalNameTmp, setHospitalNameTmp] = React.useState<string>('')
   const [phoneNumberTmp, setPhoneNumberTmp] = React.useState<string>('')
   const [emailTmp, setEmailTmp] = React.useState<string>('')

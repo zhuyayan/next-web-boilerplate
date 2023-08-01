@@ -44,9 +44,9 @@ export interface Prescription {
   created_at: string;
   part: string;
   mode: string;
-  zz: number;
-  u: number;
-  v: number;
+  zz: number | string;
+  u: number | string;
+  v: number | string;
 }
 
 export interface PrescriptionRecord {

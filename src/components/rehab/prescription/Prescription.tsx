@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
+
 import {
   Box,
   Dialog,
@@ -30,13 +30,12 @@ import {
   Prescription,
   sendPrescriptionToEquipment
 } from "@/redux/features/rehab/rehab-slice";
-import {ChangeEvent, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
 import {
   BodyPartToNumMapping,
-  GetDefaultPatient,
   ModeToNumMapping,
   NumToBodyPartMapping,
   NumToModeMapping
@@ -50,6 +49,17 @@ import SendAndArchiveIcon from '@mui/icons-material/SendAndArchive';
 import DeleteConfirmationDialog from "@/components/rehab/DeleteConfirmationDialog";
 import {GetDefaultPrescription} from "@/utils/mct-utils";
 
+import { useForm } from 'react-hook-form';
+import {useSnackbar} from "notistack";
+
+interface IFormInput {
+  mode: string;
+  part: string;
+  zz: number;
+  u: number;
+  v: number;
+}
+
 const StyledDiv = styled.div`
   display: flex;
   gap: 10px;
@@ -57,7 +67,7 @@ const StyledDiv = styled.div`
 `;
 
 interface Column {
-  id: 'time' | 'pattern' | 'part' | 'count' | 'bendingtimevalue' | 'stretchtimevalue' | 'action';
+  id: 'time' | 'pattern' | 'part' | 'count' | 'bendingTimeValue' | 'stretchTimeValue' | 'action';
   label: string;
   minWidth?: number;
   align: 'right' | 'left' | 'center';
@@ -87,13 +97,13 @@ const columns: readonly Column[] = [
     align: 'right',
   },
   {
-    id: 'bendingtimevalue',
+    id: 'bendingTimeValue',
     label: '弯曲定时值',
     minWidth: 105,
     align: 'right',
   },
   {
-    id: 'stretchtimevalue',
+    id: 'stretchTimeValue',
     label: '伸展定时值',
     minWidth: 105,
     align: 'right',
@@ -114,10 +124,6 @@ export default function StickyHeadTable(params: {PId:string,
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
-  const [error, setError] = React.useState(false)
-  const [timesError, setTimesError] = React.useState<string>('')
-  const [bendError, setBendError] = React.useState<string>('')
-  const [stretchError, setStretchError] = React.useState<string>('')
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription>({
     id: 0,
     created_at: "",
@@ -137,9 +143,9 @@ export default function StickyHeadTable(params: {PId:string,
     v: 3,
   })
   const [clientId, setClientId] = useState("")
-  const [openDelPrescription, setOpenDelPrescription] = React.useState(false);
+  const [openDelPrescription, setOpenDelPrescription] = useState(false);
   const [prescriptionToBeDeleted, setPrescriptionToBeDeleted] = useState<Prescription>(GetDefaultPrescription());
-
+  const { enqueueSnackbar } = useSnackbar();
   const handleClickOpen = (row: Prescription) => {
     setOpen(true);
     setSelectedPrescription(row)
@@ -181,8 +187,6 @@ export default function StickyHeadTable(params: {PId:string,
   };
 
   const handlePartChange = (event: SelectChangeEvent) => {
-    console.log(event.target)
-    console.log(BodyPartToNumMapping[parseInt(event.target.value)])
     setWillEditPrescription((prevState) => ({
       ...prevState,
       part: BodyPartToNumMapping[parseInt(event.target.value)]
@@ -198,16 +202,40 @@ export default function StickyHeadTable(params: {PId:string,
     setOpen(false);
   };
 
-  const handleEditPrescription = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleEditPrescription = async () => {
+    const isValid = await trigger();
+    if (!isValid) {
+      // 如果表单无效，就不提交
+      console.log("handleEditPrescription isValid", isValid)
+      return;
+    }
+    setIsSubmitting(true);
     appThunkDispatch(editPrescription({
       id: willEditPrescription.id,
       x: NumToBodyPartMapping[willEditPrescription.part],
       y: NumToModeMapping[willEditPrescription.mode],
-      zz: willEditPrescription.zz,
-      u: willEditPrescription.u,
-      v: willEditPrescription.v,
-    }))
-    setOpenModify(false);
+      zz: Number(willEditPrescription.zz),
+      u: Number(willEditPrescription.u),
+      v: Number(willEditPrescription.v),
+    })).then((prescription) => {
+      console.log('The updated prescription is: ', prescription);
+      console.log('The updated prescription is: ', typeof prescription);
+      enqueueSnackbar('修改成功', {
+        variant: 'success',
+        autoHideDuration: 5000,
+        anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'center',
+        }
+      })
+    }).catch((error) => {
+      console.error('Failed to edit prescription: ', error);
+    }).finally(() => {
+      setOpenModify(false);
+      setIsSubmitting(false);
+    })
   }
 
   const handleCloseModify = () => {
@@ -215,43 +243,33 @@ export default function StickyHeadTable(params: {PId:string,
   };
 
   function handleZZChange(e: ChangeEvent<HTMLInputElement>) {
-    const inputValue = e.target.value;
-    if (inputValue !== '' && parseInt(inputValue) < 3) {
-      setTimesError('输入的数字不能小于3');
-    } else {
-      setTimesError('');
-      setWillEditPrescription(prevState => ({
-        ...prevState,
-        zz: parseInt(inputValue)
-      }));
-    }
+    setWillEditPrescription(prevState => ({
+      ...prevState,
+      zz: e.target.value === '' ? '' : parseInt(e.target.value)
+    }))
   }
 
   function handleUChange(e: ChangeEvent<HTMLInputElement>) {
-    const inputValue = e.target.value;
-    if (inputValue !== '' && parseInt(inputValue) < 3) {
-      setBendError('输入的数字不能小于3');
-    } else {
-      setBendError('');
-      setWillEditPrescription(prevState => ({
-        ...prevState,
-        u: parseInt(e.target.value)
-      }));
-    }
+    setWillEditPrescription(prevState => ({
+      ...prevState,
+      u: parseInt(e.target.value)
+    }))
   }
 
   function handleVChange(e: ChangeEvent<HTMLInputElement>) {
-    const inputValue = e.target.value;
-    if (inputValue !== '' && parseInt(inputValue) < 3) {
-      setStretchError('输入的数字不能小于3');
-    } else {
-      setStretchError('');
-      setWillEditPrescription(prevState => ({
-        ...prevState,
-        v: parseInt(inputValue)
-      }));
-    }
+    setWillEditPrescription(prevState => ({
+      ...prevState,
+      v: parseInt(e.target.value)
+    }))
   }
+
+  const { register, formState: { errors }, clearErrors, trigger } = useForm<IFormInput>({mode: 'onBlur' });
+
+  useEffect(() => {
+    if(openModify) {
+      clearErrors()
+    }
+  }, [clearErrors, openModify]);
 
   return (<>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -377,95 +395,104 @@ export default function StickyHeadTable(params: {PId:string,
           <Button onClick={handleSendCommand}>确定</Button>
         </DialogActions>
       </Dialog>
+
       <Dialog
-        open={openModify} onClose={handleCloseModify}
-        slotProps={{
-              backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
-        PaperProps={{ elevation: 0 }}>
+          open={openModify} onClose={handleCloseModify}
+          slotProps={{
+            backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
+          PaperProps={{ elevation: 0 }}>
         <DialogTitle>修改处方</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            请正确修改处方各项信息
-          </DialogContentText>
           <StyledDiv>
             <Box>
-              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                <InputLabel id="demo-select-small-label">训练模式</InputLabel>
+                <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                  <InputLabel id="demo-select-small-label">训练模式</InputLabel>
+                  <Select
+                      {...register('mode', {required: '训练模式是必需的'})}
+                      labelId="demo-select-small-label"
+                      id="demo-select-small"
+                      value={String(NumToModeMapping[willEditPrescription.mode])}
+                      label="Age1"
+                      name="mode"
+                      onChange={handleModeChange}>
+                    <MenuItem value={1}>被动计次模式</MenuItem>
+                    <MenuItem value={2}>被动定时模式</MenuItem>
+                    <MenuItem value={3}>主动计次模式</MenuItem>
+                    <MenuItem value={4}>主动定时模式</MenuItem>
+                    <MenuItem value={5}>助力计次模式</MenuItem>
+                    <MenuItem value={6}>助力定时模式</MenuItem>
+                    <MenuItem value={7}>手动计次模式</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                <InputLabel id="demo-select-small-label">训练部位</InputLabel>
                 <Select
-                  labelId="demo-select-small-label"
-                        id="demo-select-small"
-                        value={String(NumToModeMapping[willEditPrescription.mode])}
-                        label="Age1"
-                        name="mode"
-                        onChange={handleModeChange}
-                    >
-                      <MenuItem value={1}>被动计次模式</MenuItem>
-                      <MenuItem value={2}>被动定时模式</MenuItem>
-                      <MenuItem value={3}>主动计次模式</MenuItem>
-                      <MenuItem value={4}>主动定时模式</MenuItem>
-                      <MenuItem value={5}>助力计次模式</MenuItem>
-                      <MenuItem value={6}>助力定时模式</MenuItem>
-                      <MenuItem value={7}>手动计次模式</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                    <InputLabel id="demo-select-small-label">训练部位</InputLabel>
-                    <Select
-                        labelId="demo-select-small-label"
-                        id="demo-select-small"
-                        value={String(NumToBodyPartMapping[willEditPrescription.part])}
-                        label="Age2"
-                        onChange={handlePartChange}
-                        name="part"
-                    >
-                      <MenuItem value={1}>左手</MenuItem>
-                      <MenuItem value={2}>右手</MenuItem>
-                      <MenuItem value={3}>左腕</MenuItem>
-                      <MenuItem value={4}>右腕</MenuItem>
-                      <MenuItem value={5}>左踝</MenuItem>
-                      <MenuItem value={6}>右踝</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-
-                <Box>
-                  <TextField
-                      sx={{ m: 1, minWidth: 160 }}
-                      value={willEditPrescription.zz}
-                      id="outlined-zz" label="训练次数或时间"
-                      onChange={handleZZChange}
-                      error={timesError != ''}
-                      helperText={timesError}
-                      inputProps={{ type: 'number' }}
-                      variant="outlined" size="small"/>
-                  <TextField
-                      sx={{ m: 1, minWidth: 160 }}
-                      value={willEditPrescription.u}
-                      id="outlined-u"
-                      label="弯曲定时值"
-                      onChange={handleUChange}
-                      error={bendError != ''}
-                      helperText={bendError}
-                      inputProps={{ type: 'number' }}
-                      variant="outlined" size="small"/>
-                  <TextField
-                      sx={{ m: 1, minWidth: 160 }}
-                      value={willEditPrescription.v}
-                      id="outlined-v"
-                      label="伸展定时值"
-                      onChange={handleVChange}
-                      error={stretchError != ""}
-                      helperText={stretchError}
-                      inputProps={{ type: 'number' }}
-                      variant="outlined" size="small"/>
-                </Box>
-              </StyledDiv>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseModify}>取消</Button>
-              <Button onClick={handleEditPrescription} disabled={Boolean(error)}>确定</Button>
-            </DialogActions>
-          </Dialog>
+                    {...register('part', { required: '训练部位是必需的' })}
+                    labelId="demo-select-small-label"
+                    id="demo-select-small"
+                    value={String(NumToBodyPartMapping[willEditPrescription.part])}
+                    label="Age2"
+                    onChange={handlePartChange}
+                    name="part">
+                  <MenuItem value={1}>左手</MenuItem>
+                  <MenuItem value={2}>右手</MenuItem>
+                  <MenuItem value={3}>左腕</MenuItem>
+                  <MenuItem value={4}>右腕</MenuItem>
+                  <MenuItem value={5}>左踝</MenuItem>
+                  <MenuItem value={6}>右踝</MenuItem>
+                </Select>
+              </FormControl>
+              </Box>
+            <Box>
+              <TextField
+                  {...register('zz', {
+                    required: '不能为空',
+                    validate: value => (!isNaN(value) && value >= 3) || '值须大于等于3'
+                  })}
+                  sx={{ m: 1, minWidth: 160 }}
+                  value={willEditPrescription.zz}
+                  id="outlined-zz" label="训练次数或时间"
+                  onChange={handleZZChange}
+                  error={!!errors.zz}
+                  helperText={errors.zz?.message}
+                  inputProps={{ type: 'number' }}
+                  variant="outlined" size="small"/>
+              <TextField
+                  {...register('u', {
+                    required: '不能为空',
+                    validate: value => (!isNaN(value) && value >= 3) || '值须大于等于3'
+                  })}
+                  sx={{ m: 1, minWidth: 160 }}
+                  value={willEditPrescription.u}
+                  id="outlined-u"
+                  label="弯曲定时值"
+                  onChange={handleUChange}
+                  error={!!errors.u}
+                  helperText={errors.u?.message}
+                  inputProps={{ type: 'number' }}
+                  variant="outlined" size="small"/>
+              <TextField
+                  {...register('v', {
+                      required: '不能为空',
+                      validate: value => (!isNaN(value) && value >= 3) || '值须大于等于3'
+                  })}
+                  sx={{ m: 1, minWidth: 160 }}
+                  value={willEditPrescription.v}
+                  id="outlined-v"
+                  label="伸展定时值"
+                  onChange={handleVChange}
+                  error={ !!errors.v }
+                  helperText={errors.v?.message}
+                  inputProps={{ type: 'number' }}
+                  variant="outlined" size="small"/>
+              </Box>
+          </StyledDiv>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModify}>取消</Button>
+          <Button onClick={handleEditPrescription} disabled={isSubmitting}>确定</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

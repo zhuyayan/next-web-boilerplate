@@ -16,7 +16,7 @@ import {useDispatch, useSelector} from "react-redux";
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts'
 import Divider from "@mui/material/Divider";
-import {GetCurrentDateTime, GetOneMonthAgoDateTime, GetOneWeekAgoDateTime} from "@/utils/mct-utils";
+import {GetCurrentDateTime, GetOneMonthAgoDateTime} from "@/utils/mct-utils";
 import { Title } from '@/components/rehab/styles';
 
 //图表

@@ -14,7 +14,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography
 } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
@@ -23,7 +22,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
   deleteStaff,
   fetchStaffs,
-  MedicalStaff, addStaff, editStaff, deletePatient,
+  MedicalStaff, addStaff, editStaff,
 } from "@/redux/features/rehab/rehab-slice";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
@@ -40,7 +39,6 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import FormControl from "@mui/material/FormControl";
-import DialogContentText from "@mui/material/DialogContentText";
 import {GetDefaultMedicalStaff} from "@/utils/mct-utils";
 import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog';
 import { Title } from '@/components/rehab/styles';
@@ -72,7 +70,6 @@ export default function MedicalStaffManagement() {
   const medicalStaffList = useAppSelector((state: RootState) => state.rehab.staff)
   const [open, setOpen] = React.useState(false);
   const [openAddStaff, setOpenAddStaff] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
   const [passwordsVisibility, setPasswordsVisibility] = React.useState<{[id: number]: boolean}>({});
   const [willEditStaff, setWillEditStaff] = React.useState<MedicalStaff>({
     id: 0,
