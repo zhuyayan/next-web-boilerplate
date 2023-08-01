@@ -53,7 +53,6 @@ import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
 import { Title } from '@/components/rehab/styles';
 import {stat} from "fs";
 
-
 const StyledDiv = styled.div`
   display: flex;
   gap: 10px;
