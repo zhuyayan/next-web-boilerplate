@@ -65,7 +65,7 @@ export default function EquipmentManagement() {
         console.log("activePatientList", activePatientList.length)
         console.log("equipmentList", equipmentList)
         setActivePatientCount(activePatientList.length)
-        setPatientSeries([patientList.length, (activePatientList.length / patientList.length)*100])
+        setPatientSeries([100, activePatientList.length * 100 / patientList.length])
         setEquipmentSeries([onlineEquipment.length, equipmentList.length - onlineEquipment.length])
     }, [patientList,activePatientList, equipmentList, onlineEquipment]);
 
@@ -112,6 +112,10 @@ export default function EquipmentManagement() {
                     },
                     value: {
                         fontSize: '16px',
+                        formatter: function (val) {
+                            return Math.round(val * patientList.length / 100).toString()
+                            // return val.toString()
+                        },
                     },
                     total: {
                         show: true,

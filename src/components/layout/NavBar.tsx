@@ -65,7 +65,8 @@ const MCTStyledButton = styled(Button)`
   &&:hover {
     background-color: #5ba2e8; // 设置 hover 状态下的背景颜色
   }
-
+  
+  font-size: 16px;
   color: white;
   display: block;
 `;
@@ -172,11 +173,14 @@ export default function NavBar() {
                   mr: 2,
                   display: { xs: 'none', md: 'flex' },
                   fontFamily: 'monospace',
-                  fontWeight: 700,
+                  fontSize: '28px',
+                  fontWeight: 800,
                   letterSpacing: '.3rem',
                   textDecoration: 'none',
+                  color: '#ffffff',
                 }}
             >
+              <Avatar alt="Remy Sharp" src="/images/logo/新起点logo.png" sx={{marginRight:1, width: 40, height: 40, borderRadius: '4px',backgroundColor: 'transparent'}}/>
                 {hospitalName}
               {/*<Image*/}
               {/*    src="/images/logo/MCTlogo.png"*/}
@@ -267,7 +271,7 @@ export default function NavBar() {
                   textDecoration: 'none',
                 }}
             >
-              LOGO3
+              MCT
             </Typography>
 
             {/*<Box style={{marginTop: appBarHeight+'px', flexGrow: 1}}>*/}
@@ -308,22 +312,24 @@ export default function NavBar() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="设置">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  {/*<Avatar alt="Remy Sharp" src="/images/logo/灼远logo.jpg" sx={{ width: 150, height: 60, borderRadius: '8px' }}/>*/}
+                  <Avatar alt="Remy Sharp" src="/images/logo/灼远logo.jpg" sx={{marginRight:2}}/>
                   <Avatar alt="Remy Sharp" src="/images/logo/MCTlogo.png" />
                 </IconButton>
               </Tooltip>
               <Menu
-                  sx={{ mt: '45px' }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
               >
