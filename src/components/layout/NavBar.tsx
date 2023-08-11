@@ -12,7 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import {fetchConfig, setHeight} from "@/redux/features/layout-slice";
 import {Dialog, Popover, Slide} from "@mui/material";
@@ -26,6 +26,9 @@ import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {asyncSysTime} from "@/redux/features/rehab/rehab-slice";
 import {GetCurrentDateTime} from "@/utils/mct-utils";
+import screenfull from "screenfull"
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 
 interface MCTMenu {
   name: string,
@@ -78,6 +81,7 @@ export default function NavBar() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const hospitalName = useSelector((state:RootState) => state.appBar.rsConfig.Hospital.Name);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     thunkDispatch(fetchConfig())
@@ -142,6 +146,16 @@ export default function NavBar() {
   const handleClose = () => {
     setOpen(false);
   }
+
+  const fullScreen = () => {
+      if(screenfull.isFullscreen){
+          setIsFullscreen(false);
+      }
+      else {
+          setIsFullscreen(true);
+      }
+      screenfull.toggle()
+  };
 
     const handleLogout = (): void => {
         // 执行注销逻辑，例如清除用户登录状态等
@@ -309,6 +323,17 @@ export default function NavBar() {
               ))}
             </Box>
 
+              <Box sx={{ flexGrow: 0 }} style={{marginRight:6}}>
+                  <Tooltip title="全屏显示">
+                      <IconButton
+                          aria-label="screenfull"
+                          onClick={fullScreen}
+                      >
+                          {isFullscreen ? <FullscreenExitIcon style={{ color: '#fafafa', fontSize: 48}} /> : <FullscreenIcon style={{ color: '#fafafa', fontSize: 48 }} />}
+                      </IconButton>
+                  </Tooltip>
+              </Box>
+
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="设置">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -343,6 +368,7 @@ export default function NavBar() {
                   </MenuItem>
               </Menu>
             </Box>
+
           </Toolbar>
         </Container>
       </AppBar>
