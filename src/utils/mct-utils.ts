@@ -150,3 +150,45 @@ export function GetDefaultPrescription() {
     v: 0,
   }
 }
+
+export type DateFormat = 'Date' | 'YYYY-MM-DD HH:mm:ss' | 'YYYY-MM-DD HH:mm' | 'YYYY-MM-DD \n HH:mm' | 'HH:mm:ss' | 'ISO';
+
+export const formatDate = (date: Date, format: DateFormat): string | Date => {
+  switch (format) {
+    case 'YYYY-MM-DD HH:mm:ss':
+      const YYYY = date.getFullYear();
+      const MM = String(date.getMonth() + 1).padStart(2, '0');
+      const DD = String(date.getDate()).padStart(2, '0');
+      const HH = String(date.getHours()).padStart(2, '0');
+      const mm = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${YYYY}-${MM}-${DD} ${HH}:${mm}:${ss}`;
+    case 'YYYY-MM-DD HH:mm':
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    case 'YYYY-MM-DD \n HH:mm':
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} \n ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    case 'HH:mm:ss':
+      return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+    case 'ISO':
+      return date.toISOString();
+    case 'Date':
+    default:
+      return date;
+  }
+}
+
+export const getRandomDate = (start: string, end: string, format: DateFormat = 'YYYY-MM-DD HH:mm:ss'): string | Date => {
+  const startDate = new Date(start.replace(' ', 'T'));
+  const endDate = new Date(end.replace(' ', 'T'));
+
+  const startTime = startDate.getTime();
+  const endTime = endDate.getTime();
+
+  if (endTime < startTime) {
+    throw new Error('End date must be after start date.');
+  }
+
+  const randomTime = startTime + Math.random() * (endTime - startTime);
+  const randomDate = new Date(randomTime);
+  return formatDate(randomDate, format);
+};

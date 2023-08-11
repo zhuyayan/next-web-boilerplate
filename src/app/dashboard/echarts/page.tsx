@@ -1,10 +1,13 @@
 "use client";
 import ReactECharts from 'echarts-for-react';
 import {CustomSeriesRenderItemAPI} from "echarts/types/dist/echarts";
+import {getRandomDate} from "@/utils/mct-utils";
 
 export default function EChartsTest(){
+  // 2 类
   const yearCount = 2;
-  const categoryCount = 30;
+  // 10 天
+  const categoryCount = 10;
 
   const xAxisData: string[] = [];
   const customData: number[][] = [];
@@ -16,12 +19,15 @@ export default function EChartsTest(){
   }
 
   const encodeY = Array.from({ length: yearCount }, (_, i) => 1 + i);
-  legendData.push('trend');
-  legendData.push(...Array.from({ length: yearCount }, (_, i) => (2010 + i).toString()));
-
+  // legendData.push('trend');
+  // legendData.push(...Array.from({ length: yearCount }, (_, i) => (2010 + i).toString()));
+  legendData.push('');
+  legendData.push('屈');
+  legendData.push('伸');
   for (let i = 0; i < categoryCount; i++) {
     let val = Math.random() * 1000;
-    xAxisData.push('category' + i);
+    let date = getRandomDate('2023-08-10 09:00:00', '2023-08-10 09:30:00', 'HH:mm:ss')
+    xAxisData.push(date as string);
     let customVal = [i];
     customData.push(customVal);
 
@@ -33,6 +39,8 @@ export default function EChartsTest(){
       customVal.push(value);
     }
   }
+  // xAxisData.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  xAxisData.sort((a, b) => a.localeCompare(b));
 
   const option = {
     tooltip: {
