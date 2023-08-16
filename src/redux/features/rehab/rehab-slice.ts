@@ -47,6 +47,18 @@ export interface Prescription {
   zz: number | string;
   u: number | string;
   v: number | string;
+  history: [
+    {
+      date: "2023-08-01 17:09:14",
+      customerId: "2023-08-01 17:10:01",
+      amount: 3
+    },
+    {
+      date: "2023-08-01 17:09:14",
+      customerId: "2023-08-01 17:09:14",
+      amount: 1
+    }
+  ]
 }
 
 export interface PrescriptionRecord {

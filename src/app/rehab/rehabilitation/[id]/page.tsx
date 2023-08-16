@@ -215,9 +215,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
           </Grid>
         </Grid>
         <Grid container spacing={2}>
-            {/*病人card*/}
           <Grid container item xs={6} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
+                {/*病人card*/}
                 <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 150}} >
                   <CardHeader title=' ' titleTypographyProps={{ variant: 'h5' }} />
                   <CardContent>
@@ -272,7 +272,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       {trainMinus}<br />
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      总训练时长
+                      弯曲总时长
                     </Typography>
                     <Divider style={{padding:'5px'}}/>
                     <Typography sx={{ fontSize: 6 }} color="text.secondary">
@@ -281,25 +281,44 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   </CardContent>
                 </StatisticsCard>
               </Grid>
-              <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
-                <StatisticsCard>
-                  <Typography sx={{ float:"left" }}>
-                    <AssessmentIcon  sx={{ color: '#0a94a1', fontSize: 50 }}/>
+            <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
+              <StatisticsCard>
+                <Typography sx={{ float:"left" }}>
+                  <AssessmentIcon  sx={{ color: '#0a94a1', fontSize: 50 }}/>
+                </Typography>
+                <CardContent sx={{ textAlign: 'right' }}>
+                  <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
+                    {record.length}
                   </Typography>
-                  <CardContent sx={{ textAlign: 'right' }}>
-                    <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
-                      {record.length}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      总训练次数
-                    </Typography>
-                    <Divider sx={{padding:'5px'}}/>
-                    <Typography sx={{ fontSize: 6 }} color="text.secondary">
-                      次数 / 次
-                    </Typography>
-                  </CardContent>
-                </StatisticsCard>
-              </Grid>
+                  <Typography variant="body2" color="text.secondary">
+                    伸展总时长
+                  </Typography>
+                  <Divider sx={{padding:'5px'}}/>
+                  <Typography sx={{ fontSize: 6 }} color="text.secondary">
+                    时间 / 分钟
+                  </Typography>
+                </CardContent>
+              </StatisticsCard>
+            </Grid>
+              {/*<Grid item xs={6} md={2} alignItems="center" justifyContent="center">*/}
+              {/*  <StatisticsCard>*/}
+              {/*    <Typography sx={{ float:"left" }}>*/}
+              {/*      <AssessmentIcon  sx={{ color: '#0a94a1', fontSize: 50 }}/>*/}
+              {/*    </Typography>*/}
+              {/*    <CardContent sx={{ textAlign: 'right' }}>*/}
+              {/*      <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>*/}
+              {/*        {record.length}*/}
+              {/*      </Typography>*/}
+              {/*      <Typography variant="body2" color="text.secondary">*/}
+              {/*        总训练次数*/}
+              {/*      </Typography>*/}
+              {/*      <Divider sx={{padding:'5px'}}/>*/}
+              {/*      <Typography sx={{ fontSize: 6 }} color="text.secondary">*/}
+              {/*        次数 / 次*/}
+              {/*      </Typography>*/}
+              {/*    </CardContent>*/}
+              {/*  </StatisticsCard>*/}
+              {/*</Grid>*/}
               <Grid item xs={6} md={2}>
                 <StatisticsCard>
                   <Typography sx={{ float:"left" }}>

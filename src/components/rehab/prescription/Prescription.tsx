@@ -7,9 +7,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import {
-  Box,
+  Box, Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -51,6 +53,7 @@ import {GetDefaultPrescription} from "@/utils/mct-utils";
 
 import { useForm } from 'react-hook-form';
 import {useSnackbar} from "notistack";
+import Typography from "@mui/material/Typography";
 
 interface IFormInput {
   mode: string;
@@ -67,13 +70,18 @@ const StyledDiv = styled.div`
 `;
 
 interface Column {
-  id: 'time' | 'pattern' | 'part' | 'count' | 'bendingTimeValue' | 'stretchTimeValue' | 'action';
+  id: 'Keyboard' |'time' | 'pattern' | 'part' | 'count' | 'bendingTimeValue' | 'stretchTimeValue' | 'times' | 'action';
   label: string;
   minWidth?: number;
   align: 'right' | 'left' | 'center';
 }
 
 const columns: readonly Column[] = [
+  { id: 'Keyboard',
+    label: ' ',
+    minWidth: 20,
+    align: 'left',
+  },
   { id: 'time',
     label: '处方创建时间',
     minWidth: 165,
@@ -87,7 +95,7 @@ const columns: readonly Column[] = [
   {
     id: 'part',
     label: '训练部位',
-    minWidth: 90,
+    minWidth: 80,
     align: 'right',
   },
   {
@@ -109,6 +117,12 @@ const columns: readonly Column[] = [
     align: 'right',
   },
   {
+    id: 'times',
+    label: '已做次数/需做次数',
+    minWidth: 110,
+    align: 'right',
+  },
+  {
     id: 'action',
     label: '操作',
     minWidth: 180,
@@ -124,6 +138,7 @@ export default function StickyHeadTable(params: {PId:string,
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
+  const [openRecord, setOpenRecord] = React.useState(false);
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription>({
     id: 0,
     created_at: "",
@@ -132,6 +147,18 @@ export default function StickyHeadTable(params: {PId:string,
     zz: 10,
     u: 3,
     v: 3,
+    history: [
+      {
+        date: "2023-08-01 17:09:14",
+        customerId: "2023-08-01 17:10:01",
+        amount: 3
+      },
+      {
+        date: "2023-08-01 17:09:14",
+        customerId: "2023-08-01 17:09:14",
+        amount: 1
+      }
+    ]
   })
   const [willEditPrescription, setWillEditPrescription] = useState<Prescription>({
     id: 0,
@@ -141,6 +168,18 @@ export default function StickyHeadTable(params: {PId:string,
     zz: 10,
     u: 3,
     v: 3,
+    history: [
+      {
+        date: "2023-08-01 17:09:14",
+        customerId: "2023-08-01 17:10:01",
+        amount: 3
+      },
+      {
+        date: "2023-08-01 17:09:14",
+        customerId: "2023-08-01 17:09:14",
+        amount: 1
+      }
+    ]
   })
   const [clientId, setClientId] = useState("")
   const [openDelPrescription, setOpenDelPrescription] = useState(false);
@@ -299,6 +338,15 @@ export default function StickyHeadTable(params: {PId:string,
                         },
                       }}
                   >
+                    <TableCell>
+                      <IconButton
+                        aria-label="expand row"
+                        size="small"
+                        onClick={() => setOpenRecord(!openRecord)}
+                      >
+                        {openRecord ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                      </IconButton>
+                    </TableCell>
                     <TableCell component='th' scope='row'>
                       {row.created_at}
                     </TableCell>
@@ -307,6 +355,7 @@ export default function StickyHeadTable(params: {PId:string,
                     <TableCell align='right'>{row.zz}</TableCell>
                     <TableCell align='right'>{row.u}</TableCell>
                     <TableCell align='right'>{row.v}</TableCell>
+                    <TableCell align='center'>{row.u} / {row.v}</TableCell>
                     <TableCell align='center'>
                       {/*<ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>*/}
                       {/*  <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>*/}
@@ -346,6 +395,57 @@ export default function StickyHeadTable(params: {PId:string,
                     </TableCell>
                   </TableRow>
               ))}
+
+              <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+                  <Collapse in={openRecord} timeout="auto" unmountOnExit>
+                    <Box sx={{ margin: 1 }}>
+                      <Typography variant="h6" gutterBottom component="div">
+                        康复记录
+                      </Typography>
+                      <Table size="small" aria-label="purchases">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>康复开始时间</TableCell>
+                            <TableCell>康复结束时间</TableCell>
+                            <TableCell align="right">各项指标</TableCell>
+                            <TableCell align="right">医生评价</TableCell>
+                            <TableCell align="right">操作</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
+                              <TableCell>2023-07-13 17:45:35</TableCell>
+                              <TableCell>2023-07-13 17:55:35</TableCell>
+                              <TableCell align="right">
+                                <Button color="secondary" >查看指标</Button>
+                              </TableCell>
+                              <TableCell align="right">
+                                <Button color="secondary" >查看评价</Button>
+                              </TableCell>
+                              <TableCell align="right">
+                                <Button color="secondary" >查看直方图</Button>
+                              </TableCell>
+                            </TableRow>
+
+                          {/*{params.prescription.history.map((historyRow) => (*/}
+                          {/*  <TableRow key={historyRow.date}>*/}
+                          {/*    <TableCell component="th" scope="row">*/}
+                          {/*      {historyRow.date}*/}
+                          {/*    </TableCell>*/}
+                          {/*    <TableCell>{historyRow.customerId}</TableCell>*/}
+                          {/*    <TableCell align="right">{historyRow.amount}</TableCell>*/}
+                          {/*    <TableCell align="right"> 2</TableCell>*/}
+                          {/*    <TableCell align="right">直方图</TableCell>*/}
+                          {/*  </TableRow>*/}
+                          {/*))}*/}
+                        </TableBody>
+                      </Table>
+                    </Box>
+                  </Collapse>
+                </TableCell>
+              </TableRow>
+
             </TableBody>
           </Table>
         </TableContainer>
