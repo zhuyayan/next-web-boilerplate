@@ -41,16 +41,18 @@ import {
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
-import {IconButton} from "@mui/material";
+import {Icon, IconButton} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
+import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew';
 
 import { Title } from '@/components/rehab/styles';
 import {ThunkDispatch} from "redux-thunk";
+import CardMedia from "@mui/material/CardMedia";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -264,9 +266,19 @@ export default function MUITable({ params }: { params: { id: string } }) {
               </Grid>
               <Grid item xs={6} md={2}>
                 <StatisticsCard>
-                  <Typography style={{ float:"left" }}>
-                    <AccessTimeFilledIcon style={{ color: '#69acee', fontSize: 50 }}/>
-                  </Typography>
+                  <CardMedia
+                      style={{
+                      position: 'absolute',
+                      width: 50, // 图片的宽度
+                      height: 50, // 图片的高度
+                      }}
+                      component="img"
+                      src="/images/fist.png"
+                      alt="Image"
+                  />
+                  {/*<Typography style={{ float:"left" }}>*/}
+                  {/*  /!*<AccessTimeFilledIcon style={{ color: '#69acee', fontSize: 50 }}/>*!/*/}
+                  {/*</Typography>*/}
                   <CardContent style={{ textAlign: 'right' }}>
                     <Typography variant="h3" color="primary" style={{display:'inline-block'}}>
                       {trainMinus}<br />
