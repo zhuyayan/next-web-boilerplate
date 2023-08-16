@@ -312,7 +312,7 @@ export default function StickyHeadTable(params: {PId:string,
 
   return (<>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ height: 280 }}>
+        <TableContainer sx={{ height: 400 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -408,9 +408,9 @@ export default function StickyHeadTable(params: {PId:string,
                           <TableRow>
                             <TableCell>康复开始时间</TableCell>
                             <TableCell>康复结束时间</TableCell>
-                            <TableCell align="right">各项指标</TableCell>
-                            <TableCell align="right">医生评价</TableCell>
-                            <TableCell align="right">操作</TableCell>
+                            <TableCell align="center">各项指标</TableCell>
+                            <TableCell align="center">医生评价</TableCell>
+                            <TableCell align="center">操作</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -423,7 +423,7 @@ export default function StickyHeadTable(params: {PId:string,
                               <TableCell align="right">
                                 <Button color="secondary" >查看评价</Button>
                               </TableCell>
-                              <TableCell align="right">
+                              <TableCell align="left">
                                 <Button color="secondary" >查看直方图</Button>
                               </TableCell>
                             </TableRow>

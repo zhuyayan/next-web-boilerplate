@@ -2,6 +2,7 @@
 import ReactECharts from 'echarts-for-react';
 import {CustomSeriesRenderItemAPI} from "echarts/types/dist/echarts";
 import {getRandomDate} from "@/utils/mct-utils";
+import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
 
 export default function EChartsTest(){
   // 2 类

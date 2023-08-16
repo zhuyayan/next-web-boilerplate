@@ -8,6 +8,7 @@ import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import Prescription from "@/components/rehab/prescription/Prescription";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
+import EChartsTest from "@/components/rehab/echarts/EChartsTest";
 import * as React from 'react';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
@@ -64,6 +65,12 @@ const StatisticsCard = styled.div`
   background-color: rgb(182, 212, 246);
   height: 150px;
   padding: 10px;
+`;
+
+const StyledBoxContainer = styled(Box)`
+  &:not(:first-child) {
+    margin: -1px;
+  }
 `;
 
 export default function MUITable({ params }: { params: { id: string } }) {
@@ -231,7 +238,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       </Grid>
                       <Grid item xs={3.5}>
                         <Typography component="div">
-                          年龄：{rehabPatient.age}
+                          年龄：{rehabPatient.age} 岁
                         </Typography>
                       </Grid>
                       <Grid item xs={3.5}>
@@ -250,7 +257,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       </Grid>
                       <Grid item xs={3.5}>
                         <Typography component="div">
-                          病史：{rehabPatient.medicalHistory}
+                          诊断：{rehabPatient.medicalHistory}
                         </Typography>
                       </Grid>
                       <Grid item xs={3.5}>
@@ -351,10 +358,155 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 </StatisticsCard>
               </Grid>
             </Grid>
+
+          {/*直方图*/}
+          <Grid item xs={6} md={12}>
+            <Card sx={{ padding: '10px' ,height: 390}}>
+              <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
+              {
+                <EChartsTest/>
+              }
+
+            </Card>
+          </Grid>
+          <br/>
+
             {/*处方*/}
           <Grid item xs={6} md={12}>
-            <Card sx={{ padding: '10px' ,height: 365}}>
+            <Card sx={{ padding: '10px' ,height: 1320}}>
+
+              <div style={{ fontSize: '16px' }}>
+                请在病人训练前和训练中将下面表格填写完整：
+              </div>
+              <br/>
+              <div style={{ borderCollapse: 'collapse' }}>
+                <Grid container spacing={0}>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input1">发病时间:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField id="input1" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={3}>
+                            <label htmlFor="input2">用药:</label>
+                          </Grid>
+                          <Grid item xs={9}>
+                            <TextField id="input2" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={3}>
+                            <label htmlFor="input3">心率:</label>
+                          </Grid>
+                          <Grid item xs={9}>
+                            <TextField id="input3" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{ padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={3}>
+                            <label htmlFor="input4">心肌:</label>
+                          </Grid>
+                          <Grid item xs={9}>
+                            <TextField id="input4" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{ padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input5">痉挛状态:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField id="input5" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{ padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={5.5}>
+                            <label htmlFor="input6">静止基础心率：</label>
+                          </Grid>
+                          <Grid item xs={6.5}>
+                            <TextField id="input6" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{ padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={5}>
+                            <label htmlFor="input7">弯曲时心率:</label>
+                          </Grid>
+                          <Grid item xs={7}>
+                            <TextField id="input7" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{ padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={5}>
+                            <label htmlFor="input8">伸展时心率:</label>
+                          </Grid>
+                          <Grid item xs={7}>
+                            <TextField id="input8" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <StyledBoxContainer>
+                      <Box sx={{ padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="right">
+                          <Button style={{float: 'right'}} variant="outlined">提交</Button>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                </Grid>
+              </div>
+
               <div>
+                <br/>
                 <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h5' }} />
                 <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
                   (共
@@ -377,27 +529,157 @@ export default function MUITable({ params }: { params: { id: string } }) {
               </div>
 
               <Prescription PId={params.id} prescription={prescription} onlineEquipment={onlineData || []}/>
+
+              <br/>
+              <div style={{ textAlign: 'center', fontSize: '16px' }}>当次压力直方图</div>
+              <div>
+                <EChartsTest/>
+              </div>
+
+              <br/>
+              <div>
+                请医护根据此次训练的直方图对以下信息进行评价：
+              </div>
+              <br/>
+              <div style={{ borderCollapse: 'collapse' }}>
+                <Grid container spacing={0}>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input9">耐受状态:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField id="input9" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input10">运动评价:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField id="input10" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input11">痉挛评价:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField id="input11" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={3}>
+                            <label htmlFor="input12">肌张力:</label>
+                          </Grid>
+                          <Grid item xs={9}>
+                            <TextField id="input12" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input13">急性期情况:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField id="input13" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={5}>
+                            <label htmlFor="input14">神经科判断：</label>
+                          </Grid>
+                          <Grid item xs={7}>
+                            <TextField id="input14" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={5.5}>
+                            <label htmlFor="input15">运动损伤程度:</label>
+                          </Grid>
+                          <Grid item xs={6.5}>
+                            <TextField id="input15" variant="outlined" size="small" fullWidth />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <StyledBoxContainer>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="right">
+                          <Button style={{float: 'right'}} variant="outlined">提交</Button>
+                        </Grid>
+                      </Box>
+                    </StyledBoxContainer>
+                  </Grid>
+                </Grid>
+              </div>
+
+              <br/>
+              <div style={{ color: 'red', fontSize: '10px' }}>
+                注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。
+              </div>
+
             </Card>
           </Grid>
-            <br/>
+          <br/>
+
 
             {/*压力数据折线图*/}
-          <Grid item xs={6} md={5.5}>
-            <Card sx={{ height: 365 ,padding: '10px'}}>
-              <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
-              {
-                trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
-              }
-            </Card>
-          </Grid>
+          {/*<Grid item xs={6} md={5.5}>*/}
+          {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
+          {/*    <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />*/}
+          {/*    {*/}
+          {/*      trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>*/}
+          {/*    }*/}
+          {/*  </Card>*/}
+          {/*</Grid>*/}
 
             {/*康复记录*/}
-          <Grid item xs={6} md={6.5}>
-            <Card sx={{ height: 365 ,padding: '10px'}}>
-              <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                <PrescriptionTable record={record} pid={params.id}/>
-              </Card>
-            </Grid>
+          {/*<Grid item xs={6} md={6.5}>*/}
+          {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
+          {/*    <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />*/}
+          {/*      <PrescriptionTable record={record} pid={params.id}/>*/}
+          {/*    </Card>*/}
+          {/*  </Grid>*/}
         </Grid>
         <br/>
       </Container>
@@ -405,9 +687,10 @@ export default function MUITable({ params }: { params: { id: string } }) {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>添加处方</DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText style={{display:'inline-block'}}>
             请正确填写处方各项信息
           </DialogContentText>
+          <Typography variant='body2' style={{display:'inline-block', color: 'red' }} >（建议伸展定时值为弯曲定时值的 1.5 倍）</Typography>
           <StyledDiv>
             <Box>
               <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
