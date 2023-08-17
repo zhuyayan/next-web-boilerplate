@@ -423,20 +423,20 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       </Box>
                     </StyledBoxContainer>
                   </Grid>
-                  <Grid item xs={3}>
-                    <StyledBoxContainer>
-                      <Box sx={{ padding: '8px' }}>
-                        <Grid container spacing={0} alignItems="center">
-                          <Grid item xs={3}>
-                            <label htmlFor="input4">心肌:</label>
-                          </Grid>
-                          <Grid item xs={9}>
-                            <TextField id="input4" variant="outlined" size="small" fullWidth />
-                          </Grid>
-                        </Grid>
-                      </Box>
-                    </StyledBoxContainer>
-                  </Grid>
+                  {/*<Grid item xs={3}>*/}
+                  {/*  <StyledBoxContainer>*/}
+                  {/*    <Box sx={{ padding: '8px' }}>*/}
+                  {/*      <Grid container spacing={0} alignItems="center">*/}
+                  {/*        <Grid item xs={3}>*/}
+                  {/*          <label htmlFor="input4">心肌:</label>*/}
+                  {/*        </Grid>*/}
+                  {/*        <Grid item xs={9}>*/}
+                  {/*          <TextField id="input4" variant="outlined" size="small" fullWidth />*/}
+                  {/*        </Grid>*/}
+                  {/*      </Grid>*/}
+                  {/*    </Box>*/}
+                  {/*  </StyledBoxContainer>*/}
+                  {/*</Grid>*/}
                   <Grid item xs={3}>
                     <StyledBoxContainer>
                       <Box sx={{ padding: '8px' }}>
@@ -456,7 +456,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       <Box sx={{ padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center">
                           <Grid item xs={5.5}>
-                            <label htmlFor="input6">静止基础心率：</label>
+                            <label htmlFor="input6">最高心率：</label>
                           </Grid>
                           <Grid item xs={6.5}>
                             <TextField id="input6" variant="outlined" size="small" fullWidth />
@@ -470,7 +470,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       <Box sx={{ padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center">
                           <Grid item xs={5}>
-                            <label htmlFor="input7">弯曲时心率:</label>
+                            <label htmlFor="input7">最低心率:</label>
                           </Grid>
                           <Grid item xs={7}>
                             <TextField id="input7" variant="outlined" size="small" fullWidth />
@@ -484,7 +484,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       <Box sx={{ padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center">
                           <Grid item xs={5}>
-                            <label htmlFor="input8">伸展时心率:</label>
+                            <label htmlFor="input8">平均心率:</label>
                           </Grid>
                           <Grid item xs={7}>
                             <TextField id="input8" variant="outlined" size="small" fullWidth />
@@ -493,7 +493,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       </Box>
                     </StyledBoxContainer>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={3}>
                     <StyledBoxContainer>
                       <Box sx={{ padding: '8px' }}>
                         <Grid container spacing={0} alignItems="right">

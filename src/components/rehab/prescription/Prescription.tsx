@@ -130,6 +130,7 @@ const columns: readonly Column[] = [
   },
 ];
 
+
 export default function StickyHeadTable(params: {PId:string,
   prescription:Prescription[],
   onlineEquipment: EquipmentOnline[]}) {
@@ -138,7 +139,14 @@ export default function StickyHeadTable(params: {PId:string,
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
-  const [openRecord, setOpenRecord] = React.useState(false);
+  const [openIcon, setOpenIcon] = React.useState(false);
+  const [openRecord, setOpenRecord] = React.useState<{ [key: number]: boolean }>(() => {
+    const OpenState: { [key: number]: boolean } = {};
+    if (params.prescription.length > 0) {
+      OpenState[params.prescription[0].id] = true; // 默认展开第一条记录
+    }
+    return OpenState;
+  });
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription>({
     id: 0,
     created_at: "",
@@ -181,6 +189,43 @@ export default function StickyHeadTable(params: {PId:string,
       }
     ]
   })
+
+
+  function createTargetData(
+    diseaseTime: number,
+    medication: number,
+    preHeartRate: number,
+    spasticity: number,
+    postHeartRate: number,
+  ) {
+    return { diseaseTime, medication, preHeartRate, spasticity, postHeartRate };
+  }
+  const rows = [
+    createTargetData(1314, 159, 6.0, 24, 4.0),
+  ];
+
+  function createEvaluateData(
+    tolerance: number,
+    sportsEvaluation: number,
+    spasmEvaluation: number,
+    muscularTension: number,
+    acutePhase: number,
+    neurological: number,
+    sportsInjury: number
+  ) {
+    return {
+      tolerance,
+      sportsEvaluation,
+      spasmEvaluation,
+      muscularTension,
+      acutePhase,
+      neurological,
+      sportsInjury
+    };
+  }
+  const evaluateData = [createEvaluateData(1314, 159, 6.0, 24, 4.0, 5, 4)];
+
+
   const [clientId, setClientId] = useState("")
   const [openDelPrescription, setOpenDelPrescription] = useState(false);
   const [prescriptionToBeDeleted, setPrescriptionToBeDeleted] = useState<Prescription>(GetDefaultPrescription());
@@ -310,9 +355,34 @@ export default function StickyHeadTable(params: {PId:string,
     }
   }, [clearErrors, openModify]);
 
+  const handleRowClick = (rowId: number) => {
+    setOpenRecord((prevOpenRows) => ({
+      ...prevOpenRows,
+      [rowId]: !prevOpenRows[rowId],
+    }));
+  };
+
+  // 查看指标弹框
+  const [openTarget, setOpenTarget] = React.useState(false);
+  const handleClickOpenTarget = () => {
+    setOpenTarget(true);
+  };
+  const handleCloseTarget = () => {
+    setOpenTarget(false);
+  };
+
+  // 查看评价弹框
+  const [openEvaluate, setOpenEvaluate] = React.useState(false);
+  const handleClickOpenEvaluate = () => {
+    setOpenEvaluate(true);
+  };
+  const handleCloseEvaluate = () => {
+    setOpenEvaluate(false);
+  };
+
   return (<>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ height: 400 }}>
+        <TableContainer>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -329,9 +399,10 @@ export default function StickyHeadTable(params: {PId:string,
             </TableHead>
             <TableBody>
               {params.prescription.map(row => (
+                <React.Fragment key={row.id}>
                   <TableRow
-                      key={row.created_at}
                       style={{height:'30px'}}
+                      onClick={() => handleRowClick(row.id)}
                       sx={{
                         '&:last-of-type td, &:last-of-type th': {
                           border: 0
@@ -342,9 +413,9 @@ export default function StickyHeadTable(params: {PId:string,
                       <IconButton
                         aria-label="expand row"
                         size="small"
-                        onClick={() => setOpenRecord(!openRecord)}
+                        // onClick={() => handleRowClick(row.id)}
                       >
-                        {openRecord ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                        {openRecord[row.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                       </IconButton>
                     </TableCell>
                     <TableCell component='th' scope='row'>
@@ -391,14 +462,11 @@ export default function StickyHeadTable(params: {PId:string,
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-
                     </TableCell>
                   </TableRow>
-              ))}
-
-              <TableRow>
+                <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
-                  <Collapse in={openRecord} timeout="auto" unmountOnExit>
+                  <Collapse in={openRecord[row.id]} timeout="auto" unmountOnExit>
                     <Box sx={{ margin: 1 }}>
                       <Typography variant="h6" gutterBottom component="div">
                         康复记录
@@ -417,13 +485,13 @@ export default function StickyHeadTable(params: {PId:string,
                             <TableRow>
                               <TableCell>2023-07-13 17:45:35</TableCell>
                               <TableCell>2023-07-13 17:55:35</TableCell>
-                              <TableCell align="right">
-                                <Button color="secondary" >查看指标</Button>
+                              <TableCell align="center">
+                                <Button color="secondary" onClick={handleClickOpenTarget}>查看指标</Button>
                               </TableCell>
-                              <TableCell align="right">
-                                <Button color="secondary" >查看评价</Button>
+                              <TableCell align="center">
+                                <Button color="secondary" onClick={handleClickOpenEvaluate}>查看评价</Button>
                               </TableCell>
-                              <TableCell align="left">
+                              <TableCell align="center">
                                 <Button color="secondary" >查看直方图</Button>
                               </TableCell>
                             </TableRow>
@@ -445,11 +513,102 @@ export default function StickyHeadTable(params: {PId:string,
                   </Collapse>
                 </TableCell>
               </TableRow>
-
+                </React.Fragment>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
+
+      {/*查看指标弹框*/}
+      <Dialog
+        open={openTarget}
+        onClose={handleCloseTarget}
+        aria-describedby="Target"
+      >
+        <DialogTitle>{"病人各项指标"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="Target">
+            <Table sx={{ minWidth: 500 }} aria-label="a dense table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>发病时间</TableCell>
+                  <TableCell align="right">用药</TableCell>
+                  <TableCell align="right">训练前心率</TableCell>
+                  <TableCell align="right">痉挛状态</TableCell>
+                  <TableCell align="right">训练后心率</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow
+                    key={row.diseaseTime}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.diseaseTime}
+                    </TableCell>
+                    <TableCell align="right">{row.medication}</TableCell>
+                    <TableCell align="right">{row.preHeartRate}</TableCell>
+                    <TableCell align="right">{row.spasticity}</TableCell>
+                    <TableCell align="right">{row.postHeartRate}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseTarget}>关闭</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/*查看评价弹框*/}
+      <Dialog
+        open={openEvaluate}
+        onClose={handleCloseEvaluate}
+        aria-describedby="Evaluate"
+      >
+        <DialogTitle>{"医生评价"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="Evaluate">
+            <Table sx={{ minWidth: 700 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>耐受程度</TableCell>
+                  <TableCell align="right">运动评价</TableCell>
+                  <TableCell align="right">痉挛评价</TableCell>
+                  <TableCell align="right">肌张力</TableCell>
+                  <TableCell align="right">急性期情况</TableCell>
+                  <TableCell align="right">神经科判断</TableCell>
+                  <TableCell align="right">运动损伤程度</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {evaluateData.map((row) => (
+                  <TableRow
+                    key={row.tolerance}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {row.tolerance}
+                    </TableCell>
+                    <TableCell align="right">{row.sportsEvaluation}</TableCell>
+                    <TableCell align="right">{row.spasmEvaluation}</TableCell>
+                    <TableCell align="right">{row.muscularTension}</TableCell>
+                    <TableCell align="right">{row.acutePhase}</TableCell>
+                    <TableCell align="right">{row.neurological}</TableCell>
+                    <TableCell align="right">{row.sportsInjury}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEvaluate}>关闭</Button>
+        </DialogActions>
+      </Dialog>
 
       <DeleteConfirmationDialog
         open={openDelPrescription}
@@ -457,6 +616,7 @@ export default function StickyHeadTable(params: {PId:string,
         onConfirm={() => handleDeletePrescription(prescriptionToBeDeleted.id)}
         deleteItemName={prescriptionToBeDeleted.created_at}
       />
+
       <Dialog
         open={open} onClose={handleClose}
         slotProps={{
