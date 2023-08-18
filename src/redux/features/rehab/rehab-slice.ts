@@ -50,12 +50,31 @@ export interface Prescription {
 }
 
 export interface PrescriptionRecord {
-  id: number
-  created_at: string
-  eid: string
-  pid: string
-  state: string
-  updated_at: string
+  id: number;
+  created_at: string;
+  eid: string;
+  pid: string;
+  state: string;
+  updated_at: string;
+}
+
+export interface TargetFormProps {
+  onsetTime: string;
+  medication: string;
+  spasmStatus: string;
+  minHeartRate: string;
+  maxHeartRate: string;
+  avgHeartRate: string;
+}
+
+export interface EvaluateFormProps {
+  tolerance: string;
+  sportsEvaluation: string;
+  spasmEvaluation: string;
+  muscularTension: string;
+  acutePhase: string;
+  neurological: string;
+  sportsInjury: string;
 }
 
 // export interface  systemInformation

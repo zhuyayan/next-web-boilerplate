@@ -54,6 +54,7 @@ import {GetDefaultPrescription} from "@/utils/mct-utils";
 import { useForm } from 'react-hook-form';
 import {useSnackbar} from "notistack";
 import Typography from "@mui/material/Typography";
+import {string} from "postcss-selector-parser";
 
 interface IFormInput {
   mode: string;
@@ -155,18 +156,6 @@ export default function StickyHeadTable(params: {PId:string,
     zz: 10,
     u: 3,
     v: 3,
-    history: [
-      {
-        date: "2023-08-01 17:09:14",
-        customerId: "2023-08-01 17:10:01",
-        amount: 3
-      },
-      {
-        date: "2023-08-01 17:09:14",
-        customerId: "2023-08-01 17:09:14",
-        amount: 1
-      }
-    ]
   })
   const [willEditPrescription, setWillEditPrescription] = useState<Prescription>({
     id: 0,
@@ -176,32 +165,21 @@ export default function StickyHeadTable(params: {PId:string,
     zz: 10,
     u: 3,
     v: 3,
-    history: [
-      {
-        date: "2023-08-01 17:09:14",
-        customerId: "2023-08-01 17:10:01",
-        amount: 3
-      },
-      {
-        date: "2023-08-01 17:09:14",
-        customerId: "2023-08-01 17:09:14",
-        amount: 1
-      }
-    ]
   })
 
 
   function createTargetData(
-    diseaseTime: number,
-    medication: number,
-    preHeartRate: number,
-    spasticity: number,
-    postHeartRate: number,
+    onsetTime: string,
+    medication: string,
+    spasmStatus: string,
+    minHeartRate: string,
+    maxHeartRate: string,
+    avgHeartRate: string,
   ) {
-    return { diseaseTime, medication, preHeartRate, spasticity, postHeartRate };
+    return { onsetTime, medication, spasmStatus, minHeartRate, maxHeartRate,avgHeartRate };
   }
   const rows = [
-    createTargetData(1314, 159, 6.0, 24, 4.0),
+    createTargetData('1314', '159', '6.0', '24', '4.0','9'),
   ];
 
   function createEvaluateData(
@@ -465,9 +443,9 @@ export default function StickyHeadTable(params: {PId:string,
                     </TableCell>
                   </TableRow>
                 <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
                   <Collapse in={openRecord[row.id]} timeout="auto" unmountOnExit>
-                    <Box sx={{ margin: 1 }}>
+                    <Box sx={{ margin: 1,backgroundColor: 'rgba(177,197,238,0.78)',paddingLeft:3,marginLeft:2}}>
                       <Typography variant="h6" gutterBottom component="div">
                         康复记录
                       </Typography>
@@ -495,18 +473,6 @@ export default function StickyHeadTable(params: {PId:string,
                                 <Button color="secondary" >查看直方图</Button>
                               </TableCell>
                             </TableRow>
-
-                          {/*{params.prescription.history.map((historyRow) => (*/}
-                          {/*  <TableRow key={historyRow.date}>*/}
-                          {/*    <TableCell component="th" scope="row">*/}
-                          {/*      {historyRow.date}*/}
-                          {/*    </TableCell>*/}
-                          {/*    <TableCell>{historyRow.customerId}</TableCell>*/}
-                          {/*    <TableCell align="right">{historyRow.amount}</TableCell>*/}
-                          {/*    <TableCell align="right"> 2</TableCell>*/}
-                          {/*    <TableCell align="right">直方图</TableCell>*/}
-                          {/*  </TableRow>*/}
-                          {/*))}*/}
                         </TableBody>
                       </Table>
                     </Box>
@@ -534,24 +500,26 @@ export default function StickyHeadTable(params: {PId:string,
                 <TableRow>
                   <TableCell>发病时间</TableCell>
                   <TableCell align="right">用药</TableCell>
-                  <TableCell align="right">训练前心率</TableCell>
                   <TableCell align="right">痉挛状态</TableCell>
-                  <TableCell align="right">训练后心率</TableCell>
+                  <TableCell align="right">最小心率</TableCell>
+                  <TableCell align="right">最大心率</TableCell>
+                  <TableCell align="right">平均心率</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
                   <TableRow
-                    key={row.diseaseTime}
+                    key={row.onsetTime}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      {row.diseaseTime}
+                      {row.onsetTime}
                     </TableCell>
                     <TableCell align="right">{row.medication}</TableCell>
-                    <TableCell align="right">{row.preHeartRate}</TableCell>
-                    <TableCell align="right">{row.spasticity}</TableCell>
-                    <TableCell align="right">{row.postHeartRate}</TableCell>
+                    <TableCell align="right">{row.spasmStatus}</TableCell>
+                    <TableCell align="right">{row.minHeartRate}</TableCell>
+                    <TableCell align="right">{row.maxHeartRate}</TableCell>
+                    <TableCell align="right">{row.avgHeartRate}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -581,7 +549,7 @@ export default function StickyHeadTable(params: {PId:string,
                   <TableCell align="right">肌张力</TableCell>
                   <TableCell align="right">急性期情况</TableCell>
                   <TableCell align="right">神经科判断</TableCell>
-                  <TableCell align="right">运动损伤程度</TableCell>
+                  <TableCell align="right">运动损伤度</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -663,6 +631,7 @@ export default function StickyHeadTable(params: {PId:string,
           PaperProps={{ elevation: 0 }}>
         <DialogTitle>修改处方</DialogTitle>
         <DialogContent>
+          <Typography variant='body2' style={{display:'inline-block', color: 'red' }} >（建议伸展定时值为弯曲定时值的 1.5 倍）</Typography>
           <StyledDiv>
             <Box>
                 <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
