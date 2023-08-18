@@ -15,45 +15,28 @@ import MenuItem from '@mui/material/MenuItem';
 import {useEffect, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import {fetchConfig, setHeight} from "@/redux/features/layout-slice";
-import {Dialog, Popover, Slide} from "@mui/material";
+import {Collapse, Dialog, List, ListItem, ListItemButton, ListItemText, Popover, Slide, Stack} from "@mui/material";
 import {RootState, useAppSelector} from "@/redux/store";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import {TransitionProps} from "@mui/material/transitions";
-import Link from "next/link";
 import styled from "styled-components";
 import { useSelector } from 'react-redux';
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
-import {asyncSysTime} from "@/redux/features/rehab/rehab-slice";
+import {asyncSysTime, selectedMenu} from "@/redux/features/rehab/rehab-slice";
 import {GetCurrentDateTime} from "@/utils/mct-utils";
 import screenfull from "screenfull"
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
-
-interface MCTMenu {
-  name: string,
-  path: string
-}
-
-const pages: MCTMenu[] = [
-  {
-    name: "病人",
-    path: "/rehab/patient",
-  },
-  {
-    name: "用户",
-    path: "/rehab/staff",
-  },
-  {
-    name: "统计",
-    path: "/rehab/equipment",
-  },
-  {
-    name: "配置",
-    path: "/rehab/config",
-  }];
-
-const settings: string[] = ['Logout'];
+import Paper from "@mui/material/Paper";
+import ListItemIcon from '@mui/material/ListItemIcon';
+import SendIcon from '@mui/icons-material/Send';
+import {RSMenuItem} from "@/redux/features/rehab/rehab-api-slice";
+import Link from "next/link";
+import DashboardIcon from "@/icons/svg-components/DashboardSvg";
+import {IconMapping} from "@/utils/icon-map";
+import {fontSize} from "@mui/system";
+import {useRouter, usePathname} from "next/navigation";
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -74,7 +57,70 @@ const MCTStyledButton = styled(Button)`
   display: block;
 `;
 
+
 export default function NavBar() {
+  const [menus, setMenus] = useState<RSMenuItem[]>([]);
+  const router = useRouter();
+  const pathname = usePathname()
+  useEffect(() => {
+    async function fetchMenus() {
+      return fetch('/api/nav')
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            return data.data; // This return value will be available in the following .then() block
+          });
+    }
+    fetchMenus()
+        .then(resultData => {
+          console.log('resultData', resultData);
+          setMenus(resultData);
+        })
+        .catch(error => {
+          console.error("Error fetching menus:", error);
+        });
+  }, []);
+
+  function renderMenuItem(menu: RSMenuItem, depth = 0) {
+    const ComponentIcon = IconMapping[menu.icon];
+    const [openMenu, setOpenMenu] = useState(false);
+    if (menu.children && menu.children.length > 0) {
+
+      return (
+          <List key={menu.id} component="nav" disablePadding>
+            <ListItemButton onClick={() => setOpenMenu(!openMenu)}>
+              <ListItemIcon style={{ minWidth: 'unset' }}>
+                <ComponentIcon style={{ fontSize: 'large' }} />
+              </ListItemIcon>
+              <ListItemText primary={menu.name} />
+            </ListItemButton>
+
+            <Collapse in={openMenu} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {menu.children.map(child => renderMenuItem(child, depth + 1))}
+              </List>
+            </Collapse>
+          </List>
+      );
+    }
+
+    return (
+        <List key={menu.id} component="nav" disablePadding style={{ marginLeft: depth * 20 }}>
+          <Link href={menu.path} passHref>
+            <ListItemButton
+                selected={selectedMe === menu.name}
+                onClick={() => setSelectedPage(menu.name)}
+            >
+              <ListItemIcon style={{ minWidth: 'unset' }}>
+                <ComponentIcon style={{ fontSize: 'large' }} />
+              </ListItemIcon>
+              <ListItemText primary={menu.name} />
+            </ListItemButton>
+          </Link>
+        </List>
+    );
+  }
+
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const appBarRef = useRef<HTMLDivElement>(null);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -82,6 +128,13 @@ export default function NavBar() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const hospitalName = useSelector((state:RootState) => state.appBar.rsConfig.Hospital.Name);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const [selectedPage, setSelectedPage] = useState<string>('');
+  const selectedMe = useAppSelector((state: RootState) => state.rehab.selectedMenu);
+  useEffect(() => {
+    console.log('selectedPage', selectedPage);
+    dispatch(selectedMenu(selectedPage));
+  }, [selectedPage]);
 
   useEffect(() => {
     thunkDispatch(fetchConfig())
@@ -123,7 +176,6 @@ export default function NavBar() {
     }
   })
 
-
   const handleSideBarToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     console.log("handleSideBarToggle");
   }
@@ -164,7 +216,8 @@ export default function NavBar() {
     };
   const id = open ? 'simple-popover' : undefined;
   return (
-      <AppBar position="static" ref={appBarRef}>
+      <>
+        <AppBar position="static" ref={appBarRef}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <IconButton
@@ -197,7 +250,7 @@ export default function NavBar() {
               <Avatar alt="Remy Sharp" src="/images/logo/新起点logo.png" sx={{marginRight:1, width: 40, height: 40, borderRadius: '4px',backgroundColor: 'transparent'}}/>
                 {hospitalName}
               {/*<Image*/}
-              {/*    src="/images/logo/MCTlogo.png"*/}
+              {/*    src="/images/logo/MCTLogo.png"*/}
               {/*    alt="Vercel Logo"*/}
               {/*    // className="dark:invert"*/}
               {/*    width={100}*/}
@@ -258,11 +311,11 @@ export default function NavBar() {
                       display: { xs: 'block', md: 'none' },
                     }}
                 >
-                  {pages.map((page) => (
-                      <MenuItem key={page.name} onClick={handleCloseNavMenu}>
-                        <Typography textAlign="center">{page.name}</Typography>
-                      </MenuItem>
-                  ))}
+                  {/*{pages.map((page) => (*/}
+                  {/*    <MenuItem key={page.name} onClick={handleCloseNavMenu}>*/}
+                  {/*      <Typography textAlign="center">{page.name}</Typography>*/}
+                  {/*    </MenuItem>*/}
+                  {/*))}*/}
                 </Menu>
               </Dialog>
             </Box>
@@ -309,18 +362,6 @@ export default function NavBar() {
                   <Typography>The content of the Popover.</Typography>
                 </Box>
               </Popover>
-            </Box>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
-                  <Link
-                      key={page.name}
-                      href={page.path} passHref>
-                    <MCTStyledButton
-                        key={page.name}>
-                      {page.name}
-                    </MCTStyledButton>
-                  </Link>
-              ))}
             </Box>
 
               <Box sx={{ flexGrow: 0 }} style={{marginRight:6}}>
@@ -372,5 +413,30 @@ export default function NavBar() {
           </Toolbar>
         </Container>
       </AppBar>
+        <Paper component="nav">
+          <Toolbar>
+            <Stack direction="row" spacing={1}>
+              {menus.map((page: RSMenuItem) => {
+                const ComponentIcon = IconMapping[page.icon];
+                return (
+                      <Link key={page.name} href={page.path} passHref>
+                          <ListItemButton
+                              selected={selectedMe === page.name}
+                              onClick={() => setSelectedPage(page.name)}
+                              style={{ fontSize: '16px' }}>
+                            <ListItemIcon style={{minWidth: 'unset'}}>
+                              <ComponentIcon style={{'fontSize': 'large'}}/>
+                            </ListItemIcon>
+                            <ListItemText primary={page.name}/>
+                          </ListItemButton>
+                      </Link>
+                );
+              })}
+              {/*{menus.map(menu => renderMenuItem(menu))}*/}
+            </Stack>
+          </Toolbar>
+          <Box></Box>
+        </Paper>
+      </>
   );
 }

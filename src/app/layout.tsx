@@ -1,9 +1,10 @@
 import './globals.css'
-// import { Inter } from 'next/font/google'
 import React from "react";
 import {Metadata} from "next";
-
-// const inter = Inter({ subsets: ['latin'] })
+import {ReduxProvider} from "@/redux/provider";
+import MCTThemeProvider from "@/components/provider/MCTThemeProvider";
+import MCTApiProvider from "@/components/provider/MCTApiProvider";
+import MCTSnackbarProvider from "@/components/provider/MCTSnackbarProvider";
 
 export const metadata: Metadata = {
   title: '卒中康复',
@@ -17,8 +18,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/*<body className={inter.className}>{children}</body>*/}
-      <body>{children}</body>
+      <body>
+        <MCTThemeProvider>
+          <MCTApiProvider>
+            <ReduxProvider>
+              <MCTSnackbarProvider>
+                {children}
+              </MCTSnackbarProvider>
+            </ReduxProvider>
+          </MCTApiProvider>
+        </MCTThemeProvider>
+      </body>
     </html>
   )
 }

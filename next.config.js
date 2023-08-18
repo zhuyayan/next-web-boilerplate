@@ -32,5 +32,11 @@ switch (process.env.NODE_ENV) {
 // NODE_ENV=development npm run dev
 // NODE_ENV=test npm run test
 // NODE_ENV=production npm run build
-
+nextConfig.webpack = (config, { isServer }) => {
+    config.module.rules.push({
+        test: /\.svg$/,
+        use: ['@svgr/webpack'],
+    });
+    return config;
+};
 module.exports = nextConfig

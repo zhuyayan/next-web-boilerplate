@@ -3,8 +3,10 @@ import ReactECharts from 'echarts-for-react';
 import {CustomSeriesRenderItemAPI} from "echarts/types/dist/echarts";
 import {getRandomDate} from "@/utils/mct-utils";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
+import React from "react";
 
-export default function EChartsTest(){
+
+export const EChartsTest = React.memo(function EChartsTest(){
   // 2 类
   const yearCount = 2;
   // 10 天
@@ -131,4 +133,6 @@ export default function EChartsTest(){
         <ReactECharts option={option} />
       </>
   )
-}
+});
+
+export default EChartsTest;

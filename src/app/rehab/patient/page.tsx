@@ -49,6 +49,7 @@ import Checkbox from '@mui/material/Checkbox';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog';
 import { Title } from '@/components/rehab/styles';
+import Link from "next/link";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -403,19 +404,15 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.physician}</TableCell>
                           <TableCell align='center'>{patient.i18d}</TableCell>
                           <TableCell align='center'>
-
-                            {/*<Link href={`/rehab/rehabilitation/` + patient.id} passHref>*/}
-                            {/*  */}
-                            {/*</Link>*/}
-
                             <Tooltip title="查看详细信息">
-                              <IconButton
-                                  aria-label="more"
-                                  color="primary"
-                                  onClick={()=> {window.location.href="rehabilitation/"+patient.id}}
-                              >
-                                <SmsIcon fontSize="small" />
-                              </IconButton>
+                              <Link href={`/rehab/rehabilitation/${patient.id}`} passHref>
+                                <IconButton
+                                    aria-label="more"
+                                    color="primary"
+                                >
+                                  <SmsIcon fontSize="small" />
+                                </IconButton>
+                              </Link>
                             </Tooltip>
 
                             <Tooltip title="修改信息">

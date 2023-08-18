@@ -38,3 +38,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 - Material UI [https://material-ui.com](https://material-ui.com)
 - Material Design [https://m3.material.io](https://m3.material.io)
 - Tailwind CSS [https://tailwindcss.com](https://tailwindcss.com)
+
+## Note
+- Tailwind CSS is used for styling when creating a new UI Component.
+- Material UI is used for styling when using a Material Design component.

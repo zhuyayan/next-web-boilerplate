@@ -12,7 +12,7 @@ import {
   BodyPartToNumMapping,
   genderLabelToValue, GetCurrentDate,
   getDefaultGenderLabel,
-  getDefaultGenderValue, GetOneYearAgoDate, GetOneYearAgoDateTime,
+  getDefaultGenderValue, GetOneYearAgoDate,
   ModeToNumMapping,
   timeSampleFormat
 } from "@/utils/mct-utils";
@@ -116,6 +116,7 @@ interface RehabState {
   equipmentAll: equipmentAll[]
   systemInformation: systemInformation
   patientDuration: PatientDuration
+  selectedMenu: string
 }
 
 const initialState: RehabState = {
@@ -128,7 +129,8 @@ const initialState: RehabState = {
   onlineEquipment: onlineEquipment,
   equipmentAll: equipmentAll,
   systemInformation: sysInfo,
-  patientDuration: patientDuration
+  patientDuration: patientDuration,
+  selectedMenu: '',
 }
 
 export type Channel = 'redux' | 'general'
@@ -632,6 +634,10 @@ const RehabSlice = createSlice({
     deletePatient1:(state, action: PayloadAction<number>)=>{
       state.patient = state.patient.filter((patient) => patient.id !== action.payload);
     },
+    selectedMenu: (state, action: PayloadAction<string>) => {
+      state.selectedMenu = action.payload
+      console.log('selectedMenu', state.selectedMenu)
+    },
   },
   extraReducers: (builder: ActionReducerMapBuilder<RehabState>) => {
     builder
@@ -751,5 +757,6 @@ const RehabSlice = createSlice({
   },
 })
 
+export const { selectedMenu } = RehabSlice.actions;
 export const { useGetOnlineEquipmentsQuery, useGetTrainMessageQuery } = rehabApi
 export default RehabSlice.reducer

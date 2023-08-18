@@ -8,7 +8,7 @@ import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import Prescription from "@/components/rehab/prescription/Prescription";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
-import EChartsTest from "@/components/rehab/echarts/EChartsTest";
+import {EChartsTest} from "@/components/rehab/echarts/EChartsTest";
 import * as React from 'react';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
@@ -54,6 +54,7 @@ import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew';
 import { Title } from '@/components/rehab/styles';
 import {ThunkDispatch} from "redux-thunk";
 import CardMedia from "@mui/material/CardMedia";
+import Link from "next/link";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -90,13 +91,18 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const [trainDays, setTrainDays] = useState<number>(0)
 
   const [willAddPrescription, setWillAddPrescription] = React.useState<PrescriptionEntity>({
+    history: [{amount: 3, customerId: "2023-08-01 17:10:01", date: "2023-08-01 17:09:14"}, {
+      amount: 1,
+      customerId: "2023-08-01 17:09:14",
+      date: "2023-08-01 17:09:14"
+    }],
     id: 0,
     created_at: "",
     part: "0",
     mode: "0",
     zz: 3,
     u: 3,
-    v: 3,
+    v: 3
   })
 
 
@@ -210,14 +216,15 @@ export default function MUITable({ params }: { params: { id: string } }) {
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Title>康复管理</Title>
               <Tooltip title="返回病人列表">
-                <IconButton
-                  style={{ marginLeft: 'auto' }}
-                  aria-label="back"
-                  color="primary"
-                  onClick={()=> {window.location.href="/rehab/patient"}}
-                >
-                  <AssignmentReturnIcon fontSize="medium" />
-                </IconButton>
+                <Link href={`/rehab/patient`} passHref>
+                  <IconButton
+                      style={{ marginLeft: 'auto' }}
+                      aria-label="back"
+                      color="primary"
+                  >
+                    <AssignmentReturnIcon fontSize="medium" />
+                  </IconButton>
+                </Link>
               </Tooltip>
               <br />
             </div>

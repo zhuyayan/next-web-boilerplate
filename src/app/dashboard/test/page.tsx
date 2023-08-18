@@ -18,6 +18,7 @@ import { AutoFixed } from "./auto-fixed";
 import Link from '@mui/material/Link';
 import Footer from "@/components/layout/Footer";
 import {Alert, Button, Snackbar} from "@mui/material";
+import EChartsTest from "@/components/rehab/echarts/EChartsTest";
 
 const actions = [
   { icon: <FileCopyIcon />, name: 'Copy' },
@@ -114,6 +115,7 @@ export default function Test() {
 
   return (
       <>
+        <EChartsTest/>
         <Button onClick={handleClick}>Open simple snackbar</Button>
         <Snackbar
           anchorOrigin={{vertical: 'top', horizontal: 'center'}}
