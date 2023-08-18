@@ -47,27 +47,34 @@ export interface Prescription {
   zz: number | string;
   u: number | string;
   v: number | string;
-  history: [
-    {
-      date: "2023-08-01 17:09:14",
-      customerId: "2023-08-01 17:10:01",
-      amount: 3
-    },
-    {
-      date: "2023-08-01 17:09:14",
-      customerId: "2023-08-01 17:09:14",
-      amount: 1
-    }
-  ]
 }
 
 export interface PrescriptionRecord {
-  id: number
-  created_at: string
-  eid: string
-  pid: string
-  state: string
-  updated_at: string
+  id: number;
+  created_at: string;
+  eid: string;
+  pid: string;
+  state: string;
+  updated_at: string;
+}
+
+export interface TargetFormProps {
+  onsetTime: string;
+  medication: string;
+  spasmStatus: string;
+  minHeartRate: string;
+  maxHeartRate: string;
+  avgHeartRate: string;
+}
+
+export interface EvaluateFormProps {
+  tolerance: string;
+  sportsEvaluation: string;
+  spasmEvaluation: string;
+  muscularTension: string;
+  acutePhase: string;
+  neurological: string;
+  sportsInjury: string;
 }
 
 // export interface  systemInformation
