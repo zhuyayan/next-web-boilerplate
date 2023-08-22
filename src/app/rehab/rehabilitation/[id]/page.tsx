@@ -258,20 +258,27 @@ export default function MUITable({ params }: { params: { id: string } }) {
         <Box sx={{marginBottom:5}}>
           <Grid container spacing={8}>
             <Grid item xs={12} md={12}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Title>康复管理</Title>
-                <Tooltip title="返回病人列表">
-                  <Link href={`/rehab/patient`} passHref>
-                    <IconButton
-                      style={{ marginLeft: 'auto' }}
-                      aria-label="back"
-                      color="primary"
-                    >
-                    <AssignmentReturnIcon fontSize="medium" />
-                  </IconButton>
-                </Link>
-              </Tooltip>
-              <br />
+              <div >
+
+                <Grid container alignItems="center">
+                  <Grid item xs={6}>
+                    <Title >康复管理</Title>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Grid container justifyContent="flex-end">
+                      <Tooltip title="返回病人列表">
+                        <Link href={`/rehab/patient`} passHref>
+                          <IconButton
+                              aria-label="back"
+                              color="primary"
+                          >
+                            <AssignmentReturnIcon fontSize="medium" />
+                          </IconButton>
+                        </Link>
+                      </Tooltip>
+                    </Grid>
+                  </Grid>
+                </Grid>
             </div>
           </Grid>
         </Grid>
