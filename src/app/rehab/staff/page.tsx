@@ -205,109 +205,112 @@ export default function MedicalStaffManagement() {
   };
 
   return (
+
     <>
       <Container>
-        <Title>医护管理</Title>
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-          <FormControl sx={{ m: 1, width: 640}}>
+          <Title>医护管理</Title>
+          <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+            <Box sx={{marginBottom:5}}>
+            <FormControl sx={{ m: 1, width: 640}}>
               <OutlinedInput
-                  sx={{ ml: 1, flex: 1 }}
-                  placeholder="输入用户姓名进行查询"
-                  inputProps={{ 'aria-label': '输入用户姓名进行查询' }}
-                  onChange={e => {
-                    inputChangeValue(e.target.value);
-                  }}
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  }
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="输入用户姓名进行查询"
+                inputProps={{ 'aria-label': '输入用户姓名进行查询' }}
+                onChange={e => {
+                  inputChangeValue(e.target.value);
+                }}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                }
               />
             </FormControl>
-          <Tooltip title="添加医护">
+            <Tooltip title="添加医护">
               <IconButton
-                  style={{float: 'right'}}
-                  aria-label="add"
-                  onClick={handleAddStaffClickOpen}
+                style={{float: 'right'}}
+                aria-label="add"
+                onClick={handleAddStaffClickOpen}
               >
                 <AddCircleIcon sx={{ fontSize: 54 }} color="secondary"/>
               </IconButton>
             </Tooltip>
 
-          <TableContainer sx={{ maxHeight: 620}}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell align='center' style={{width: 300}}>名字</TableCell>
-                  <TableCell align='center' style={{width: 300}}>登录名</TableCell>
-                  <TableCell align='center' style={{width: 300}}>密码</TableCell>
-                  <TableCell align='center' style={{width: 300}}>操作</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {medicalStaffList
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((medicalStaff) => (
-                    <StyledTableRow key={medicalStaff.id}>
-                      <TableCell align='center'>{medicalStaff.fullName}</TableCell>
-                      <TableCell align='center'>{medicalStaff.username}</TableCell>
-                      <TableCell align='center'>
-                        {passwordsVisibility[medicalStaff.id] ? (
+            <TableContainer sx={{ maxHeight: 620}}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align='center' style={{width: 300}}>名字</TableCell>
+                    <TableCell align='center' style={{width: 300}}>登录名</TableCell>
+                    <TableCell align='center' style={{width: 300}}>密码</TableCell>
+                    <TableCell align='center' style={{width: 300}}>操作</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {medicalStaffList
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((medicalStaff) => (
+                      <StyledTableRow key={medicalStaff.id}>
+                        <TableCell align='center'>{medicalStaff.fullName}</TableCell>
+                        <TableCell align='center'>{medicalStaff.username}</TableCell>
+                        <TableCell align='center'>
+                          {passwordsVisibility[medicalStaff.id] ? (
                             medicalStaff.password
-                        ) : (
+                          ) : (
                             '*****   '
-                        )}
-                        <IconButton
+                          )}
+                          <IconButton
                             onClick={() => handleTogglePasswordVisibility(medicalStaff.id)}
                             size='small'
-                        >
-                          {passwordsVisibility[medicalStaff.id] ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <Tooltip title="修改信息">
-                          <IconButton
+                          >
+                            {passwordsVisibility[medicalStaff.id] ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                          </IconButton>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Tooltip title="修改信息">
+                            <IconButton
                               aria-label="edit"
                               color="primary"
                               onClick={() => handleEditRowOpen(medicalStaff.id)}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
 
-                        <Tooltip title="删除">
-                          <IconButton
+                          <Tooltip title="删除">
+                            <IconButton
                               aria-label="delete"
                               onClick={() => handleDeleteMedicalStaff(medicalStaff)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </StyledTableRow>
-                  ))}
-              </TableBody>
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </StyledTableRow>
+                    ))}
+                </TableBody>
               </Table>
-          </TableContainer>
-          <TablePagination
-            labelRowsPerPage="每页行数:"
-            nextIconButtonProps={{
-              'aria-label': '下一页',
-              'title': '下一页'
-            }}
-            backIconButtonProps={{
-              'aria-label': '上一页',
-              'title': '上一页'
-            }}
-            labelDisplayedRows={({from, to, count}) => `${from}-${to} 共 ${count}`}
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={medicalStaffList.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}/>
-        </Paper>
+            </TableContainer>
+            <TablePagination
+              labelRowsPerPage="每页行数:"
+              nextIconButtonProps={{
+                'aria-label': '下一页',
+                'title': '下一页'
+              }}
+              backIconButtonProps={{
+                'aria-label': '上一页',
+                'title': '上一页'
+              }}
+              labelDisplayedRows={({from, to, count}) => `${from}-${to} 共 ${count}`}
+              rowsPerPageOptions={[10, 25, 100]}
+              component="div"
+              count={medicalStaffList.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}/>
+            </Box>
+          </Paper>
       </Container>
 
       <DeleteConfirmationDialog

@@ -132,7 +132,7 @@ export default function EquipmentManagement() {
     }
 
   return (
-    <Container>
+    <Container sx={{marginBottom:5 }}>
         <Title>数据汇总</Title>
         <Grid container spacing={3}>
             <Grid item xs={4} md={4}>
@@ -301,7 +301,7 @@ export default function EquipmentManagement() {
             </Grid>
 
             <Grid item xs={4} md={4}>
-                <Card sx={{ maxWidth: 345 }}>
+                <Card sx={{ maxWidth: 345, marginBottom:5 }}>
                     <CardMedia
                         sx={{ height: 140 }}
                         image="/images/system.jpg"
@@ -323,7 +323,7 @@ export default function EquipmentManagement() {
             </Grid>
 
             <Grid item xs={4} md={4}>
-                <Card sx={{ maxWidth: 345 }}>
+                <Card sx={{ maxWidth: 345, marginBottom:5 }}>
                     <CardMedia
                         sx={{ height: 140 }}
                         image="/images/help.jpg"

@@ -1,11 +1,13 @@
+"use client";
+// ** MUI Imports
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
+import TableCell, {tableCellClasses, TableCellProps} from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import TableRow, {TableRowProps} from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -54,7 +56,7 @@ import {GetDefaultPrescription} from "@/utils/mct-utils";
 import { useForm } from 'react-hook-form';
 import {useSnackbar} from "notistack";
 import Typography from "@mui/material/Typography";
-import {string} from "postcss-selector-parser";
+
 
 interface IFormInput {
   mode: string;
