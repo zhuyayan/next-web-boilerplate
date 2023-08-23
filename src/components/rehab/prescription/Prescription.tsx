@@ -35,7 +35,7 @@ import {
   Prescription,
   sendPrescriptionToEquipment
 } from "@/redux/features/rehab/rehab-slice";
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
@@ -57,6 +57,19 @@ import {GetDefaultPrescription} from "@/utils/mct-utils";
 import { useForm } from 'react-hook-form';
 import {useSnackbar} from "notistack";
 import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import { createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
+import { green } from '@mui/material/colors';
+
+const theme = createTheme({
+  palette: {
+    success: {
+      main: '#81c784',
+      contrastText: '#ffffff',
+    },
+  },
+});
 
 
 interface IFormInput {
@@ -134,7 +147,7 @@ const columns: readonly Column[] = [
     id: 'times',
     label: '进度',
     minWidth: 110,
-    align: 'right',
+    align: 'center',
   },
   {
     id: 'action',
@@ -381,6 +394,12 @@ export default function StickyHeadTable(params: {PId:string,
     setOpenEvaluate(false);
   };
 
+  //跳转
+  const handleClickMove = () => {
+    const targetElement = document.getElementById('target-element');
+    targetElement?.scrollIntoView({ behavior: 'smooth'});
+  };
+
   return (<>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer>
@@ -428,20 +447,22 @@ export default function StickyHeadTable(params: {PId:string,
                     <TableCell align='right'>{row.zz}</TableCell>
                     <TableCell align='right'>{row.u}</TableCell>
                     <TableCell align='right'>{row.v}</TableCell>
-                    <TableCell align='center'>
-                      {
-                        (() => {
-                          let label = row.u + '/' + row.v;
-                          let color = 'success';
-                          if (row.u == row.v) {
-                            color = 'success';
-                          } else if (row.u < row.v) {
-                            color = 'primary';
-                          }
-                          return <MCTFixedWidthChip label={label} color={color} />;
-                        })()
-                      }
-                    </TableCell>
+                    <ThemeProvider theme={theme}>
+                      <TableCell align='right'>
+                        {
+                          (() => {
+                            let label = row.u + ' / ' + row.v;
+                            let color = 'success';
+                            if (row.u == row.v) {
+                              color = 'success';
+                            } else if (row.u < row.v) {
+                              color = 'primary';
+                            }
+                            return <MCTFixedWidthChip label={label} color={color} />;
+                          })()
+                        }
+                      </TableCell>
+                    </ThemeProvider>
                     <TableCell align='center'>
                       {/*<ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>*/}
                       {/*  <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>*/}
@@ -507,7 +528,7 @@ export default function StickyHeadTable(params: {PId:string,
                                 <Button color="secondary" onClick={handleClickOpenEvaluate}>查看评价</Button>
                               </TableCell>
                               <TableCell align="center">
-                                <Button color="secondary" >查看直方图</Button>
+                                <Button color="secondary" onClick={handleClickMove} >查看直方图</Button>
                               </TableCell>
                             </TableRow>
                         </TableBody>
@@ -577,37 +598,96 @@ export default function StickyHeadTable(params: {PId:string,
         <DialogTitle>{"医生评价"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="Evaluate">
-            <Table sx={{ minWidth: 700 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>耐受程度</TableCell>
-                  <TableCell align="right">运动评价</TableCell>
-                  <TableCell align="right">痉挛评价</TableCell>
-                  <TableCell align="right">肌张力</TableCell>
-                  <TableCell align="right">急性期情况</TableCell>
-                  <TableCell align="right">神经科判断</TableCell>
-                  <TableCell align="right">运动损伤度</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {evaluateData.map((row) => (
-                  <TableRow
-                    key={row.tolerance}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {row.tolerance}
-                    </TableCell>
-                    <TableCell align="right">{row.sportsEvaluation}</TableCell>
-                    <TableCell align="right">{row.spasmEvaluation}</TableCell>
-                    <TableCell align="right">{row.muscularTension}</TableCell>
-                    <TableCell align="right">{row.acutePhase}</TableCell>
-                    <TableCell align="right">{row.neurological}</TableCell>
-                    <TableCell align="right">{row.sportsInjury}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {evaluateData.map((row, index) => (
+                <Grid container spacing={0} key={index}>
+                  <Grid item xs={6}>
+                    <Box sx={{padding: '8px' }}>
+                      <Grid container spacing={0} alignItems="center">
+                        <label htmlFor="input9">耐受程度: {row.tolerance.toFixed(1)}</label>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{padding: '8px' }}>
+                      <Grid container spacing={0} alignItems="center">
+                        <label htmlFor="input10">运动评价: {row.sportsEvaluation.toFixed(1)}</label>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{padding: '8px' }}>
+                      <Grid container spacing={0} alignItems="center">
+                        <label htmlFor="input11">痉挛评价: {row.spasmEvaluation.toFixed(1)}</label>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{padding: '8px' }}>
+                      <Grid container spacing={0} alignItems="center">
+                        <label htmlFor="input11">肌张力: {row.muscularTension.toFixed(1)}</label>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{padding: '8px' }}>
+                      <Grid container spacing={0} alignItems="center">
+                        <label htmlFor="input11">急性期情况: {row.acutePhase.toFixed(1)}</label>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{padding: '8px' }}>
+                      <Grid container spacing={0} alignItems="center">
+                        <label htmlFor="input11">神经科判断: {row.neurological.toFixed(1)}</label>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{padding: '8px' }}>
+                      <Grid container spacing={0} alignItems="center">
+                        <label htmlFor="input11">运动损伤度: {row.sportsInjury.toFixed(1)}</label>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{padding: '8px' }}>
+
+                    </Box>
+                  </Grid>
+                </Grid>
+            ))}
+
+            {/*<Table sx={{ minWidth: 700 }}>*/}
+            {/*  <TableHead>*/}
+            {/*    <TableRow>*/}
+            {/*      <TableCell>耐受程度</TableCell>*/}
+            {/*      <TableCell align="right">运动评价</TableCell>*/}
+            {/*      <TableCell align="right">痉挛评价</TableCell>*/}
+            {/*      <TableCell align="right">肌张力</TableCell>*/}
+            {/*      <TableCell align="right">急性期情况</TableCell>*/}
+            {/*      <TableCell align="right">神经科判断</TableCell>*/}
+            {/*      <TableCell align="right">运动损伤度</TableCell>*/}
+            {/*    </TableRow>*/}
+            {/*  </TableHead>*/}
+            {/*  <TableBody>*/}
+            {/*    {evaluateData.map((row) => (*/}
+            {/*      <TableRow*/}
+            {/*        key={row.tolerance}*/}
+            {/*        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}*/}
+            {/*      >*/}
+            {/*        <TableCell component="th" scope="row">*/}
+            {/*          {row.tolerance}*/}
+            {/*        </TableCell>*/}
+            {/*        <TableCell align="right">{row.sportsEvaluation}</TableCell>*/}
+            {/*        <TableCell align="right">{row.spasmEvaluation}</TableCell>*/}
+            {/*        <TableCell align="right">{row.muscularTension}</TableCell>*/}
+            {/*        <TableCell align="right">{row.acutePhase}</TableCell>*/}
+            {/*        <TableCell align="right">{row.neurological}</TableCell>*/}
+            {/*        <TableCell align="right">{row.sportsInjury}</TableCell>*/}
+            {/*      </TableRow>*/}
+            {/*    ))}*/}
+            {/*  </TableBody>*/}
+            {/*</Table>*/}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

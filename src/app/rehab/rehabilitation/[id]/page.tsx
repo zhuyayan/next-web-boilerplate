@@ -582,9 +582,10 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 </Tooltip>
               </div>
 
+
               <Prescription PId={params.id} prescription={prescription} onlineEquipment={onlineData || []}/>
               <br/>
-              <Card>
+              <Card id="target-element">
                 <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
                 <CardContent>
                   <EChartsTest/>
@@ -759,15 +760,16 @@ export default function MUITable({ params }: { params: { id: string } }) {
           {/*</Grid>*/}
 
             {/*康复记录*/}
-          <Grid item xs={6} md={6.5}>
-            <Card sx={{ height: 365 ,padding: '10px'}}>
-              <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                <PrescriptionTable record={record} pid={params.id}/>
-              </Card>
-            </Grid>
+          {/*<Grid item xs={6} md={6.5}>*/}
+          {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
+          {/*    <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />*/}
+          {/*      <PrescriptionTable record={record} pid={params.id}/>*/}
+          {/*    </Card>*/}
+          {/*  </Grid>*/}
         </Grid>
           <br/>
         </Box>
+        <br/>
       </Container>
 
       <Dialog open={open} onClose={handleClose}>
