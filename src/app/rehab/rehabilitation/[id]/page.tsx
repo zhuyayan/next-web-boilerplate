@@ -539,7 +539,11 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       </Grid>
                       <Grid item xs={3}>
                         <Box sx={{padding: '8px' }}>
-                          <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveTarget}>保存指标</Button>
+                          <Button
+                              style={{float: 'right'}}
+                              variant="outlined"
+                              size="small"
+                              onClick={handleSaveTarget}>保存指标</Button>
                         </Box>
                       </Grid>
                     </Grid>
@@ -559,7 +563,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
                   条处方)
                 </Typography>
-                <Tooltip title="添加处方">
+                <Tooltip title="新建处方">
                   <IconButton
                       style={{float: 'right'}}
                       aria-label="add"
@@ -758,12 +762,12 @@ export default function MUITable({ params }: { params: { id: string } }) {
       </Container>
 
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>添加处方</DialogTitle>
+        <DialogTitle>新建处方</DialogTitle>
         <DialogContent>
           <DialogContentText style={{display:'inline-block'}}>
-            请正确填写处方各项信息
+            确保正确填写所有处方信息
           </DialogContentText>
-          <Typography variant='body2' style={{display:'inline-block', color: 'red' }} >（建议伸展定时值为弯曲定时值的 1.5 倍）</Typography>
+          <Typography variant='body2' style={{display:'inline-block', color: 'red' }} >（建议：伸展定时值=弯曲定时值的 1.5 倍）</Typography>
           <StyledDiv>
             <Box>
               <FormControl sx={{ m: 1, minWidth: 240 }} size="small">

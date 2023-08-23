@@ -11,7 +11,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import {
-  Box, Collapse,
+  Box, Chip, Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -131,6 +131,16 @@ const columns: readonly Column[] = [
   },
 ];
 
+const MCTFixedWidthChip = styled(Chip)`
+  width: 70px;  // 你可以调整这里的宽度值
+  @media (min-width: 600px) {  // 中屏幕，例如：平板
+    width: 60px;
+  }
+
+  @media (min-width: 960px) {  // 大屏幕，例如：桌面
+    width: 70px;
+  }
+`;
 
 export default function StickyHeadTable(params: {PId:string,
   prescription:Prescription[],
@@ -404,7 +414,20 @@ export default function StickyHeadTable(params: {PId:string,
                     <TableCell align='right'>{row.zz}</TableCell>
                     <TableCell align='right'>{row.u}</TableCell>
                     <TableCell align='right'>{row.v}</TableCell>
-                    <TableCell align='center'>{row.u} / {row.v}</TableCell>
+                    <TableCell align='center'>
+                      {
+                        (() => {
+                          let label = row.u + '/' + row.v;
+                          let color = 'success';
+                          if (row.u == row.v) {
+                            color = 'success';
+                          } else if (row.u < row.v) {
+                            color = 'primary';
+                          }
+                          return <MCTFixedWidthChip label={label} color={color} />;
+                        })()
+                      }
+                    </TableCell>
                     <TableCell align='center'>
                       {/*<ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>*/}
                       {/*  <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>*/}
@@ -631,7 +654,7 @@ export default function StickyHeadTable(params: {PId:string,
           PaperProps={{ elevation: 0 }}>
         <DialogTitle>修改处方</DialogTitle>
         <DialogContent>
-          <Typography variant='body2' style={{display:'inline-block', color: 'red' }} >（建议伸展定时值为弯曲定时值的 1.5 倍）</Typography>
+          <Typography variant='body2' style={{display:'inline-block', color: 'red' }} >（建议：伸展定时值为弯曲定时值的 1.5 倍）</Typography>
           <StyledDiv>
             <Box>
                 <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
