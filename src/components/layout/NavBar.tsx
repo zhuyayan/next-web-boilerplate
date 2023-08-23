@@ -37,6 +37,7 @@ import DashboardIcon from "@/icons/svg-components/DashboardSvg";
 import {IconMapping} from "@/utils/icon-map";
 import {fontSize} from "@mui/system";
 import {useRouter, usePathname} from "next/navigation";
+import { Grid }from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -364,51 +365,55 @@ export default function NavBar() {
               </Popover>
             </Box>
 
-              <Box sx={{ flexGrow: 0 }} style={{marginRight:6}}>
-                  <Tooltip title="全屏显示">
-                      <IconButton
-                          aria-label="screenfull"
-                          onClick={fullScreen}
-                      >
-                          {isFullscreen ? <FullscreenExitIcon style={{ color: '#fafafa', fontSize: 48}} /> : <FullscreenIcon style={{ color: '#fafafa', fontSize: 48 }} />}
-                      </IconButton>
-                  </Tooltip>
-              </Box>
+              <Grid container justifyContent="flex-end" alignItems="center">
+                  <Box sx={{ flexGrow: 0 }} style={{marginRight:6}}>
+                      <Tooltip title="全屏显示">
+                          <IconButton
+                              aria-label="screenfull"
+                              onClick={fullScreen}
+                          >
+                              {isFullscreen ? <FullscreenExitIcon style={{ color: '#fafafa', fontSize: 48}} /> : <FullscreenIcon style={{ color: '#fafafa', fontSize: 48 }} />}
+                          </IconButton>
+                      </Tooltip>
+                  </Box>
 
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="设置">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  {/*<Avatar alt="Remy Sharp" src="/images/logo/灼远logo.jpg" sx={{ width: 150, height: 60, borderRadius: '8px' }}/>*/}
-                  <Avatar alt="Remy Sharp" src="/images/logo/灼远logo.jpg" sx={{marginRight:2}}/>
-                  <Avatar alt="Remy Sharp" src="/images/logo/MCTlogo.png" />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-              >
-                {/*{settings.map((setting) => (*/}
-                {/*    <MenuItem key={setting} onClick={handleCloseUserMenu}>*/}
-                {/*      <Typography textAlign="center">{setting}</Typography>*/}
-                {/*    </MenuItem>*/}
-                {/*))}*/}
-                  <MenuItem key="Logout" onClick={handleLogout}>
-                      <Typography textAlign="center">退出</Typography>
-                  </MenuItem>
-              </Menu>
-            </Box>
+                  <Box sx={{ flexGrow: 0 }}>
+                      <Tooltip title="设置">
+                          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                              {/*<Avatar alt="Remy Sharp" src="/images/logo/灼远logo.jpg" sx={{ width: 150, height: 60, borderRadius: '8px' }}/>*/}
+                              <Avatar alt="Remy Sharp" src="/images/logo/灼远logo.jpg" sx={{marginRight:2}}/>
+                              <Avatar alt="Remy Sharp" src="/images/logo/MCTlogo.png" />
+                          </IconButton>
+                      </Tooltip>
+                      <Menu
+                          sx={{ mt: '45px' }}
+                          id="menu-appbar"
+                          anchorEl={anchorElUser}
+                          anchorOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right',
+                          }}
+                          keepMounted
+                          transformOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right',
+                          }}
+                          open={Boolean(anchorElUser)}
+                          onClose={handleCloseUserMenu}
+                      >
+                          {/*{settings.map((setting) => (*/}
+                          {/*    <MenuItem key={setting} onClick={handleCloseUserMenu}>*/}
+                          {/*      <Typography textAlign="center">{setting}</Typography>*/}
+                          {/*    </MenuItem>*/}
+                          {/*))}*/}
+                          <MenuItem key="Logout" onClick={handleLogout}>
+                              <Typography textAlign="center">退出</Typography>
+                          </MenuItem>
+                      </Menu>
+                  </Box>
+              </Grid>
+
+
 
           </Toolbar>
         </Container>

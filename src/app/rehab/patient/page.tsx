@@ -376,9 +376,8 @@ export default function PatientList() {
             {/*</Box>*/}
           </Stack>
         </Box>
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          </Box>
+        <Paper sx={{ width: '100%', overflow: 'hidden'}}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom:5 }}>
           <TableContainer sx={{ maxHeight: 620}}>
             <Table>
               <TableHead>
@@ -473,7 +472,9 @@ export default function PatientList() {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}/>
           </Box>
+          </Box>
         </Paper>
+
         <DeleteConfirmationDialog
           open={openDelPatient}
           onClose={handleCloseDel}

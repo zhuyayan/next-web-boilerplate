@@ -112,7 +112,7 @@ export default function ConfigManagement() {
   return (
     <Container>
       <Title>配置管理</Title>
-      <Card>
+      <Card sx={{ marginBottom:5 }}>
         <CardContent>
             <Grid container spacing={5}>
               <Grid item xs={12}>

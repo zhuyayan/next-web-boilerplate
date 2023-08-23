@@ -255,26 +255,34 @@ export default function MUITable({ params }: { params: { id: string } }) {
   return (
     <>
       <Container>
-        <Grid container spacing={8}>
-          <Grid item xs={12} md={12}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Title>康复管理</Title>
-              <Tooltip title="返回病人列表">
-                <Link href={`/rehab/patient`} passHref>
-                  <IconButton
-                      style={{ marginLeft: 'auto' }}
-                      aria-label="back"
-                      color="primary"
-                  >
-                    <AssignmentReturnIcon fontSize="medium" />
-                  </IconButton>
-                </Link>
-              </Tooltip>
-              <br />
+        <Box sx={{marginBottom:5}}>
+          <Grid container spacing={8}>
+            <Grid item xs={12} md={12}>
+              <div >
+
+                <Grid container alignItems="center">
+                  <Grid item xs={6}>
+                    <Title >康复管理</Title>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Grid container justifyContent="flex-end">
+                      <Tooltip title="返回病人列表">
+                        <Link href={`/rehab/patient`} passHref>
+                          <IconButton
+                              aria-label="back"
+                              color="primary"
+                          >
+                            <AssignmentReturnIcon fontSize="medium" />
+                          </IconButton>
+                        </Link>
+                      </Tooltip>
+                    </Grid>
+                  </Grid>
+                </Grid>
             </div>
           </Grid>
         </Grid>
-        <Grid container spacing={2}>
+          <Grid container spacing={2}>
           <Grid container item xs={6} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
                 {/*病人card*/}
@@ -751,14 +759,15 @@ export default function MUITable({ params }: { params: { id: string } }) {
           {/*</Grid>*/}
 
             {/*康复记录*/}
-          {/*<Grid item xs={6} md={6.5}>*/}
-          {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
-          {/*    <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />*/}
-          {/*      <PrescriptionTable record={record} pid={params.id}/>*/}
-          {/*    </Card>*/}
-          {/*  </Grid>*/}
+          <Grid item xs={6} md={6.5}>
+            <Card sx={{ height: 365 ,padding: '10px'}}>
+              <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
+                <PrescriptionTable record={record} pid={params.id}/>
+              </Card>
+            </Grid>
         </Grid>
-        <br/>
+          <br/>
+        </Box>
       </Container>
 
       <Dialog open={open} onClose={handleClose}>

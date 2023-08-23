@@ -1,11 +1,14 @@
+"use client";
+// ** MUI Imports
 import * as React from 'react';
+import { styled as muiStyled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import TableRow, {TableRowProps} from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -54,7 +57,7 @@ import {GetDefaultPrescription} from "@/utils/mct-utils";
 import { useForm } from 'react-hook-form';
 import {useSnackbar} from "notistack";
 import Typography from "@mui/material/Typography";
-import {string} from "postcss-selector-parser";
+
 
 interface IFormInput {
   mode: string;
@@ -69,6 +72,16 @@ const StyledDiv = styled.div`
   gap: 10px;
   margin-top: 20px;
 `;
+
+const StyledTableRow = muiStyled(TableRow)<TableRowProps>(({ theme }) => ({
+  '&:nth-of-type(4n-3)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  '&:last-of-type td, &:last-of-type th': {
+    border: 0
+  }
+}))
 
 interface Column {
   id: 'Keyboard' |'time' | 'pattern' | 'part' | 'count' | 'bendingTimeValue' | 'stretchTimeValue' | 'times' | 'action';
@@ -388,14 +401,15 @@ export default function StickyHeadTable(params: {PId:string,
             <TableBody>
               {params.prescription.map(row => (
                 <React.Fragment key={row.id}>
-                  <TableRow
+                  <StyledTableRow
+
                       style={{height:'30px'}}
                       onClick={() => handleRowClick(row.id)}
-                      sx={{
-                        '&:last-of-type td, &:last-of-type th': {
-                          border: 0
-                        },
-                      }}
+                      // sx={{
+                      //   '&:last-of-type td, &:last-of-type th': {
+                      //     border: 0
+                      //   },
+                      // }}
                   >
                     <TableCell>
                       <IconButton
@@ -464,8 +478,8 @@ export default function StickyHeadTable(params: {PId:string,
                         </IconButton>
                       </Tooltip>
                     </TableCell>
-                  </TableRow>
-                <TableRow>
+                  </StyledTableRow>
+                <StyledTableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
                   <Collapse in={openRecord[row.id]} timeout="auto" unmountOnExit>
                     <Box sx={{ margin: 1,backgroundColor: 'rgba(177,197,238,0.78)',paddingLeft:3,marginLeft:2}}>
@@ -501,7 +515,7 @@ export default function StickyHeadTable(params: {PId:string,
                     </Box>
                   </Collapse>
                 </TableCell>
-              </TableRow>
+              </StyledTableRow>
                 </React.Fragment>
                 ))}
             </TableBody>
