@@ -27,6 +27,16 @@ export interface MedicalStaff {
   fullName: string;
 }
 
+export interface Status {
+  pid: number;
+  onset_time : string;
+  medication : string;
+  spasm_status : string;
+  min_heart_rate : number;
+  max_heart_rate : number;
+  avg_heart_rate : number;
+}
+
 export interface Patient {
   id: number;
   name: string;
@@ -90,6 +100,7 @@ export interface EvaluateFormProps {
 // export interface  systemInformation
 
 let staffs: MedicalStaff[] = []
+let status: Status[] = []
 let patients: Patient[] = []
 let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
@@ -124,6 +135,7 @@ let patient: Patient = {
 
 interface RehabState {
   staff: MedicalStaff[]
+  status: Status[]
   patient: Patient[]
   activePatient: Patient[]
   rehabPatient: Patient
@@ -138,6 +150,7 @@ interface RehabState {
 
 const initialState: RehabState = {
   staff: staffs,
+  status: status,
   patient: patients,
   activePatient: [],
   rehabPatient: patient,
@@ -353,6 +366,17 @@ function convertAPIStaffToMedicalStaff(apiStaff: any): MedicalStaff {
     fullName: apiStaff.name,
   };
 }
+function convertAPIStatusToStatus(apiStatus: any): Status {
+  return {
+    pid:apiStatus.pid,
+    onset_time : apiStatus.onset_time,
+    medication : apiStatus.medication,
+    spasm_status : apiStatus.spasm_status,
+    min_heart_rate : apiStatus.min_heart_rate,
+    max_heart_rate : apiStatus.max_heart_rate,
+    avg_heart_rate : apiStatus.avg_heart_rate,
+  };
+}
 
 function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescription {
   return {
@@ -413,11 +437,6 @@ export const activePatients = createAsyncThunk<Patient[],
   return response.data.data.patients.map(convertAPIPatientToPatient)
 });
 
-// export const fetchPatients = createAsyncThunk<Patient[], {page: number, size: number, id: number}, {}>('fetchPatients', async ({page, size, id}):Promise<any> => {
-//   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('patient', {params:{ page, size, id}});
-//   console.log("fetch patient async thunk: ", response.data.data.patients)
-//   return response.data.data.patients.map(convertAPIPatientToPatient)
-// });
 
 // 查找病人
 export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fetchPatientById', async ({ id}):Promise<any> => {
@@ -484,6 +503,20 @@ export const deleteStaff = createAsyncThunk<{ id: number }, { id: number }, {}>(
   console.log("delete staff async thunk: ", response.data)
   return {id: id}
 });
+
+// 添加指标
+export const addStatus = createAsyncThunk<Status, { onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
+  console.log("add status async thunk: ", response.data.data.status[0])
+  return convertAPIStatusToStatus(response.data.data.status[0])
+});
+
+// 添加评价
+// export const addEvaluation = createAsyncThunk<Status, { onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
+//   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/evaluation',{onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
+//   console.log("add evaluation async thunk: ", response.data.data.evaluation[0])
+//   return convertAPIStatusToStatus(response.data.data.evaluation[0])
+// });
 
 export const addPrescription = createAsyncThunk<Prescription, { pid: number, x: number, y: number , zz: number, u: number, v: number},
     {}>('addPrescription', async ({pid, x, y , zz, u, v}, thunkAPI):Promise<any> => {
@@ -699,6 +732,10 @@ const RehabSlice = createSlice({
           state.staff.unshift(action.payload)
           console.log("add_staff_action", action.payload)
         })
+      .addCase(addStatus.fulfilled,(state, action) => {
+        state.status.unshift(action.payload)
+        console.log("add_status_action", action.payload)
+      })
         .addCase(editStaff.fulfilled, (state, action) => {
           let targetPatientIndex = state.staff.findIndex((s) => s.id === action.payload.id)
           if (targetPatientIndex !== -1) {

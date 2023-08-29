@@ -33,7 +33,7 @@ import {
   fetchPatientStatisticsById,
   fetchPrescriptionByPId,
   Prescription as PrescriptionEntity,
-  EvaluateFormProps, TargetFormProps, AddPrescriptionItem
+  EvaluateFormProps, TargetFormProps, AddPrescriptionItem, Status, addStatus
 } from "@/redux/features/rehab/rehab-slice";
 import {
   addPrescription,
@@ -57,6 +57,22 @@ import {ThunkDispatch} from "redux-thunk";
 import CardMedia from "@mui/material/CardMedia";
 import Link from "next/link";
 import {useForm} from "react-hook-form";
+
+import dayjs, { Dayjs } from 'dayjs';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+
+const lastMonday = dayjs().startOf('week');
+const nextSunday = dayjs().endOf('week').startOf('day');
+
+const isWeekend = (date: Dayjs) => {
+  const day = date.day();
+
+  return day === 0 || day === 6;
+};
 
 const StyledDiv = styled.div`
   display: flex;
@@ -115,6 +131,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const handleSaveTarget = () => {
     onSaveTarget(targetFormData);
   };
+
+  const [openAddStatus, setOpenAddStatus] = React.useState(false);
 
   // 医生评价表单
   const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
@@ -264,6 +282,30 @@ export default function MUITable({ params }: { params: { id: string } }) {
     }))
   };
 
+  const [willAddStatus, setWillAddStatus] = React.useState<Status>({
+    pid:0,
+    onset_time : "",
+    medication : "",
+    spasm_status : "",
+    min_heart_rate : 0,
+    max_heart_rate : 0,
+    avg_heart_rate : 0,
+  })
+
+  const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    console.log(id, value)
+    setWillAddStatus((prevInputValues) => ({
+      ...prevInputValues,
+      [id]: value,
+    }))
+  };
+
+  const handleSaveAddStatus = () => {
+    thunkDispatch(addStatus({onset_time: willAddStatus.onset_time, medication: willAddStatus.medication, spasm_status: willAddStatus.spasm_status , min_heart_rate:willAddStatus.min_heart_rate,max_heart_rate:willAddStatus.max_heart_rate,avg_heart_rate:willAddStatus.avg_heart_rate }))
+    setOpenAddStatus(false)
+  };
+
   return (
     <>
       <Container>
@@ -295,7 +337,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
           </Grid>
         </Grid>
           <Grid container spacing={2}>
-          <Grid container item xs={6} md={12} spacing={2}>
+          <Grid container item xs={12} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
                 {/*病人card*/}
                 <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 150}} >
@@ -422,7 +464,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
             </Grid>
 
           {/*直方图*/}
-          <Grid item xs={6} md={12}>
+          <Grid item xs={12} md={12}>
             <Card sx={{ padding: '10px'}}>
               <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
               <CardContent>
@@ -433,7 +475,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
           <br/>
 
             {/*处方*/}
-          <Grid item xs={6} md={12}>
+          <Grid item xs={12} md={12}>
             <Card sx={{ padding: '10px' }}>
               <Card>
                 <CardContent>
@@ -442,21 +484,40 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   </div>
                   <br/>
                   <Typography variant="h6">病人各项指标</Typography>
-                  <Grid container spacing={0}>
-                      <Grid item xs={3}>
+                    <Grid container spacing={0}>
+                      <Grid item xs={4.5}>
                         <Box sx={{padding: '8px' }}>
                           <Grid container spacing={0} alignItems="center">
-                            <Grid item xs={4}>
+                            <Grid item xs={3}>
                               <label htmlFor="input9">发病时间:</label>
                             </Grid>
-                            <Grid item xs={8}>
-                              <TextField
-                                name="onsetTime"
-                                value={targetFormData.onsetTime}
-                                onChange={handleTargetFormChange}
-                                size="small"
-                                fullWidth
-                              />
+                            <Grid item xs={9}>
+                              <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
+                                <DateTimePicker
+                                  id="onset_time"
+                                  value={willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null}
+                                  onChange={(newValue) => {
+                                    // newValue is the selected date and time object
+                                    const formattedDate = newValue.format('YYYY-MM-DD HH:mm:ss');
+                                    setWillAddStatus((prevStatus) => ({
+                                      ...prevStatus,
+                                      onset_time: formattedDate,
+                                    }));
+                                  }}
+                                  defaultValue={nextSunday}
+                                  shouldDisableDate={isWeekend}
+                                  views={['year', 'month', 'day', 'hours', 'minutes']}
+                                  size="small"
+                                  fullWidth
+                                />
+                              </LocalizationProvider>
+                              {/*<TextField*/}
+                              {/*  id="onset_time"*/}
+                              {/*  value={willAddStatus.onset_time}*/}
+                              {/*  onChange={handleAddStatus}*/}
+                              {/*  size="small"*/}
+                              {/*  fullWidth*/}
+                              {/*/>*/}
                             </Grid>
                           </Grid>
                         </Box>
@@ -469,9 +530,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                             </Grid>
                             <Grid item xs={8}>
                               <TextField
-                                name="medication"
-                                value={targetFormData.medication}
-                                onChange={handleTargetFormChange}
+                                id="medication"
+                                value={willAddStatus.medication}
+                                onChange={handleAddStatus}
                                 size="small"
                                 fullWidth
                               />
@@ -487,9 +548,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                             </Grid>
                             <Grid item xs={8}>
                               <TextField
-                                name="spasmStatus"
-                                value={targetFormData.spasmStatus}
-                                onChange={handleTargetFormChange}
+                                id="spasm_status"
+                                value={willAddStatus.spasm_status}
+                                onChange={handleAddStatus}
                                 size="small"
                                 fullWidth
                               />
@@ -497,23 +558,22 @@ export default function MUITable({ params }: { params: { id: string } }) {
                           </Grid>
                         </Box>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid item xs={1.5}>
                         <Box sx={{padding: '8px' }}>
                         </Box>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid item xs={4.5}>
                         <Box sx={{padding: '8px' }}>
                           <Grid container spacing={0} alignItems="center">
-                            <Grid item xs={4}>
+                            <Grid item xs={3}>
                               <label htmlFor="input9">最小心率:</label>
                             </Grid>
-                            <Grid item xs={8}>
+                            <Grid item xs={9}>
                               <TextField
-                                name="minHeartRate"
-                                value={targetFormData.minHeartRate}
-                                onChange={handleTargetFormChange}
+                                id="min_heart_rate"
+                                value={willAddStatus.min_heart_rate}
+                                onChange={handleAddStatus}
                                 size="small"
-                                fullWidth
                               />
                             </Grid>
                           </Grid>
@@ -527,9 +587,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                             </Grid>
                             <Grid item xs={8}>
                               <TextField
-                                name="maxHeartRate"
-                                value={targetFormData.maxHeartRate}
-                                onChange={handleTargetFormChange}
+                                id="max_heart_rate"
+                                value={willAddStatus.max_heart_rate}
+                                onChange={handleAddStatus}
                                 size="small"
                                 fullWidth
                               />
@@ -545,9 +605,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                             </Grid>
                             <Grid item xs={8}>
                               <TextField
-                                name="avgHeartRate"
-                                value={targetFormData.avgHeartRate}
-                                onChange={handleTargetFormChange}
+                                id="avg_heart_rate"
+                                value={willAddStatus.avg_heart_rate}
+                                onChange={handleAddStatus}
                                 size="small"
                                 fullWidth
                               />
@@ -555,13 +615,13 @@ export default function MUITable({ params }: { params: { id: string } }) {
                           </Grid>
                         </Box>
                       </Grid>
-                      <Grid item xs={3}>
+                      <Grid item xs={1.5}>
                         <Box sx={{padding: '8px' }}>
                           <Button
                               style={{float: 'right'}}
                               variant="outlined"
                               size="small"
-                              onClick={handleSaveTarget}>保存指标</Button>
+                              onClick={handleSaveAddStatus}>保存指标</Button>
                         </Box>
                       </Grid>
                     </Grid>
@@ -591,9 +651,10 @@ export default function MUITable({ params }: { params: { id: string } }) {
                 </Tooltip>
               </div>
 
+
               <Prescription PId={params.id} prescription={prescription} onlineEquipment={onlineData || []}/>
               <br/>
-              <Card>
+              <Card id="target-element">
                 <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
                 <CardContent>
                   <EChartsTest/>
@@ -768,15 +829,16 @@ export default function MUITable({ params }: { params: { id: string } }) {
           {/*</Grid>*/}
 
             {/*康复记录*/}
-          <Grid item xs={6} md={6.5}>
-            <Card sx={{ height: 365 ,padding: '10px'}}>
-              <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                <PrescriptionTable record={record} pid={params.id}/>
-              </Card>
-            </Grid>
+          {/*<Grid item xs={6} md={6.5}>*/}
+          {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
+          {/*    <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />*/}
+          {/*      <PrescriptionTable record={record} pid={params.id}/>*/}
+          {/*    </Card>*/}
+          {/*  </Grid>*/}
         </Grid>
           <br/>
         </Box>
+        <br/>
       </Container>
 
       <Dialog open={open} onClose={handleClose}>
