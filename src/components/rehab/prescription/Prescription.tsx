@@ -30,10 +30,11 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 
 import {
+  addStaff, addStatus,
   editPrescription,
-  EquipmentOnline,
+  EquipmentOnline, MedicalStaff,
   Prescription,
-  sendPrescriptionToEquipment
+  sendPrescriptionToEquipment, Status
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -61,6 +62,7 @@ import Grid from "@mui/material/Grid";
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/material/styles';
 import { green } from '@mui/material/colors';
+import {string} from "postcss-selector-parser";
 
 const theme = createTheme({
   palette: {
@@ -176,7 +178,7 @@ export default function StickyHeadTable(params: {PId:string,
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
-  const [openIcon, setOpenIcon] = React.useState(false);
+
   const [openRecord, setOpenRecord] = React.useState<{ [key: number]: boolean }>(() => {
     const OpenState: { [key: number]: boolean } = {};
     if (params.prescription.length > 0) {
