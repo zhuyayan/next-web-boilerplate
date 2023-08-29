@@ -283,7 +283,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
           </Grid>
         </Grid>
           <Grid container spacing={2}>
-          <Grid container item xs={6} md={12} spacing={2}>
+          <Grid container item xs={12} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
                 {/*病人card*/}
                 <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 150}} >
@@ -410,7 +410,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
             </Grid>
 
           {/*直方图*/}
-          <Grid item xs={6} md={12}>
+          <Grid item xs={12} md={12}>
             <Card sx={{ padding: '10px'}}>
               <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
               <CardContent>
@@ -421,7 +421,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
           <br/>
 
             {/*处方*/}
-          <Grid item xs={6} md={12}>
+          <Grid item xs={12} md={12}>
             <Card sx={{ padding: '10px' }}>
               <Card>
                 <CardContent>
