@@ -262,8 +262,8 @@ export default function StickyHeadTable(params: {PId:string,
     handleCloseDel()
   };
   const handleClickDel = async (prescription: Prescription) => {
-    setPrescriptionToBeDeleted(prescription)
     setOpenDelPrescription(true);
+    setPrescriptionToBeDeleted(prescription)
   }
   const handleCloseDel= () => {
     setOpenDelPrescription(false);
@@ -485,7 +485,7 @@ export default function StickyHeadTable(params: {PId:string,
                         <IconButton
                             aria-label="edit"
                             color="secondary"
-                            onClick={(event) => {event.stopPropagation();handleClickModify(row)}}
+                            onClick={(event) => {event.stopPropagation(); handleClickModify(row)}}
                         >
                           <EditIcon fontSize="small" />
                         </IconButton>
@@ -495,7 +495,7 @@ export default function StickyHeadTable(params: {PId:string,
                         <IconButton
                             aria-label="delete"
                             // onClick={() => handleDeletePrescription(row.id)}
-                            onClick={() => handleClickDel(row)}
+                            onClick={(event) => {event.stopPropagation(); handleClickDel(row)}}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>

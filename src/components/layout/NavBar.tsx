@@ -418,7 +418,7 @@ export default function NavBar() {
           </Toolbar>
         </Container>
       </AppBar>
-        <Paper component="nav">
+        <Paper component="nav" style={{ height: '50px', display: 'flex', alignItems: 'center' }}>
           <Toolbar>
             <Stack direction="row" spacing={1}>
               {menus.map((page: RSMenuItem) => {
