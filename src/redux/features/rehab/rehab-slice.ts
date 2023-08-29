@@ -47,6 +47,16 @@ export interface Prescription {
   zz: number | string;
   u: number | string;
   v: number | string;
+  duration?: number | string;
+}
+
+export interface AddPrescriptionItem {
+  part: string;
+  mode: string;
+  zz: number | string;
+  u: number | string;
+  v: number | string;
+  duration?: number | string;
 }
 
 export interface PrescriptionRecord {

@@ -33,7 +33,7 @@ import {
   fetchPatientStatisticsById,
   fetchPrescriptionByPId,
   Prescription as PrescriptionEntity,
-  EvaluateFormProps, TargetFormProps
+  EvaluateFormProps, TargetFormProps, AddPrescriptionItem
 } from "@/redux/features/rehab/rehab-slice";
 import {
   addPrescription,
@@ -56,6 +56,7 @@ import { Title } from '@/components/rehab/styles';
 import {ThunkDispatch} from "redux-thunk";
 import CardMedia from "@mui/material/CardMedia";
 import Link from "next/link";
+import {useForm} from "react-hook-form";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -90,6 +91,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const [stretchError, setStretchError] = React.useState<string>('')
   const [trainMinus, setTrainMinus] = useState<string>('')
   const [trainDays, setTrainDays] = useState<number>(0)
+  const [trainDuration, setTrainDuration] = useState<number>(0)
   // 病人各项指标
   const [targetFormData, setTargetFormData] = React.useState<TargetFormProps>({
     onsetTime: '',
@@ -99,6 +101,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
     maxHeartRate: '',
     avgHeartRate: '',
   });
+
+  const { register: AddPrescriptionItemRegister, formState: { errors: AddPrescriptionItemErrors }, clearErrors: AddPrescriptionItemClearErrors, trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
 
   const handleTargetFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -133,7 +137,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
     onSaveEvaluate(evaluateFormData);
   };
 
-
   const [willAddPrescription, setWillAddPrescription] = React.useState<PrescriptionEntity>({
     history: [{amount: 3, customerId: "2023-08-01 17:10:01", date: "2023-08-01 17:09:14"}, {
       amount: 1,
@@ -146,7 +149,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
     mode: "0",
     zz: 3,
     u: 3,
-    v: 3
+    v: 3,
+    duration: 1,
   })
 
 
@@ -162,6 +166,14 @@ export default function MUITable({ params }: { params: { id: string } }) {
         [id]: parseInt(value),
       }))
     }
+  };
+
+  const handleAddPrescriptionDuration = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    setWillAddPrescription((prevInputValues) => ({
+      ...prevInputValues,
+      [id]: parseInt(value),
+    }))
   };
 
   const handleAddPrescriptionBend = (event: ChangeEvent<HTMLInputElement>) => {
@@ -430,8 +442,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   </div>
                   <br/>
                   <Typography variant="h6">病人各项指标</Typography>
-                  <form>
-                    <Grid container spacing={0}>
+                  <Grid container spacing={0}>
                       <Grid item xs={3}>
                         <Box sx={{padding: '8px' }}>
                           <Grid container spacing={0} alignItems="center">
@@ -488,7 +499,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       </Grid>
                       <Grid item xs={3}>
                         <Box sx={{padding: '8px' }}>
-
                         </Box>
                       </Grid>
                       <Grid item xs={3}>
@@ -555,7 +565,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
                         </Box>
                       </Grid>
                     </Grid>
-                  </form>
                   <br/>
                 </CardContent>
               </Card>
@@ -811,6 +820,30 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   <MenuItem value={5}>左踝</MenuItem>
                   <MenuItem value={6}>右踝</MenuItem>
                 </Select>
+              </FormControl>
+              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                <TextField
+                    {...AddPrescriptionItemRegister('duration', {
+                      required: '不能为空',
+                      validate: value => {
+                        if (typeof value === 'undefined') {
+                          return false;
+                        }
+                        if (typeof value === 'string') {
+                          const numberValue = parseFloat(value);
+                          return (!isNaN(numberValue) && numberValue >= 1) || '值须大于等于1';
+                        }
+                        return (!isNaN(value) && value >= 3) || '值须大于等于3';
+                      }
+                    })}
+                    value={willAddPrescription.duration}
+                    onChange={handleAddPrescriptionDuration}
+                    error={!!AddPrescriptionItemErrors.duration}
+                    helperText={AddPrescriptionItemErrors.duration?.message}
+                    inputProps={{ type: 'number', min: 1 }}
+                    sx={{ m: 1, minWidth: 160 }}
+                    id="duration"
+                    label="疗程" variant="outlined" size="small"/>
               </FormControl>
             </Box>
             <Box>

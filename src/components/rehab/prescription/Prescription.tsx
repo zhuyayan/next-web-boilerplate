@@ -431,14 +431,14 @@ export default function StickyHeadTable(params: {PId:string,
                     <TableCell align='center'>
                       {
                         (() => {
-                          let label = row.u + '/' + row.v;
+                          let label = row.u + ' / ' + row.v;
                           let color = 'success';
                           if (row.u == row.v) {
                             color = 'success';
                           } else if (row.u < row.v) {
                             color = 'primary';
                           }
-                          return <MCTFixedWidthChip label={label} color={color} />;
+                          return <MCTFixedWidthChip label={label} color={color}  />;
                         })()
                       }
                     </TableCell>

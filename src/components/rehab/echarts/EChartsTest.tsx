@@ -10,7 +10,7 @@ export const EChartsTest = React.memo(function EChartsTest(){
   // 2 类
   const yearCount = 2;
   // 10 天
-  const categoryCount = 10;
+  const categoryCount = 500;
 
   const xAxisData: string[] = [];
   const customData: number[][] = [];
