@@ -495,18 +495,18 @@ export const deleteStaff = createAsyncThunk<{ id: number }, { id: number }, {}>(
 });
 
 // 添加指标
-// export const addStatus = createAsyncThunk<Status, { onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
-//   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
-//   console.log("add status async thunk: ", response.data.data.status[0])
-//   return convertAPIStatusToStatus(response.data.data.status[0])
-// });
+export const addStatus = createAsyncThunk<Status, { onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
+  console.log("add status async thunk: ", response.data.data.status[0])
+  return convertAPIStatusToStatus(response.data.data.status[0])
+});
 
 // 添加评价
-export const addEvaluation = createAsyncThunk<Status, { onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/evaluation',{onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
-  console.log("add evaluation async thunk: ", response.data.data.evaluation[0])
-  return convertAPIStatusToStatus(response.data.data.evaluation[0])
-});
+// export const addEvaluation = createAsyncThunk<Status, { onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
+//   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/evaluation',{onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
+//   console.log("add evaluation async thunk: ", response.data.data.evaluation[0])
+//   return convertAPIStatusToStatus(response.data.data.evaluation[0])
+// });
 
 export const addPrescription = createAsyncThunk<Prescription, { pid: number, x: number, y: number , zz: number, u: number, v: number},
     {}>('addPrescription', async ({pid, x, y , zz, u, v}, thunkAPI):Promise<any> => {
