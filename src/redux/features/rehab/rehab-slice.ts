@@ -27,7 +27,7 @@ export interface MedicalStaff {
   fullName: string;
 }
 
-export interface Status {
+export interface PatientStatus {
   pid: number;
   onset_time : string;
   medication : string;
@@ -37,6 +37,16 @@ export interface Status {
   avg_heart_rate : number;
 }
 
+export interface RehabEvaluation {
+  RehabSessionID: number;
+  Tolerance:      string;
+  MotionReview:   string;
+  SpasmReview:    string;
+  MuscleTone:     string;
+  AcuteState:     string;
+  NeuroJudgment:  string;
+  MotionInjury:   string;
+}
 export interface Patient {
   id: number;
   name: string;
@@ -57,7 +67,8 @@ export interface Prescription {
   zz: number | string;
   u: number | string;
   v: number | string;
-  duration?: number | string;
+  duration?: number;
+  prescription_record?: PrescriptionRecord[];
 }
 
 export interface AddPrescriptionItem {
@@ -89,18 +100,18 @@ export interface TargetFormProps {
 
 export interface EvaluateFormProps {
   tolerance: string;
-  sportsEvaluation: string;
-  spasmEvaluation: string;
-  muscularTension: string;
-  acutePhase: string;
-  neurological: string;
-  sportsInjury: string;
+  motionReview: string;
+  spasmReview: string;
+  muscleTone: string;
+  acuteState: string;
+  neuroJudgment: string;
+  motionInjury: string;
 }
 
 // export interface  systemInformation
 
 let staffs: MedicalStaff[] = []
-let status: Status[] = []
+let status: PatientStatus[] = []
 let patients: Patient[] = []
 let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
@@ -135,7 +146,7 @@ let patient: Patient = {
 
 interface RehabState {
   staff: MedicalStaff[]
-  status: Status[]
+  patientStatus: PatientStatus[]
   patient: Patient[]
   activePatient: Patient[]
   rehabPatient: Patient
@@ -150,7 +161,7 @@ interface RehabState {
 
 const initialState: RehabState = {
   staff: staffs,
-  status: status,
+  patientStatus: status,
   patient: patients,
   activePatient: [],
   rehabPatient: patient,
@@ -366,7 +377,7 @@ function convertAPIStaffToMedicalStaff(apiStaff: any): MedicalStaff {
     fullName: apiStaff.name,
   };
 }
-function convertAPIStatusToStatus(apiStatus: any): Status {
+function convertAPIStatusToStatus(apiStatus: any): PatientStatus {
   return {
     pid:apiStatus.pid,
     onset_time : apiStatus.onset_time,
@@ -378,6 +389,18 @@ function convertAPIStatusToStatus(apiStatus: any): Status {
   };
 }
 
+function convertAPIEvaluationToEvaluation(apiEvaluation: any): RehabEvaluation {
+  return {
+    RehabSessionID: apiEvaluation.rehab_session_id,
+    Tolerance: apiEvaluation.tolerance,
+    MotionReview: apiEvaluation.motion_review,
+    SpasmReview: apiEvaluation.spasm_review,
+    MuscleTone: apiEvaluation.muscle_tone,
+    AcuteState: apiEvaluation.acute_state,
+    NeuroJudgment: apiEvaluation.neuro_judgment,
+    MotionInjury: apiEvaluation.motion_injury,
+  }
+}
 function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescription {
   return {
     id: apiPrescription.id,
@@ -385,8 +408,21 @@ function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescriptio
     part: BodyPartToNumMapping[apiPrescription.part],
     mode: ModeToNumMapping[apiPrescription.mode],
     zz: apiPrescription.zz,
-    u:apiPrescription.u,
-    v:apiPrescription.v,
+    u: apiPrescription.u,
+    v: apiPrescription.v,
+    duration: apiPrescription.duration,
+    prescription_record: apiPrescription.rehabilitation_tasks
+    ? apiPrescription.rehabilitation_tasks.map((t:any) => {
+      return {
+        id: t.id,
+        created_at: timeSampleFormat(t.created_at),
+        eid: t.eid,
+        pid: t.pid,
+        state: t.state,
+        updated_at: timeSampleFormat(t.updated_at)
+      }
+    })
+        : []
   }
 }
 
@@ -505,18 +541,28 @@ export const deleteStaff = createAsyncThunk<{ id: number }, { id: number }, {}>(
 });
 
 // 添加指标
-export const addStatus = createAsyncThunk<Status, { onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
+export const addStatus = createAsyncThunk<PatientStatus, {pid: number, onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({pid, onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{pid, onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
   console.log("add status async thunk: ", response.data.data.status[0])
   return convertAPIStatusToStatus(response.data.data.status[0])
 });
 
 // 添加评价
-// export const addEvaluation = createAsyncThunk<Status, { onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
-//   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/evaluation',{onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
-//   console.log("add evaluation async thunk: ", response.data.data.evaluation[0])
-//   return convertAPIStatusToStatus(response.data.data.evaluation[0])
-// });
+export const addEvaluation = createAsyncThunk<RehabEvaluation, {
+  pid: number,
+  rehab_session_id : number,
+  tolerance : string,
+  motion_review : string ,
+  spasm_review : string,
+  muscle_tone : string,
+  acute_state : string,
+  neuro_judgment : string,
+  motion_injury : string,
+}, {}>('addEvaluation', async ({pid , rehab_session_id , tolerance , motion_review , spasm_review , muscle_tone, acute_state, neuro_judgment, motion_injury}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/evaluation',{pid , rehab_session_id , tolerance , motion_review , spasm_review , muscle_tone, acute_state, neuro_judgment, motion_injury })
+  console.log("add evaluation async thunk: ", response.data.data.evaluation[0])
+  return convertAPIEvaluationToEvaluation(response.data.data.evaluation[0])
+});
 
 export const addPrescription = createAsyncThunk<Prescription, { pid: number, x: number, y: number , zz: number, u: number, v: number},
     {}>('addPrescription', async ({pid, x, y , zz, u, v}, thunkAPI):Promise<any> => {
@@ -733,7 +779,7 @@ const RehabSlice = createSlice({
           console.log("add_staff_action", action.payload)
         })
       .addCase(addStatus.fulfilled,(state, action) => {
-        state.status.unshift(action.payload)
+        state.patientStatus.unshift(action.payload)
         console.log("add_status_action", action.payload)
       })
         .addCase(editStaff.fulfilled, (state, action) => {

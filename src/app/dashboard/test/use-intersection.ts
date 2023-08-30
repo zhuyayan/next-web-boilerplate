@@ -27,7 +27,7 @@ export function useIntersection(props: Props): boolean {
       // 销毁
       intersectionObserver.disconnect();
     };
-  }, [el.current]);
+  }, [el, options]);
 
   return intersection;
 }

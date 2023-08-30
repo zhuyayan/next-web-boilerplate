@@ -9,9 +9,13 @@ const StyledFooter = styled.footer`
   bottom: 0;
   width: 100%;
 `;
-export default function Footer() {
+
+type FooterProps = {
+  style?: React.CSSProperties;
+};
+export default function Footer(props: FooterProps) {
     return (
-        <StyledFooter>
+        <StyledFooter style={props.style}>
             <p>上海鸣辰通健康科技有限公司</p>
         </StyledFooter>
     );

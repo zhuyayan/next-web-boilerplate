@@ -33,8 +33,8 @@ import {
   addStaff, addStatus,
   editPrescription,
   EquipmentOnline, MedicalStaff,
-  Prescription,
-  sendPrescriptionToEquipment, Status
+  Prescription, PrescriptionRecord,
+  sendPrescriptionToEquipment, PatientStatus
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -159,8 +159,9 @@ const columns: readonly Column[] = [
   },
 ];
 
-const MCTFixedWidthChip = styled(Chip)`
+const MCTFixedWidthChip = styled(Chip)<{color?: string}>`
   width: 70px;  // 你可以调整这里的宽度值
+  background-color: ${props => props.color || 'primary'};
   @media (min-width: 600px) {  // 中屏幕，例如：平板
     width: 60px;
   }
@@ -469,11 +470,11 @@ export default function StickyHeadTable(params: {PId:string,
                       <TableCell align='right'>
                         {
                           (() => {
-                            let label = row.u + ' / ' + row.v;
+                            let label = row.prescription_record?.length + ' / ' + row.duration;
                             let color = 'success';
-                            if (row.u == row.v) {
+                            if (row.prescription_record?.length == row.duration) {
                               color = 'success';
-                            } else if (row.u < row.v) {
+                            } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {
                               color = 'primary';
                             }
                             return <MCTFixedWidthChip label={label} color={color} />;
@@ -537,19 +538,23 @@ export default function StickyHeadTable(params: {PId:string,
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                            <TableRow>
-                              <TableCell>2023-07-13 17:45:35</TableCell>
-                              <TableCell>2023-07-13 17:55:35</TableCell>
-                              <TableCell align="center">
-                                <Button color="secondary" onClick={handleClickOpenTarget}>查看指标</Button>
-                              </TableCell>
-                              <TableCell align="center">
-                                <Button color="secondary" onClick={handleClickOpenEvaluate}>查看评价</Button>
-                              </TableCell>
-                              <TableCell align="center">
-                                <Button color="secondary" onClick={handleClickMove} >查看直方图</Button>
-                              </TableCell>
-                            </TableRow>
+                          {
+                            row.prescription_record?.map((historyRow: PrescriptionRecord) => (
+                                <TableRow key={historyRow.id}>
+                                  <TableCell>{historyRow.eid}</TableCell>
+                                  <TableCell>{historyRow.pid}</TableCell>
+                                  <TableCell align="center">
+                                    <Button color="secondary" onClick={handleClickOpenTarget}>查看指标</Button>
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <Button color="secondary" onClick={handleClickOpenEvaluate}>查看评价</Button>
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <Button color="secondary" onClick={handleClickMove} >查看直方图</Button>
+                                  </TableCell>
+                                </TableRow>
+                            ))
+                          }
                         </TableBody>
                       </Table>
                     </Box>

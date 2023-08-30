@@ -82,45 +82,45 @@ export default function NavBar() {
         });
   }, []);
 
-  function renderMenuItem(menu: RSMenuItem, depth = 0) {
-    const ComponentIcon = IconMapping[menu.icon];
-    const [openMenu, setOpenMenu] = useState(false);
-    if (menu.children && menu.children.length > 0) {
-
-      return (
-          <List key={menu.id} component="nav" disablePadding>
-            <ListItemButton onClick={() => setOpenMenu(!openMenu)}>
-              <ListItemIcon style={{ minWidth: 'unset' }}>
-                <ComponentIcon style={{ fontSize: 'large' }} />
-              </ListItemIcon>
-              <ListItemText primary={menu.name} />
-            </ListItemButton>
-
-            <Collapse in={openMenu} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {menu.children.map(child => renderMenuItem(child, depth + 1))}
-              </List>
-            </Collapse>
-          </List>
-      );
-    }
-
-    return (
-        <List key={menu.id} component="nav" disablePadding style={{ marginLeft: depth * 20 }}>
-          <Link href={menu.path} passHref>
-            <ListItemButton
-                selected={selectedMe === menu.name}
-                onClick={() => setSelectedPage(menu.name)}
-            >
-              <ListItemIcon style={{ minWidth: 'unset' }}>
-                <ComponentIcon style={{ fontSize: 'large' }} />
-              </ListItemIcon>
-              <ListItemText primary={menu.name} />
-            </ListItemButton>
-          </Link>
-        </List>
-    );
-  }
+  // function renderMenuItem(menu: RSMenuItem, depth = 0) {
+  //   const ComponentIcon = IconMapping[menu.icon];
+  //   const [openMenu, setOpenMenu] = useState(false);
+  //   if (menu.children && menu.children.length > 0) {
+  //
+  //     return (
+  //         <List key={menu.id} component="nav" disablePadding>
+  //           <ListItemButton onClick={() => setOpenMenu(!openMenu)}>
+  //             <ListItemIcon style={{ minWidth: 'unset' }}>
+  //               <ComponentIcon style={{ fontSize: 'large' }} />
+  //             </ListItemIcon>
+  //             <ListItemText primary={menu.name} />
+  //           </ListItemButton>
+  //
+  //           <Collapse in={openMenu} timeout="auto" unmountOnExit>
+  //             <List component="div" disablePadding>
+  //               {/*{menu.children.map(child => renderMenuItem(child, depth + 1))}*/}
+  //             </List>
+  //           </Collapse>
+  //         </List>
+  //     );
+  //   }
+  //
+  //   return (
+  //       <List key={menu.id} component="nav" disablePadding style={{ marginLeft: depth * 20 }}>
+  //         <Link href={menu.path} passHref>
+  //           <ListItemButton
+  //               selected={selectedMe === menu.name}
+  //               onClick={() => setSelectedPage(menu.name)}
+  //           >
+  //             <ListItemIcon style={{ minWidth: 'unset' }}>
+  //               <ComponentIcon style={{ fontSize: 'large' }} />
+  //             </ListItemIcon>
+  //             <ListItemText primary={menu.name} />
+  //           </ListItemButton>
+  //         </Link>
+  //       </List>
+  //   );
+  // }
 
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const appBarRef = useRef<HTMLDivElement>(null);

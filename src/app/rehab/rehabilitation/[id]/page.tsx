@@ -7,7 +7,6 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import Prescription from "@/components/rehab/prescription/Prescription";
-import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
 import {EChartsTest} from "@/components/rehab/echarts/EChartsTest";
 import * as React from 'react';
 import CardContent from '@mui/material/CardContent';
@@ -24,7 +23,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
-import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
 import {ChangeEvent, useEffect, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
 import {AnyAction} from "redux";
@@ -33,7 +31,7 @@ import {
   fetchPatientStatisticsById,
   fetchPrescriptionByPId,
   Prescription as PrescriptionEntity,
-  EvaluateFormProps, TargetFormProps, AddPrescriptionItem, Status, addStatus
+  EvaluateFormProps, TargetFormProps, AddPrescriptionItem, PatientStatus, addStatus, addEvaluation
 } from "@/redux/features/rehab/rehab-slice";
 import {
   addPrescription,
@@ -43,14 +41,11 @@ import {
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
 import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
-import {Icon, IconButton} from "@mui/material";
+import {IconButton} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
-import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew';
 
 import { Title } from '@/components/rehab/styles';
 import {ThunkDispatch} from "redux-thunk";
@@ -59,13 +54,11 @@ import Link from "next/link";
 import {useForm} from "react-hook-form";
 
 import dayjs, { Dayjs } from 'dayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import {string} from "postcss-selector-parser";
 
-const lastMonday = dayjs().startOf('week');
 const nextSunday = dayjs().endOf('week').startOf('day');
 
 const isWeekend = (date: Dayjs) => {
@@ -128,39 +121,46 @@ export default function MUITable({ params }: { params: { id: string } }) {
     }));
   };
 
-  const handleSaveTarget = () => {
-    onSaveTarget(targetFormData);
-  };
+  // const handleSaveTarget = () => {
+  //   onSaveTarget(targetFormData);
+  // };
 
   const [openAddStatus, setOpenAddStatus] = React.useState(false);
 
   // 医生评价表单
   const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
     tolerance: '',
-    sportsEvaluation: '',
-    spasmEvaluation: '',
-    muscularTension: '',
-    acutePhase: '',
-    neurological: '',
-    sportsInjury: '',
+    motionReview: '',
+    spasmReview: '',
+    muscleTone: '',
+    acuteState: '',
+    neuroJudgment: '',
+    motionInjury: '',
   });
-  const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEvaluationFormDataFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setEvaluateFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
+
   const handleSaveEvaluate = () => {
-    onSaveEvaluate(evaluateFormData);
+    thunkDispatch(addEvaluation({
+      acute_state: evaluateFormData.acuteState,
+      motion_injury: evaluateFormData.motionInjury,
+      motion_review: evaluateFormData.motionReview,
+      muscle_tone: evaluateFormData.muscleTone,
+      neuro_judgment: evaluateFormData.neuroJudgment,
+      pid: parseInt(params.id),
+      rehab_session_id: 0,
+      spasm_review: evaluateFormData.spasmReview,
+      tolerance: evaluateFormData.tolerance,
+    }))
+    // setOpenAddStatus(false)
   };
 
   const [willAddPrescription, setWillAddPrescription] = React.useState<PrescriptionEntity>({
-    history: [{amount: 3, customerId: "2023-08-01 17:10:01", date: "2023-08-01 17:09:14"}, {
-      amount: 1,
-      customerId: "2023-08-01 17:09:14",
-      date: "2023-08-01 17:09:14"
-    }],
     id: 0,
     created_at: "",
     part: "0",
@@ -169,6 +169,16 @@ export default function MUITable({ params }: { params: { id: string } }) {
     u: 3,
     v: 3,
     duration: 1,
+    prescription_record: [
+      {
+        id: 123,
+        created_at: '2023-08-09 12:00:00',
+        eid: "100000",
+        pid: "11",
+        state: "H_END",
+        updated_at: '2023-08-09 12:20:00'
+      }
+    ],
   })
 
 
@@ -282,7 +292,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
     }))
   };
 
-  const [willAddStatus, setWillAddStatus] = React.useState<Status>({
+  const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
     onset_time : "",
     medication : "",
@@ -294,15 +304,27 @@ export default function MUITable({ params }: { params: { id: string } }) {
 
   const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
-    console.log(id, value)
+    let processedValue: string | number = value;
+    if (["avg_heart_rate", "max_heart_rate", "min_heart_rate"].includes(id)) {
+      processedValue = Number(value);
+    }
+    console.log('handleAddStatus', id, processedValue)
     setWillAddStatus((prevInputValues) => ({
       ...prevInputValues,
-      [id]: value,
+      [id]: processedValue,
     }))
   };
 
   const handleSaveAddStatus = () => {
-    thunkDispatch(addStatus({onset_time: willAddStatus.onset_time, medication: willAddStatus.medication, spasm_status: willAddStatus.spasm_status , min_heart_rate:willAddStatus.min_heart_rate,max_heart_rate:willAddStatus.max_heart_rate,avg_heart_rate:willAddStatus.avg_heart_rate }))
+    thunkDispatch(addStatus({
+      pid: parseInt(params.id),
+      onset_time: willAddStatus.onset_time,
+      medication: willAddStatus.medication,
+      spasm_status: willAddStatus.spasm_status,
+      min_heart_rate: willAddStatus.min_heart_rate,
+      max_heart_rate: willAddStatus.max_heart_rate,
+      avg_heart_rate: willAddStatus.avg_heart_rate
+    }))
     setOpenAddStatus(false)
   };
 
@@ -492,13 +514,12 @@ export default function MUITable({ params }: { params: { id: string } }) {
                               <label htmlFor="input9">发病时间:</label>
                             </Grid>
                             <Grid item xs={9}>
-                              <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
+                              <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
-                                  id="onset_time"
                                   value={willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null}
                                   onChange={(newValue) => {
                                     // newValue is the selected date and time object
-                                    const formattedDate = newValue.format('YYYY-MM-DD HH:mm:ss');
+                                    const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';
                                     setWillAddStatus((prevStatus) => ({
                                       ...prevStatus,
                                       onset_time: formattedDate,
@@ -507,8 +528,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
                                   defaultValue={nextSunday}
                                   shouldDisableDate={isWeekend}
                                   views={['year', 'month', 'day', 'hours', 'minutes']}
-                                  size="small"
-                                  fullWidth
                                 />
                               </LocalizationProvider>
                               {/*<TextField*/}
@@ -683,7 +702,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                                 <TextField
                                   name="tolerance"
                                   value={evaluateFormData.tolerance}
-                                  onChange={handleFormChange}
+                                  onChange={handleEvaluationFormDataFormChange}
                                   size="small"
                                   fullWidth
                                 />
@@ -699,9 +718,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                               </Grid>
                               <Grid item xs={8}>
                                 <TextField
-                                  name="sportsEvaluation"
-                                  value={evaluateFormData.sportsEvaluation}
-                                  onChange={handleFormChange}
+                                  name="motionReview"
+                                  value={evaluateFormData.motionReview}
+                                  onChange={handleEvaluationFormDataFormChange}
                                   size="small"
                                   fullWidth
                                 />
@@ -717,9 +736,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                               </Grid>
                               <Grid item xs={8}>
                                 <TextField
-                                  name="spasmEvaluation"
-                                  value={evaluateFormData.spasmEvaluation}
-                                  onChange={handleFormChange}
+                                  name="spasmReview"
+                                  value={evaluateFormData.spasmReview}
+                                  onChange={handleEvaluationFormDataFormChange}
                                   size="small"
                                   fullWidth
                                 />
@@ -735,9 +754,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                               </Grid>
                               <Grid item xs={8}>
                                 <TextField
-                                  name="muscularTension"
-                                  value={evaluateFormData.muscularTension}
-                                  onChange={handleFormChange}
+                                  name="muscleTone"
+                                  value={evaluateFormData.muscleTone}
+                                  onChange={handleEvaluationFormDataFormChange}
                                   size="small"
                                   fullWidth
                                 />
@@ -753,9 +772,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                               </Grid>
                               <Grid item xs={8}>
                                 <TextField
-                                  name="acutePhase"
-                                  value={evaluateFormData.acutePhase}
-                                  onChange={handleFormChange}
+                                  name="acuteState"
+                                  value={evaluateFormData.acuteState}
+                                  onChange={handleEvaluationFormDataFormChange}
                                   size="small"
                                   fullWidth
                                 />
@@ -771,9 +790,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                               </Grid>
                               <Grid item xs={8}>
                                 <TextField
-                                  name="neurological"
-                                  value={evaluateFormData.neurological}
-                                  onChange={handleFormChange}
+                                  name="neuroJudgment"
+                                  value={evaluateFormData.neuroJudgment}
+                                  onChange={handleEvaluationFormDataFormChange}
                                   size="small"
                                   fullWidth
                                 />
@@ -789,9 +808,9 @@ export default function MUITable({ params }: { params: { id: string } }) {
                               </Grid>
                               <Grid item xs={8}>
                                 <TextField
-                                  name="sportsInjury"
-                                  value={evaluateFormData.sportsInjury}
-                                  onChange={handleFormChange}
+                                  name="motionInjury"
+                                  value={evaluateFormData.motionInjury}
+                                  onChange={handleEvaluationFormDataFormChange}
                                   size="small"
                                   fullWidth
                                 />
