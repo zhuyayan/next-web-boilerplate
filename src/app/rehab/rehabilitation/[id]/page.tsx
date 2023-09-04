@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import Prescription from "@/components/rehab/prescription/Prescription";
+import PrescriptionLine from "@/components/rehab/prescription/Prescription";
 import {EChartsTest} from "@/components/rehab/echarts/EChartsTest";
 import * as React from 'react';
 import CardContent from '@mui/material/CardContent';
@@ -838,14 +839,14 @@ export default function MUITable({ params }: { params: { id: string } }) {
 
 
             {/*压力数据折线图*/}
-          {/*<Grid item xs={6} md={5.5}>*/}
-          {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
-          {/*    <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />*/}
-          {/*    {*/}
-          {/*      trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>*/}
-          {/*    }*/}
-          {/*  </Card>*/}
-          {/*</Grid>*/}
+          <Grid item xs={6} md={5.5}>
+            <Card sx={{ height: 365 ,padding: '10px'}}>
+              <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
+              {
+                trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
+              }
+            </Card>
+          </Grid>
 
             {/*康复记录*/}
           {/*<Grid item xs={6} md={6.5}>*/}

@@ -62,7 +62,21 @@ import Grid from "@mui/material/Grid";
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/material/styles';
 import { green } from '@mui/material/colors';
+
 import {string} from "postcss-selector-parser";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
+import dayjs, { Dayjs } from "dayjs";
+
+
+const nextSunday = dayjs().endOf('week').startOf('day');
+
+const isWeekend = (date: Dayjs) => {
+  const day = date.day();
+
+  return day === 0 || day === 6;
+};
 
 const theme = createTheme({
   palette: {
@@ -171,7 +185,7 @@ const MCTFixedWidthChip = styled(Chip)<{color?: string}>`
   }
 `;
 
-export default function StickyHeadTable(params: {PId:string,
+export default function StickyHeadTable(params: { id: string,PId:string,
   prescription:Prescription[],
   onlineEquipment: EquipmentOnline[]}) {
   const appDispatch = useAppDispatch()
@@ -182,7 +196,7 @@ export default function StickyHeadTable(params: {PId:string,
 
   const [openRecord, setOpenRecord] = React.useState<{ [key: number]: boolean }>(() => {
     const OpenState: { [key: number]: boolean } = {};
-    if (params.prescription.length > 0) {
+    if (params.prescription?.length > 0) {
       OpenState[params.prescription[0].id] = true; // 默认展开第一条记录
     }
     return OpenState;
@@ -218,7 +232,7 @@ export default function StickyHeadTable(params: {PId:string,
     return { onsetTime, medication, spasmStatus, minHeartRate, maxHeartRate,avgHeartRate };
   }
   const rows = [
-    createTargetData('1314', '159', '6.0', '24', '4.0','9'),
+    // createTargetData('1314', '159', '6.0', '24', '4.0','9'),
   ];
 
   function createEvaluateData(
@@ -403,6 +417,43 @@ export default function StickyHeadTable(params: {PId:string,
     targetElement?.scrollIntoView({ behavior: 'smooth'});
   };
 
+  const [openAddStatus, setOpenAddStatus] = React.useState(false);
+  const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
+    pid:0,
+    onset_time : "",
+    medication : "",
+    spasm_status : "",
+    min_heart_rate : 0,
+    max_heart_rate : 0,
+    avg_heart_rate : 0,
+  })
+
+  const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    let processedValue: string | number = value;
+    if (["avg_heart_rate", "max_heart_rate", "min_heart_rate"].includes(id)) {
+      processedValue = Number(value);
+    }
+    console.log('handleAddStatus', id, processedValue)
+    setWillAddStatus((prevInputValues) => ({
+      ...prevInputValues,
+      [id]: processedValue,
+    }))
+  };
+
+  const handleSaveAddStatus = () => {
+    appThunkDispatch(addStatus({
+      pid: parseInt(params.id),
+      onset_time: willAddStatus.onset_time,
+      medication: willAddStatus.medication,
+      spasm_status: willAddStatus.spasm_status,
+      min_heart_rate: willAddStatus.min_heart_rate,
+      max_heart_rate: willAddStatus.max_heart_rate,
+      avg_heart_rate: willAddStatus.avg_heart_rate
+    }))
+    setOpenAddStatus(false)
+  };
+
   return (<>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer>
@@ -421,7 +472,7 @@ export default function StickyHeadTable(params: {PId:string,
               </TableRow>
             </TableHead>
             <TableBody>
-              {params.prescription.map(row => (
+              {params.prescription?.map(row => (
                 <React.Fragment key={row.id}>
                   <StyledTableRow
 
@@ -544,7 +595,7 @@ export default function StickyHeadTable(params: {PId:string,
                                   <TableCell>{historyRow.eid}</TableCell>
                                   <TableCell>{historyRow.pid}</TableCell>
                                   <TableCell align="center">
-                                    <Button color="secondary" onClick={handleClickOpenTarget}>查看指标</Button>
+                                    <Button color="secondary" onClick={handleClickOpenTarget}>病人指标</Button>
                                   </TableCell>
                                   <TableCell align="center">
                                     <Button color="secondary" onClick={handleClickOpenEvaluate}>查看评价</Button>
@@ -612,6 +663,202 @@ export default function StickyHeadTable(params: {PId:string,
           <Button onClick={handleCloseTarget}>关闭</Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog
+        open={openTarget}
+        onClose={handleCloseTarget}
+        aria-describedby="Target"
+      >
+        <DialogTitle>{"病人各项指标"}</DialogTitle>
+        <DialogContent>
+          {rows.length > 0 ? (
+            <DialogContentText id="Target">
+              <Table sx={{ minWidth: 500 }} aria-label="a dense table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>发病时间</TableCell>
+                    <TableCell align="right">用药</TableCell>
+                    <TableCell align="right">痉挛状态</TableCell>
+                    <TableCell align="right">最小心率</TableCell>
+                    <TableCell align="right">最大心率</TableCell>
+                    <TableCell align="right">平均心率</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow
+                      key={row.onsetTime}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.onsetTime}
+                      </TableCell>
+                      <TableCell align="right">{row.medication}</TableCell>
+                      <TableCell align="right">{row.spasmStatus}</TableCell>
+                      <TableCell align="right">{row.minHeartRate}</TableCell>
+                      <TableCell align="right">{row.maxHeartRate}</TableCell>
+                      <TableCell align="right">{row.avgHeartRate}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </DialogContentText>
+          ) : (
+            <div>
+              {/*<TextField*/}
+              {/*  label="发病时间"*/}
+              {/*  value={willAddStatus.onset_time}*/}
+              {/*  onChange={handleAddStatus}*/}
+              {/*  fullWidth*/}
+              {/*/>*/}
+              {/* Add more input fields for other indicators */}
+              <Grid container spacing={0}>
+                <Grid item xs={4.5}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={3}>
+                        <label htmlFor="input9">发病时间:</label>
+                      </Grid>
+                      <Grid item xs={9}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DateTimePicker
+                            value={willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null}
+                            onChange={(newValue) => {
+                              // newValue is the selected date and time object
+                              const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';
+                              setWillAddStatus((prevStatus) => ({
+                                ...prevStatus,
+                                onset_time: formattedDate,
+                              }));
+                            }}
+                            defaultValue={nextSunday}
+                            shouldDisableDate={isWeekend}
+                            views={['year', 'month', 'day', 'hours', 'minutes']}
+                          />
+                        </LocalizationProvider>
+                        {/*<TextField*/}
+                        {/*  id="onset_time"*/}
+                        {/*  value={willAddStatus.onset_time}*/}
+                        {/*  onChange={handleAddStatus}*/}
+                        {/*  size="small"*/}
+                        {/*  fullWidth*/}
+                        {/*/>*/}
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={3}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input10">用药:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                          id="medication"
+                          value={willAddStatus.medication}
+                          onChange={handleAddStatus}
+                          size="small"
+                          fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={3}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input11">痉挛状态:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                          id="spasm_status"
+                          value={willAddStatus.spasm_status}
+                          onChange={handleAddStatus}
+                          size="small"
+                          fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={1.5}>
+                  <Box sx={{padding: '8px' }}>
+                  </Box>
+                </Grid>
+                <Grid item xs={4.5}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={3}>
+                        <label htmlFor="input9">最小心率:</label>
+                      </Grid>
+                      <Grid item xs={9}>
+                        <TextField
+                          id="min_heart_rate"
+                          value={willAddStatus.min_heart_rate}
+                          onChange={handleAddStatus}
+                          size="small"
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={3}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input9">最大心率:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                          id="max_heart_rate"
+                          value={willAddStatus.max_heart_rate}
+                          onChange={handleAddStatus}
+                          size="small"
+                          fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={3}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input9">平均心率:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                          id="avg_heart_rate"
+                          value={willAddStatus.avg_heart_rate}
+                          onChange={handleAddStatus}
+                          size="small"
+                          fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={1.5}>
+                  <Box sx={{padding: '8px' }}>
+                    <Button
+                      style={{float: 'right'}}
+                      variant="outlined"
+                      size="small"
+                      onClick={handleSaveAddStatus}>保存指标</Button>
+                  </Box>
+                </Grid>
+              </Grid>
+
+            </div>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseTarget}>关闭</Button>
+        </DialogActions>
+      </Dialog>
+
 
       {/*查看评价弹框*/}
       <Dialog
