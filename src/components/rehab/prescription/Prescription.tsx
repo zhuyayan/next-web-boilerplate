@@ -418,8 +418,6 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     targetElement?.scrollIntoView({ behavior: 'smooth'});
   };
 
-<<<<<<< HEAD
-  const [openAddStatus, setOpenAddStatus] = React.useState(false);
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
     onset_time : "",
@@ -453,8 +451,8 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       max_heart_rate: willAddStatus.max_heart_rate,
       avg_heart_rate: willAddStatus.avg_heart_rate
     }))
-    setOpenAddStatus(false)
-=======
+  }
+
 // 医生评价表单
   const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
     tolerance: '',
@@ -486,7 +484,6 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       tolerance: evaluateFormData.tolerance,
     }))
     // setOpenAddStatus(false)
->>>>>>> 6c632a422bb13b4239452a86567d746fbc4fee34
   };
 
   return (<>
