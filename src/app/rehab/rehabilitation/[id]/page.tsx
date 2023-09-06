@@ -683,160 +683,158 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <br/>
 
 
-              <div style={{ borderCollapse: 'collapse' }}>
-                <Card>
-                  <CardContent>
-                    <div>
-                      请医护根据此次训练的直方图对以下信息进行评价：
-                    </div>
-                    <br/>
-                    <Typography variant="h6">医生评价</Typography>
-                    <form>
-                      <Grid container spacing={0}>
-                        <Grid item xs={3}>
-                          <Box sx={{padding: '8px' }}>
-                            <Grid container spacing={0} alignItems="center">
-                              <Grid item xs={4}>
-                                <label htmlFor="input9">耐受状态:</label>
-                              </Grid>
-                              <Grid item xs={8}>
-                                <TextField
-                                  name="tolerance"
-                                  value={evaluateFormData.tolerance}
-                                  onChange={handleEvaluationFormDataFormChange}
-                                  size="small"
-                                  fullWidth
-                                />
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Box sx={{padding: '8px' }}>
-                            <Grid container spacing={0} alignItems="center">
-                              <Grid item xs={4}>
-                                <label htmlFor="input10">运动评价:</label>
-                              </Grid>
-                              <Grid item xs={8}>
-                                <TextField
-                                  name="motionReview"
-                                  value={evaluateFormData.motionReview}
-                                  onChange={handleEvaluationFormDataFormChange}
-                                  size="small"
-                                  fullWidth
-                                />
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Box sx={{padding: '8px' }}>
-                            <Grid container spacing={0} alignItems="center">
-                              <Grid item xs={4}>
-                                <label htmlFor="input11">痉挛评价:</label>
-                              </Grid>
-                              <Grid item xs={8}>
-                                <TextField
-                                  name="spasmReview"
-                                  value={evaluateFormData.spasmReview}
-                                  onChange={handleEvaluationFormDataFormChange}
-                                  size="small"
-                                  fullWidth
-                                />
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Box sx={{padding: '8px' }}>
-                            <Grid container spacing={0} alignItems="center">
-                              <Grid item xs={4}>
-                                <label htmlFor="input9">肌张力:</label>
-                              </Grid>
-                              <Grid item xs={8}>
-                                <TextField
-                                  name="muscleTone"
-                                  value={evaluateFormData.muscleTone}
-                                  onChange={handleEvaluationFormDataFormChange}
-                                  size="small"
-                                  fullWidth
-                                />
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Box sx={{padding: '8px' }}>
-                            <Grid container spacing={0} alignItems="center">
-                              <Grid item xs={4}>
-                                <label htmlFor="input9">急性期情况:</label>
-                              </Grid>
-                              <Grid item xs={8}>
-                                <TextField
-                                  name="acuteState"
-                                  value={evaluateFormData.acuteState}
-                                  onChange={handleEvaluationFormDataFormChange}
-                                  size="small"
-                                  fullWidth
-                                />
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Box sx={{padding: '8px' }}>
-                            <Grid container spacing={0} alignItems="center">
-                              <Grid item xs={4}>
-                                <label htmlFor="input9">神经科判断:</label>
-                              </Grid>
-                              <Grid item xs={8}>
-                                <TextField
-                                  name="neuroJudgment"
-                                  value={evaluateFormData.neuroJudgment}
-                                  onChange={handleEvaluationFormDataFormChange}
-                                  size="small"
-                                  fullWidth
-                                />
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Box sx={{padding: '8px' }}>
-                            <Grid container spacing={0} alignItems="center">
-                              <Grid item xs={4}>
-                                <label htmlFor="input9">运动损伤度:</label>
-                              </Grid>
-                              <Grid item xs={8}>
-                                <TextField
-                                  name="motionInjury"
-                                  value={evaluateFormData.motionInjury}
-                                  onChange={handleEvaluationFormDataFormChange}
-                                  size="small"
-                                  fullWidth
-                                />
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Box sx={{padding: '8px' }}>
-                            <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </form>
-                    <br/>
-                    <div style={{ color: 'red', fontSize: '10px' }}>
-                      注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              {/*<div style={{ borderCollapse: 'collapse' }}>*/}
+              {/*  <Card>*/}
+              {/*    <CardContent>*/}
+              {/*      <div>*/}
+              {/*        请医护根据此次训练的直方图对以下信息进行评价：*/}
+              {/*      </div>*/}
+              {/*      <br/>*/}
+              {/*      <Typography variant="h6">医生评价</Typography>*/}
+              {/*      <form>*/}
+              {/*        <Grid container spacing={0}>*/}
+              {/*          <Grid item xs={3}>*/}
+              {/*            <Box sx={{padding: '8px' }}>*/}
+              {/*              <Grid container spacing={0} alignItems="center">*/}
+              {/*                <Grid item xs={4}>*/}
+              {/*                  <label htmlFor="input9">耐受状态:</label>*/}
+              {/*                </Grid>*/}
+              {/*                <Grid item xs={8}>*/}
+              {/*                  <TextField*/}
+              {/*                    name="tolerance"*/}
+              {/*                    value={evaluateFormData.tolerance}*/}
+              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
+              {/*                    size="small"*/}
+              {/*                    fullWidth*/}
+              {/*                  />*/}
+              {/*                </Grid>*/}
+              {/*              </Grid>*/}
+              {/*            </Box>*/}
+              {/*          </Grid>*/}
+              {/*          <Grid item xs={3}>*/}
+              {/*            <Box sx={{padding: '8px' }}>*/}
+              {/*              <Grid container spacing={0} alignItems="center">*/}
+              {/*                <Grid item xs={4}>*/}
+              {/*                  <label htmlFor="input10">运动评价:</label>*/}
+              {/*                </Grid>*/}
+              {/*                <Grid item xs={8}>*/}
+              {/*                  <TextField*/}
+              {/*                    name="motionReview"*/}
+              {/*                    value={evaluateFormData.motionReview}*/}
+              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
+              {/*                    size="small"*/}
+              {/*                    fullWidth*/}
+              {/*                  />*/}
+              {/*                </Grid>*/}
+              {/*              </Grid>*/}
+              {/*            </Box>*/}
+              {/*          </Grid>*/}
+              {/*          <Grid item xs={3}>*/}
+              {/*            <Box sx={{padding: '8px' }}>*/}
+              {/*              <Grid container spacing={0} alignItems="center">*/}
+              {/*                <Grid item xs={4}>*/}
+              {/*                  <label htmlFor="input11">痉挛评价:</label>*/}
+              {/*                </Grid>*/}
+              {/*                <Grid item xs={8}>*/}
+              {/*                  <TextField*/}
+              {/*                    name="spasmReview"*/}
+              {/*                    value={evaluateFormData.spasmReview}*/}
+              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
+              {/*                    size="small"*/}
+              {/*                    fullWidth*/}
+              {/*                  />*/}
+              {/*                </Grid>*/}
+              {/*              </Grid>*/}
+              {/*            </Box>*/}
+              {/*          </Grid>*/}
+              {/*          <Grid item xs={3}>*/}
+              {/*            <Box sx={{padding: '8px' }}>*/}
+              {/*              <Grid container spacing={0} alignItems="center">*/}
+              {/*                <Grid item xs={4}>*/}
+              {/*                  <label htmlFor="input9">肌张力:</label>*/}
+              {/*                </Grid>*/}
+              {/*                <Grid item xs={8}>*/}
+              {/*                  <TextField*/}
+              {/*                    name="muscleTone"*/}
+              {/*                    value={evaluateFormData.muscleTone}*/}
+              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
+              {/*                    size="small"*/}
+              {/*                    fullWidth*/}
+              {/*                  />*/}
+              {/*                </Grid>*/}
+              {/*              </Grid>*/}
+              {/*            </Box>*/}
+              {/*          </Grid>*/}
+              {/*          <Grid item xs={3}>*/}
+              {/*            <Box sx={{padding: '8px' }}>*/}
+              {/*              <Grid container spacing={0} alignItems="center">*/}
+              {/*                <Grid item xs={4}>*/}
+              {/*                  <label htmlFor="input9">急性期情况:</label>*/}
+              {/*                </Grid>*/}
+              {/*                <Grid item xs={8}>*/}
+              {/*                  <TextField*/}
+              {/*                    name="acuteState"*/}
+              {/*                    value={evaluateFormData.acuteState}*/}
+              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
+              {/*                    size="small"*/}
+              {/*                    fullWidth*/}
+              {/*                  />*/}
+              {/*                </Grid>*/}
+              {/*              </Grid>*/}
+              {/*            </Box>*/}
+              {/*          </Grid>*/}
+              {/*          <Grid item xs={3}>*/}
+              {/*            <Box sx={{padding: '8px' }}>*/}
+              {/*              <Grid container spacing={0} alignItems="center">*/}
+              {/*                <Grid item xs={4}>*/}
+              {/*                  <label htmlFor="input9">神经科判断:</label>*/}
+              {/*                </Grid>*/}
+              {/*                <Grid item xs={8}>*/}
+              {/*                  <TextField*/}
+              {/*                    name="neuroJudgment"*/}
+              {/*                    value={evaluateFormData.neuroJudgment}*/}
+              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
+              {/*                    size="small"*/}
+              {/*                    fullWidth*/}
+              {/*                  />*/}
+              {/*                </Grid>*/}
+              {/*              </Grid>*/}
+              {/*            </Box>*/}
+              {/*          </Grid>*/}
+              {/*          <Grid item xs={3}>*/}
+              {/*            <Box sx={{padding: '8px' }}>*/}
+              {/*              <Grid container spacing={0} alignItems="center">*/}
+              {/*                <Grid item xs={4}>*/}
+              {/*                  <label htmlFor="input9">运动损伤度:</label>*/}
+              {/*                </Grid>*/}
+              {/*                <Grid item xs={8}>*/}
+              {/*                  <TextField*/}
+              {/*                    name="motionInjury"*/}
+              {/*                    value={evaluateFormData.motionInjury}*/}
+              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
+              {/*                    size="small"*/}
+              {/*                    fullWidth*/}
+              {/*                  />*/}
+              {/*                </Grid>*/}
+              {/*              </Grid>*/}
+              {/*            </Box>*/}
+              {/*          </Grid>*/}
+              {/*          <Grid item xs={3}>*/}
+              {/*            <Box sx={{padding: '8px' }}>*/}
+              {/*              <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>*/}
+              {/*            </Box>*/}
+              {/*          </Grid>*/}
+              {/*        </Grid>*/}
+              {/*      </form>*/}
+              {/*      <br/>*/}
+              {/*      <div style={{ color: 'red', fontSize: '10px' }}>*/}
+              {/*        注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。*/}
+              {/*      </div>*/}
+              {/*    </CardContent>*/}
+              {/*  </Card>*/}
+              {/*</div>*/}
             </Card>
           </Grid>
-          <br/>
-
 
             {/*压力数据折线图*/}
           <Grid item xs={6} md={5.5}>

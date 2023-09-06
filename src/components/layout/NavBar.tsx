@@ -365,7 +365,7 @@ export default function NavBar() {
               </Popover>
             </Box>
 
-              <Grid container justifyContent="flex-end" alignItems="center">
+              <Grid container justifyContent="flex-end" alignItems="center" style={{ width: '180px', marginLeft: 'auto', marginRight: 0 }}>
                   <Box sx={{ flexGrow: 0 }} style={{marginRight:6}}>
                       <Tooltip title="全屏显示">
                           <IconButton
@@ -412,9 +412,6 @@ export default function NavBar() {
                       </Menu>
                   </Box>
               </Grid>
-
-
-
           </Toolbar>
         </Container>
       </AppBar>

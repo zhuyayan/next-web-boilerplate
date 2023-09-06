@@ -34,7 +34,7 @@ import {
   editPrescription,
   EquipmentOnline, MedicalStaff,
   Prescription, PrescriptionRecord,
-  sendPrescriptionToEquipment, PatientStatus
+  sendPrescriptionToEquipment, PatientStatus, addEvaluation, EvaluateFormProps
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -189,6 +189,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
   prescription:Prescription[],
   onlineEquipment: EquipmentOnline[]}) {
   const appDispatch = useAppDispatch()
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -417,6 +418,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     targetElement?.scrollIntoView({ behavior: 'smooth'});
   };
 
+<<<<<<< HEAD
   const [openAddStatus, setOpenAddStatus] = React.useState(false);
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
@@ -452,6 +454,39 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       avg_heart_rate: willAddStatus.avg_heart_rate
     }))
     setOpenAddStatus(false)
+=======
+// 医生评价表单
+  const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
+    tolerance: '',
+    motionReview: '',
+    spasmReview: '',
+    muscleTone: '',
+    acuteState: '',
+    neuroJudgment: '',
+    motionInjury: '',
+  });
+  const handleEvaluationFormDataFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setEvaluateFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveEvaluate = () => {
+    thunkDispatch(addEvaluation({
+      acute_state: evaluateFormData.acuteState,
+      motion_injury: evaluateFormData.motionInjury,
+      motion_review: evaluateFormData.motionReview,
+      muscle_tone: evaluateFormData.muscleTone,
+      neuro_judgment: evaluateFormData.neuroJudgment,
+      pid: parseInt(params.PId),
+      rehab_session_id: 0,
+      spasm_review: evaluateFormData.spasmReview,
+      tolerance: evaluateFormData.tolerance,
+    }))
+    // setOpenAddStatus(false)
+>>>>>>> 6c632a422bb13b4239452a86567d746fbc4fee34
   };
 
   return (<>
@@ -598,7 +633,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                                     <Button color="secondary" onClick={handleClickOpenTarget}>病人指标</Button>
                                   </TableCell>
                                   <TableCell align="center">
-                                    <Button color="secondary" onClick={handleClickOpenEvaluate}>查看评价</Button>
+                                    <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>
                                   </TableCell>
                                   <TableCell align="center">
                                     <Button color="secondary" onClick={handleClickMove} >查看直方图</Button>
@@ -866,67 +901,208 @@ export default function StickyHeadTable(params: { id: string,PId:string,
         onClose={handleCloseEvaluate}
         aria-describedby="Evaluate"
       >
-        <DialogTitle>{"医生评价"}</DialogTitle>
+        <DialogTitle style={{display:'inline-block'}}>{"医生评价"}</DialogTitle>
+        <Typography variant='body2' style={{display:'inline-block'}}>&emsp;&emsp;（请医护根据此次训练的直方图对以下信息进行评价）</Typography>
         <DialogContent>
           <DialogContentText id="Evaluate">
-            {evaluateData.map((row, index) => (
-                <Grid container spacing={0} key={index}>
-                  <Grid item xs={6}>
-                    <Box sx={{padding: '8px' }}>
-                      <Grid container spacing={0} alignItems="center">
-                        <label htmlFor="input9">耐受程度: {row.tolerance.toFixed(1)}</label>
+            <form>
+              <Grid container spacing={0}>
+                <Grid item xs={6}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input9">耐受状态:</label>
                       </Grid>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{padding: '8px' }}>
-                      <Grid container spacing={0} alignItems="center">
-                        <label htmlFor="input10">运动评价: {row.sportsEvaluation.toFixed(1)}</label>
+                      <Grid item xs={8}>
+                        <TextField
+                            name="tolerance"
+                            value={evaluateFormData.tolerance}
+                            onChange={handleEvaluationFormDataFormChange}
+                            size="small"
+                            fullWidth
+                        />
                       </Grid>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{padding: '8px' }}>
-                      <Grid container spacing={0} alignItems="center">
-                        <label htmlFor="input11">痉挛评价: {row.spasmEvaluation.toFixed(1)}</label>
-                      </Grid>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{padding: '8px' }}>
-                      <Grid container spacing={0} alignItems="center">
-                        <label htmlFor="input11">肌张力: {row.muscularTension.toFixed(1)}</label>
-                      </Grid>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{padding: '8px' }}>
-                      <Grid container spacing={0} alignItems="center">
-                        <label htmlFor="input11">急性期情况: {row.acutePhase.toFixed(1)}</label>
-                      </Grid>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{padding: '8px' }}>
-                      <Grid container spacing={0} alignItems="center">
-                        <label htmlFor="input11">神经科判断: {row.neurological.toFixed(1)}</label>
-                      </Grid>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{padding: '8px' }}>
-                      <Grid container spacing={0} alignItems="center">
-                        <label htmlFor="input11">运动损伤度: {row.sportsInjury.toFixed(1)}</label>
-                      </Grid>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{padding: '8px' }}>
-
-                    </Box>
-                  </Grid>
+                    </Grid>
+                  </Box>
                 </Grid>
-            ))}
+                <Grid item xs={6}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input10">运动评价:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                            name="motionReview"
+                            value={evaluateFormData.motionReview}
+                            onChange={handleEvaluationFormDataFormChange}
+                            size="small"
+                            fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input11">痉挛评价:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                            name="spasmReview"
+                            value={evaluateFormData.spasmReview}
+                            onChange={handleEvaluationFormDataFormChange}
+                            size="small"
+                            fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input9">肌张力:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                            name="muscleTone"
+                            value={evaluateFormData.muscleTone}
+                            onChange={handleEvaluationFormDataFormChange}
+                            size="small"
+                            fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input9">急性期情况:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                            name="acuteState"
+                            value={evaluateFormData.acuteState}
+                            onChange={handleEvaluationFormDataFormChange}
+                            size="small"
+                            fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input9">神经科判断:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                            name="neuroJudgment"
+                            value={evaluateFormData.neuroJudgment}
+                            onChange={handleEvaluationFormDataFormChange}
+                            size="small"
+                            fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{padding: '8px' }}>
+                    <Grid container spacing={0} alignItems="center">
+                      <Grid item xs={4}>
+                        <label htmlFor="input9">运动损伤度:</label>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField
+                            name="motionInjury"
+                            value={evaluateFormData.motionInjury}
+                            onChange={handleEvaluationFormDataFormChange}
+                            size="small"
+                            fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{padding: '8px' }}>
+                    {/*<Button style={{float: 'right'}} variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>*/}
+                  </Box>
+                </Grid>
+                <Grid item xs={12}>
+                  <Box sx={{padding: '8px' }}>
+                    <Typography variant='body2' style={{ color: 'red' }}>注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。</Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </form>
+            {/*{evaluateData.map((row, index) => (*/}
+            {/*    <Grid container spacing={0} key={index}>*/}
+            {/*      <Grid item xs={6}>*/}
+            {/*        <Box sx={{padding: '8px' }}>*/}
+            {/*          <Grid container spacing={0} alignItems="center">*/}
+            {/*            <label htmlFor="input9">耐受状态: {row.tolerance.toFixed(1)}</label>*/}
+            {/*          </Grid>*/}
+            {/*        </Box>*/}
+            {/*      </Grid>*/}
+            {/*      <Grid item xs={6}>*/}
+            {/*        <Box sx={{padding: '8px' }}>*/}
+            {/*          <Grid container spacing={0} alignItems="center">*/}
+            {/*            <label htmlFor="input10">运动评价: {row.sportsEvaluation.toFixed(1)}</label>*/}
+            {/*          </Grid>*/}
+            {/*        </Box>*/}
+            {/*      </Grid>*/}
+            {/*      <Grid item xs={6}>*/}
+            {/*        <Box sx={{padding: '8px' }}>*/}
+            {/*          <Grid container spacing={0} alignItems="center">*/}
+            {/*            <label htmlFor="input11">痉挛评价: {row.spasmEvaluation.toFixed(1)}</label>*/}
+            {/*          </Grid>*/}
+            {/*        </Box>*/}
+            {/*      </Grid>*/}
+            {/*      <Grid item xs={6}>*/}
+            {/*        <Box sx={{padding: '8px' }}>*/}
+            {/*          <Grid container spacing={0} alignItems="center">*/}
+            {/*            <label htmlFor="input11">肌张力: {row.muscularTension.toFixed(1)}</label>*/}
+            {/*          </Grid>*/}
+            {/*        </Box>*/}
+            {/*      </Grid>*/}
+            {/*      <Grid item xs={6}>*/}
+            {/*        <Box sx={{padding: '8px' }}>*/}
+            {/*          <Grid container spacing={0} alignItems="center">*/}
+            {/*            <label htmlFor="input11">急性期情况: {row.acutePhase.toFixed(1)}</label>*/}
+            {/*          </Grid>*/}
+            {/*        </Box>*/}
+            {/*      </Grid>*/}
+            {/*      <Grid item xs={6}>*/}
+            {/*        <Box sx={{padding: '8px' }}>*/}
+            {/*          <Grid container spacing={0} alignItems="center">*/}
+            {/*            <label htmlFor="input11">神经科判断: {row.neurological.toFixed(1)}</label>*/}
+            {/*          </Grid>*/}
+            {/*        </Box>*/}
+            {/*      </Grid>*/}
+            {/*      <Grid item xs={6}>*/}
+            {/*        <Box sx={{padding: '8px' }}>*/}
+            {/*          <Grid container spacing={0} alignItems="center">*/}
+            {/*            <label htmlFor="input11">运动损伤度: {row.sportsInjury.toFixed(1)}</label>*/}
+            {/*          </Grid>*/}
+            {/*        </Box>*/}
+            {/*      </Grid>*/}
+            {/*      <Grid item xs={6}>*/}
+            {/*        <Box sx={{padding: '8px' }}>*/}
+
+            {/*        </Box>*/}
+            {/*      </Grid>*/}
+            {/*    </Grid>*/}
+            {/*))}*/}
 
             {/*<Table sx={{ minWidth: 700 }}>*/}
             {/*  <TableHead>*/}
@@ -962,6 +1138,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+          <Button onClick={handleSaveEvaluate}>保存评价</Button>
           <Button onClick={handleCloseEvaluate}>关闭</Button>
         </DialogActions>
       </Dialog>
