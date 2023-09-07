@@ -7,7 +7,6 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import Prescription from "@/components/rehab/prescription/Prescription";
-import PrescriptionLine from "@/components/rehab/prescription/Prescription";
 import {EChartsTest} from "@/components/rehab/echarts/EChartsTest";
 import * as React from 'react';
 import CardContent from '@mui/material/CardContent';
@@ -59,6 +58,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {string} from "postcss-selector-parser";
+import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
+import Test from "@/components/rehab/prescription/Test";
+import PrescriptionTest from "@/components/rehab/prescription/PrescriptionTest";
+import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
 
 const nextSunday = dayjs().endOf('week').startOf('day');
 
@@ -101,30 +104,10 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const [stretchError, setStretchError] = React.useState<string>('')
   const [trainMinus, setTrainMinus] = useState<string>('')
   const [trainDays, setTrainDays] = useState<number>(0)
-  const [trainDuration, setTrainDuration] = useState<number>(0)
-  // 病人各项指标
-  const [targetFormData, setTargetFormData] = React.useState<TargetFormProps>({
-    onsetTime: '',
-    medication: '',
-    spasmStatus: '',
-    minHeartRate: '',
-    maxHeartRate: '',
-    avgHeartRate: '',
-  });
 
   const { register: AddPrescriptionItemRegister, formState: { errors: AddPrescriptionItemErrors }, clearErrors: AddPrescriptionItemClearErrors, trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
 
-  const handleTargetFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setTargetFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
 
-  // const handleSaveTarget = () => {
-  //   onSaveTarget(targetFormData);
-  // };
 
   const [openAddStatus, setOpenAddStatus] = React.useState(false);
 
@@ -346,8 +329,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       <Tooltip title="返回病人列表">
                         <Link href={`/rehab/patient`} passHref>
                           <IconButton
-                              aria-label="back"
-                              color="primary"
+                            aria-label="back"
+                            color="primary"
                           >
                             <AssignmentReturnIcon fontSize="medium" />
                           </IconButton>
@@ -356,11 +339,11 @@ export default function MUITable({ params }: { params: { id: string } }) {
                     </Grid>
                   </Grid>
                 </Grid>
-            </div>
+              </div>
+            </Grid>
           </Grid>
-        </Grid>
           <Grid container spacing={2}>
-          <Grid container item xs={12} md={12} spacing={2}>
+            <Grid container item xs={12} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
                 {/*病人card*/}
                 <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 150}} >
@@ -410,14 +393,14 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <Grid item xs={6} md={2}>
                 <StatisticsCard>
                   <CardMedia
-                      style={{
+                    style={{
                       position: 'absolute',
                       width: 50, // 图片的宽度
                       height: 50, // 图片的高度
-                      }}
-                      component="img"
-                      src="/images/fist.png"
-                      alt="Image"
+                    }}
+                    component="img"
+                    src="/images/fist.png"
+                    alt="Image"
                   />
                   {/*<Typography style={{ float:"left" }}>*/}
                   {/*  /!*<AccessTimeFilledIcon style={{ color: '#69acee', fontSize: 50 }}/>*!/*/}
@@ -436,35 +419,35 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   </CardContent>
                 </StatisticsCard>
               </Grid>
-            <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
-              <StatisticsCard>
-                <CardMedia
-                  style={{
-                    position: 'absolute',
-                    width: 50, // 图片的宽度
-                    height: 50, // 图片的高度
-                  }}
-                  component="img"
-                  src="/images/hand.png"
-                  alt="Image"
-                />
-                {/*<Typography sx={{ float:"left" }}>*/}
-                {/*  <AssessmentIcon  sx={{ color: '#0a94a1', fontSize: 50 }}/>*/}
-                {/*</Typography>*/}
-                <CardContent sx={{ textAlign: 'right' }}>
-                  <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
-                    {record.length}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    伸展总时长
-                  </Typography>
-                  <Divider sx={{padding:'5px'}}/>
-                  <Typography sx={{ fontSize: 6 }} color="text.secondary">
-                    时间 / 分钟
-                  </Typography>
-                </CardContent>
-              </StatisticsCard>
-            </Grid>
+              <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
+                <StatisticsCard>
+                  <CardMedia
+                    style={{
+                      position: 'absolute',
+                      width: 50, // 图片的宽度
+                      height: 50, // 图片的高度
+                    }}
+                    component="img"
+                    src="/images/hand.png"
+                    alt="Image"
+                  />
+                  {/*<Typography sx={{ float:"left" }}>*/}
+                  {/*  <AssessmentIcon  sx={{ color: '#0a94a1', fontSize: 50 }}/>*/}
+                  {/*</Typography>*/}
+                  <CardContent sx={{ textAlign: 'right' }}>
+                    <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
+                      {record.length}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      伸展总时长
+                    </Typography>
+                    <Divider sx={{padding:'5px'}}/>
+                    <Typography sx={{ fontSize: 6 }} color="text.secondary">
+                      时间 / 分钟
+                    </Typography>
+                  </CardContent>
+                </StatisticsCard>
+              </Grid>
               <Grid item xs={6} md={2}>
                 <StatisticsCard>
                   <Typography sx={{ float:"left" }}>
@@ -486,27 +469,27 @@ export default function MUITable({ params }: { params: { id: string } }) {
               </Grid>
             </Grid>
 
-          {/*直方图*/}
-          <Grid item xs={12} md={12}>
-            <Card sx={{ padding: '10px'}}>
-              <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
-              <CardContent>
-                <EChartsTest/>
-              </CardContent>
-            </Card>
-          </Grid>
-          <br/>
+            {/*直方图*/}
+            <Grid item xs={12} md={12}>
+              <Card sx={{ padding: '10px'}}>
+                <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
+                <CardContent>
+                  <EChartsTest/>
+                </CardContent>
+              </Card>
+            </Grid>
+            <br/>
 
             {/*处方*/}
-          <Grid item xs={12} md={12}>
-            <Card sx={{ padding: '10px' }}>
-              <Card>
-                <CardContent>
-                  <div>
-                    请在病人训练前和训练中将下面表格填写完整：
-                  </div>
-                  <br/>
-                  <Typography variant="h6">病人各项指标</Typography>
+            <Grid item xs={12} md={12}>
+              <Card sx={{ padding: '10px' }}>
+                <Card>
+                  <CardContent>
+                    <div>
+                      请在病人训练前和训练中将下面表格填写完整：
+                    </div>
+                    <br/>
+                    <Typography variant="h6">病人各项指标</Typography>
                     <Grid container spacing={0}>
                       <Grid item xs={4.5}>
                         <Box sx={{padding: '8px' }}>
@@ -638,222 +621,236 @@ export default function MUITable({ params }: { params: { id: string } }) {
                       <Grid item xs={1.5}>
                         <Box sx={{padding: '8px' }}>
                           <Button
-                              style={{float: 'right'}}
-                              variant="outlined"
-                              size="small"
-                              onClick={handleSaveAddStatus}>保存指标</Button>
+                            style={{float: 'right'}}
+                            variant="outlined"
+                            size="small"
+                            onClick={handleSaveAddStatus}>保存指标</Button>
                         </Box>
                       </Grid>
                     </Grid>
+                    <br/>
+                  </CardContent>
+                </Card>
+                <div>
                   <br/>
-                </CardContent>
-              </Card>
-              <div>
-                <br/>
-                <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h5' }} />
-                <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
-                  (共
-                </Typography>
-                <Typography color="primary" style={{display:'inline-block'}} variant="h5" gutterBottom>
-                  {prescription.length}
-                </Typography>
-                <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
-                  条处方)
-                </Typography>
-                <Tooltip title="新建处方">
-                  <IconButton
+                  <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h5' }} />
+                  <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
+                    (共
+                  </Typography>
+                  <Typography color="primary" style={{display:'inline-block'}} variant="h5" gutterBottom>
+                    {prescription.length}
+                  </Typography>
+                  <Typography style={{display:'inline-block'}} variant="h6" gutterBottom>
+                    条处方)
+                  </Typography>
+                  <Tooltip title="新建处方">
+                    <IconButton
                       style={{float: 'right'}}
                       aria-label="add"
                       onClick={handleClickOpen}
-                  >
-                    <AddCircleIcon sx={{ fontSize: 48 }} color="secondary"/>
-                  </IconButton>
-                </Tooltip>
-              </div>
+                    >
+                      <AddCircleIcon sx={{ fontSize: 48 }} color="secondary"/>
+                    </IconButton>
+                  </Tooltip>
+                </div>
 
 
-              <Prescription PId={params.id} prescription={prescription} onlineEquipment={onlineData || []}/>
-              <br/>
-              <Card id="target-element">
-                <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
-                <CardContent>
-                  <EChartsTest/>
-                </CardContent>
+                <Prescription PId={params.id} prescription={prescription} onlineEquipment={onlineData || []}/>
+                <br/>
+                <Card id="target-element">
+                  <CardHeader title='tab' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
+                  <CardContent>
+                    <Test/>
+                  </CardContent>
+                </Card>
+                {/*<Card id="target-element">*/}
+                {/*  <CardHeader title='PrescriptionTest' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />*/}
+                {/*  <CardContent>*/}
+                {/*    <PrescriptionTest/>*/}
+                {/*  </CardContent>*/}
+                {/*</Card>*/}
+                <Card id="target-element">
+                  <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
+                  <CardContent>
+                    <EChartsTest/>
+                  </CardContent>
+                </Card>
+                <br/>
+
+
+                <div style={{ borderCollapse: 'collapse' }}>
+                  <Card>
+                    <CardContent>
+                      <div>
+                        请医护根据此次训练的直方图对以下信息进行评价：
+                      </div>
+                      <br/>
+                      <Typography variant="h6">医生评价</Typography>
+                      <form>
+                        <Grid container spacing={0}>
+                          <Grid item xs={3}>
+                            <Box sx={{padding: '8px' }}>
+                              <Grid container spacing={0} alignItems="center">
+                                <Grid item xs={4}>
+                                  <label htmlFor="input9">耐受状态:</label>
+                                </Grid>
+                                <Grid item xs={8}>
+                                  <TextField
+                                    name="tolerance"
+                                    value={evaluateFormData.tolerance}
+                                    onChange={handleEvaluationFormDataFormChange}
+                                    size="small"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <Box sx={{padding: '8px' }}>
+                              <Grid container spacing={0} alignItems="center">
+                                <Grid item xs={4}>
+                                  <label htmlFor="input10">运动评价:</label>
+                                </Grid>
+                                <Grid item xs={8}>
+                                  <TextField
+                                    name="motionReview"
+                                    value={evaluateFormData.motionReview}
+                                    onChange={handleEvaluationFormDataFormChange}
+                                    size="small"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <Box sx={{padding: '8px' }}>
+                              <Grid container spacing={0} alignItems="center">
+                                <Grid item xs={4}>
+                                  <label htmlFor="input11">痉挛评价:</label>
+                                </Grid>
+                                <Grid item xs={8}>
+                                  <TextField
+                                    name="spasmReview"
+                                    value={evaluateFormData.spasmReview}
+                                    onChange={handleEvaluationFormDataFormChange}
+                                    size="small"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <Box sx={{padding: '8px' }}>
+                              <Grid container spacing={0} alignItems="center">
+                                <Grid item xs={4}>
+                                  <label htmlFor="input9">肌张力:</label>
+                                </Grid>
+                                <Grid item xs={8}>
+                                  <TextField
+                                    name="muscleTone"
+                                    value={evaluateFormData.muscleTone}
+                                    onChange={handleEvaluationFormDataFormChange}
+                                    size="small"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <Box sx={{padding: '8px' }}>
+                              <Grid container spacing={0} alignItems="center">
+                                <Grid item xs={4}>
+                                  <label htmlFor="input9">急性期情况:</label>
+                                </Grid>
+                                <Grid item xs={8}>
+                                  <TextField
+                                    name="acuteState"
+                                    value={evaluateFormData.acuteState}
+                                    onChange={handleEvaluationFormDataFormChange}
+                                    size="small"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <Box sx={{padding: '8px' }}>
+                              <Grid container spacing={0} alignItems="center">
+                                <Grid item xs={4}>
+                                  <label htmlFor="input9">神经科判断:</label>
+                                </Grid>
+                                <Grid item xs={8}>
+                                  <TextField
+                                    name="neuroJudgment"
+                                    value={evaluateFormData.neuroJudgment}
+                                    onChange={handleEvaluationFormDataFormChange}
+                                    size="small"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <Box sx={{padding: '8px' }}>
+                              <Grid container spacing={0} alignItems="center">
+                                <Grid item xs={4}>
+                                  <label htmlFor="input9">运动损伤度:</label>
+                                </Grid>
+                                <Grid item xs={8}>
+                                  <TextField
+                                    name="motionInjury"
+                                    value={evaluateFormData.motionInjury}
+                                    onChange={handleEvaluationFormDataFormChange}
+                                    size="small"
+                                    fullWidth
+                                  />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <Box sx={{padding: '8px' }}>
+                              <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </form>
+                      <br/>
+                      <div style={{ color: 'red', fontSize: '10px' }}>
+                        注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </Card>
-              <br/>
+            </Grid>
+            <br/>
 
-
-              {/*<div style={{ borderCollapse: 'collapse' }}>*/}
-              {/*  <Card>*/}
-              {/*    <CardContent>*/}
-              {/*      <div>*/}
-              {/*        请医护根据此次训练的直方图对以下信息进行评价：*/}
-              {/*      </div>*/}
-              {/*      <br/>*/}
-              {/*      <Typography variant="h6">医生评价</Typography>*/}
-              {/*      <form>*/}
-              {/*        <Grid container spacing={0}>*/}
-              {/*          <Grid item xs={3}>*/}
-              {/*            <Box sx={{padding: '8px' }}>*/}
-              {/*              <Grid container spacing={0} alignItems="center">*/}
-              {/*                <Grid item xs={4}>*/}
-              {/*                  <label htmlFor="input9">耐受状态:</label>*/}
-              {/*                </Grid>*/}
-              {/*                <Grid item xs={8}>*/}
-              {/*                  <TextField*/}
-              {/*                    name="tolerance"*/}
-              {/*                    value={evaluateFormData.tolerance}*/}
-              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
-              {/*                    size="small"*/}
-              {/*                    fullWidth*/}
-              {/*                  />*/}
-              {/*                </Grid>*/}
-              {/*              </Grid>*/}
-              {/*            </Box>*/}
-              {/*          </Grid>*/}
-              {/*          <Grid item xs={3}>*/}
-              {/*            <Box sx={{padding: '8px' }}>*/}
-              {/*              <Grid container spacing={0} alignItems="center">*/}
-              {/*                <Grid item xs={4}>*/}
-              {/*                  <label htmlFor="input10">运动评价:</label>*/}
-              {/*                </Grid>*/}
-              {/*                <Grid item xs={8}>*/}
-              {/*                  <TextField*/}
-              {/*                    name="motionReview"*/}
-              {/*                    value={evaluateFormData.motionReview}*/}
-              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
-              {/*                    size="small"*/}
-              {/*                    fullWidth*/}
-              {/*                  />*/}
-              {/*                </Grid>*/}
-              {/*              </Grid>*/}
-              {/*            </Box>*/}
-              {/*          </Grid>*/}
-              {/*          <Grid item xs={3}>*/}
-              {/*            <Box sx={{padding: '8px' }}>*/}
-              {/*              <Grid container spacing={0} alignItems="center">*/}
-              {/*                <Grid item xs={4}>*/}
-              {/*                  <label htmlFor="input11">痉挛评价:</label>*/}
-              {/*                </Grid>*/}
-              {/*                <Grid item xs={8}>*/}
-              {/*                  <TextField*/}
-              {/*                    name="spasmReview"*/}
-              {/*                    value={evaluateFormData.spasmReview}*/}
-              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
-              {/*                    size="small"*/}
-              {/*                    fullWidth*/}
-              {/*                  />*/}
-              {/*                </Grid>*/}
-              {/*              </Grid>*/}
-              {/*            </Box>*/}
-              {/*          </Grid>*/}
-              {/*          <Grid item xs={3}>*/}
-              {/*            <Box sx={{padding: '8px' }}>*/}
-              {/*              <Grid container spacing={0} alignItems="center">*/}
-              {/*                <Grid item xs={4}>*/}
-              {/*                  <label htmlFor="input9">肌张力:</label>*/}
-              {/*                </Grid>*/}
-              {/*                <Grid item xs={8}>*/}
-              {/*                  <TextField*/}
-              {/*                    name="muscleTone"*/}
-              {/*                    value={evaluateFormData.muscleTone}*/}
-              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
-              {/*                    size="small"*/}
-              {/*                    fullWidth*/}
-              {/*                  />*/}
-              {/*                </Grid>*/}
-              {/*              </Grid>*/}
-              {/*            </Box>*/}
-              {/*          </Grid>*/}
-              {/*          <Grid item xs={3}>*/}
-              {/*            <Box sx={{padding: '8px' }}>*/}
-              {/*              <Grid container spacing={0} alignItems="center">*/}
-              {/*                <Grid item xs={4}>*/}
-              {/*                  <label htmlFor="input9">急性期情况:</label>*/}
-              {/*                </Grid>*/}
-              {/*                <Grid item xs={8}>*/}
-              {/*                  <TextField*/}
-              {/*                    name="acuteState"*/}
-              {/*                    value={evaluateFormData.acuteState}*/}
-              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
-              {/*                    size="small"*/}
-              {/*                    fullWidth*/}
-              {/*                  />*/}
-              {/*                </Grid>*/}
-              {/*              </Grid>*/}
-              {/*            </Box>*/}
-              {/*          </Grid>*/}
-              {/*          <Grid item xs={3}>*/}
-              {/*            <Box sx={{padding: '8px' }}>*/}
-              {/*              <Grid container spacing={0} alignItems="center">*/}
-              {/*                <Grid item xs={4}>*/}
-              {/*                  <label htmlFor="input9">神经科判断:</label>*/}
-              {/*                </Grid>*/}
-              {/*                <Grid item xs={8}>*/}
-              {/*                  <TextField*/}
-              {/*                    name="neuroJudgment"*/}
-              {/*                    value={evaluateFormData.neuroJudgment}*/}
-              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
-              {/*                    size="small"*/}
-              {/*                    fullWidth*/}
-              {/*                  />*/}
-              {/*                </Grid>*/}
-              {/*              </Grid>*/}
-              {/*            </Box>*/}
-              {/*          </Grid>*/}
-              {/*          <Grid item xs={3}>*/}
-              {/*            <Box sx={{padding: '8px' }}>*/}
-              {/*              <Grid container spacing={0} alignItems="center">*/}
-              {/*                <Grid item xs={4}>*/}
-              {/*                  <label htmlFor="input9">运动损伤度:</label>*/}
-              {/*                </Grid>*/}
-              {/*                <Grid item xs={8}>*/}
-              {/*                  <TextField*/}
-              {/*                    name="motionInjury"*/}
-              {/*                    value={evaluateFormData.motionInjury}*/}
-              {/*                    onChange={handleEvaluationFormDataFormChange}*/}
-              {/*                    size="small"*/}
-              {/*                    fullWidth*/}
-              {/*                  />*/}
-              {/*                </Grid>*/}
-              {/*              </Grid>*/}
-              {/*            </Box>*/}
-              {/*          </Grid>*/}
-              {/*          <Grid item xs={3}>*/}
-              {/*            <Box sx={{padding: '8px' }}>*/}
-              {/*              <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>*/}
-              {/*            </Box>*/}
-              {/*          </Grid>*/}
-              {/*        </Grid>*/}
-              {/*      </form>*/}
-              {/*      <br/>*/}
-              {/*      <div style={{ color: 'red', fontSize: '10px' }}>*/}
-              {/*        注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。*/}
-              {/*      </div>*/}
-              {/*    </CardContent>*/}
-              {/*  </Card>*/}
-              {/*</div>*/}
-            </Card>
-          </Grid>
 
             {/*压力数据折线图*/}
-          <Grid item xs={6} md={5.5}>
-            <Card sx={{ height: 365 ,padding: '10px'}}>
-              <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
-              {
-                trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
-              }
-            </Card>
-          </Grid>
+            <Grid item xs={6} md={5.5}>
+              <Card sx={{ height: 365 ,padding: '10px'}}>
+                <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
+                {
+                  trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
+                }
+              </Card>
+            </Grid>
 
             {/*康复记录*/}
-          {/*<Grid item xs={6} md={6.5}>*/}
-          {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
-          {/*    <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />*/}
-          {/*      <PrescriptionTable record={record} pid={params.id}/>*/}
-          {/*    </Card>*/}
-          {/*  </Grid>*/}
-        </Grid>
+            <Grid item xs={6} md={6.5}>
+              <Card sx={{ height: 365 ,padding: '10px'}}>
+                <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
+                <PrescriptionTable record={record} pid={params.id}/>
+              </Card>
+            </Grid>
+          </Grid>
           <br/>
         </Box>
         <br/>
@@ -888,11 +885,11 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
                 <InputLabel id="demo-select-small-label">训练部位</InputLabel>
                 <Select
-                    id="x"
-                    name="part"
-                    label="部位"
-                    value={String(NumToBodyPartMapping[willAddPrescription.part])}
-                    onChange={handleAddPrescriptionPartChange}>
+                  id="x"
+                  name="part"
+                  label="部位"
+                  value={String(NumToBodyPartMapping[willAddPrescription.part])}
+                  onChange={handleAddPrescriptionPartChange}>
                   <MenuItem value={1}>左手</MenuItem>
                   <MenuItem value={2}>右手</MenuItem>
                   <MenuItem value={3}>左腕</MenuItem>
@@ -903,65 +900,65 @@ export default function MUITable({ params }: { params: { id: string } }) {
               </FormControl>
               <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
                 <TextField
-                    {...AddPrescriptionItemRegister('duration', {
-                      required: '不能为空',
-                      validate: value => {
-                        if (typeof value === 'undefined') {
-                          return false;
-                        }
-                        if (typeof value === 'string') {
-                          const numberValue = parseFloat(value);
-                          return (!isNaN(numberValue) && numberValue >= 1) || '值须大于等于1';
-                        }
-                        return (!isNaN(value) && value >= 3) || '值须大于等于3';
+                  {...AddPrescriptionItemRegister('duration', {
+                    required: '不能为空',
+                    validate: value => {
+                      if (typeof value === 'undefined') {
+                        return false;
                       }
-                    })}
-                    value={willAddPrescription.duration}
-                    onChange={handleAddPrescriptionDuration}
-                    error={!!AddPrescriptionItemErrors.duration}
-                    helperText={AddPrescriptionItemErrors.duration?.message}
-                    inputProps={{ type: 'number', min: 1 }}
-                    sx={{ m: 1, minWidth: 160 }}
-                    id="duration"
-                    label="疗程" variant="outlined" size="small"/>
+                      if (typeof value === 'string') {
+                        const numberValue = parseFloat(value);
+                        return (!isNaN(numberValue) && numberValue >= 1) || '值须大于等于1';
+                      }
+                      return (!isNaN(value) && value >= 3) || '值须大于等于3';
+                    }
+                  })}
+                  value={willAddPrescription.duration}
+                  onChange={handleAddPrescriptionDuration}
+                  error={!!AddPrescriptionItemErrors.duration}
+                  helperText={AddPrescriptionItemErrors.duration?.message}
+                  inputProps={{ type: 'number', min: 1 }}
+                  sx={{ m: 1, minWidth: 160 }}
+                  id="duration"
+                  label="疗程" variant="outlined" size="small"/>
               </FormControl>
             </Box>
             <Box>
               <TextField
-                  value={willAddPrescription.zz}
-                  onChange={handleAddPrescriptionTimes}
-                  error={timesError != ''}
-                  helperText={timesError}
-                  inputProps={{ type: 'number' }}
-                  sx={{ m: 1, minWidth: 160 }}
-                  id="zz"
-                  label="训练次数或时间" variant="outlined" size="small"/>
+                value={willAddPrescription.zz}
+                onChange={handleAddPrescriptionTimes}
+                error={timesError != ''}
+                helperText={timesError}
+                inputProps={{ type: 'number' }}
+                sx={{ m: 1, minWidth: 160 }}
+                id="zz"
+                label="训练次数或时间" variant="outlined" size="small"/>
               <TextField
-                  value={willAddPrescription.u}
-                  onChange={handleAddPrescriptionBend}
-                  error={bendError !== ''}
-                  helperText={bendError}
-                  inputProps={{ type: 'number' }}
-                  sx={{ m: 1, minWidth: 160 }}
-                  id="u"
-                  label="弯曲定时值" variant="outlined" size="small"/>
+                value={willAddPrescription.u}
+                onChange={handleAddPrescriptionBend}
+                error={bendError !== ''}
+                helperText={bendError}
+                inputProps={{ type: 'number' }}
+                sx={{ m: 1, minWidth: 160 }}
+                id="u"
+                label="弯曲定时值" variant="outlined" size="small"/>
               <TextField
-                  value={willAddPrescription.v}
-                  onChange={handleAddPrescriptionStretch}
-                  error={stretchError !== ""}
-                  helperText={stretchError}
-                  inputProps={{ type: 'number' }}
-                  sx={{ m: 1, minWidth: 160 }}
-                  id="v"
-                  label="伸展定时值" variant="outlined" size="small"/>
+                value={willAddPrescription.v}
+                onChange={handleAddPrescriptionStretch}
+                error={stretchError !== ""}
+                helperText={stretchError}
+                inputProps={{ type: 'number' }}
+                sx={{ m: 1, minWidth: 160 }}
+                id="v"
+                label="伸展定时值" variant="outlined" size="small"/>
             </Box>
           </StyledDiv>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>取消</Button>
           <Button
-              onClick={handleSaveAddPrescription}
-              disabled={Boolean(error)}
+            onClick={handleSaveAddPrescription}
+            disabled={Boolean(error)}
           >确定</Button>
         </DialogActions>
       </Dialog>
