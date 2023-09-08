@@ -14,7 +14,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import {
-  Box, Chip, Collapse,
+  Box, Card, CardContent, Chip, Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -68,6 +68,43 @@ import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
 import dayjs, { Dayjs } from "dayjs";
+
+
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`vertical-tabpanel-${index}`}
+      aria-labelledby={`vertical-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `vertical-tab-${index}`,
+    'aria-controls': `vertical-tabpanel-${index}`,
+  };
+}
 
 
 const nextSunday = dayjs().endOf('week').startOf('day');
@@ -485,171 +522,201 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     }))
     // setOpenAddStatus(false)
   };
+  const [value, setValue] = React.useState(0);
+
+  const handleChangeTest = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
   return (<>
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                    <TableCell
-                        key={column.id}
-                        align={column.align}
-                        style={{ minWidth: column.minWidth }}
-                    >
-                      {column.label}
-                    </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {params.prescription?.map(row => (
-                <React.Fragment key={row.id}>
-                  <StyledTableRow
+    <Box
+      sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: 800 }}
+    >
+      {params.prescription?.map(row => (
+      <Tabs
+        orientation="vertical"
+        variant="scrollable"
+        value={value}
+        onChange={handleChangeTest}
+        aria-label="Vertical tabs example"
+        sx={{ borderRight: 1, borderColor: 'divider' }}
+      >
+        {/*<Tab label="编号：20230906" {...a11yProps(1)} />*/}
 
-                      style={{height:'30px'}}
-                      onClick={() => handleRowClick(row.id)}
-                      // sx={{
-                      //   '&:last-of-type td, &:last-of-type th': {
-                      //     border: 0
-                      //   },
-                      // }}
-                  >
-                    <TableCell>
-                      <IconButton
-                        aria-label="expand row"
-                        size="small"
-                        // onClick={() => handleRowClick(row.id)}
-                      >
-                        {openRecord[row.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                      </IconButton>
-                    </TableCell>
-                    <TableCell component='th' scope='row'>
-                      {row.created_at}
-                    </TableCell>
-                    <TableCell align='right'>{row.mode}</TableCell>
-                    <TableCell align='right'>{row.part}</TableCell>
-                    <TableCell align='right'>{row.zz}</TableCell>
-                    <TableCell align='right'>{row.u}</TableCell>
-                    <TableCell align='right'>{row.v}</TableCell>
-{/*<<<<<<< HEAD*/}
-{/*                    <TableCell align='center'>*/}
-{/*                      {*/}
-{/*                        (() => {*/}
-{/*                          let label = row.u + ' / ' + row.v;*/}
-{/*                          let color = 'success';*/}
-{/*                          if (row.u == row.v) {*/}
-{/*                            color = 'success';*/}
-{/*                          } else if (row.u < row.v) {*/}
-{/*                            color = 'primary';*/}
-{/*                          }*/}
-{/*                          return <MCTFixedWidthChip label={label} color={color}  />;*/}
-{/*                        })()*/}
-{/*                      }*/}
-{/*                    </TableCell>*/}
-{/*=======*/}
-                    <ThemeProvider theme={theme}>
-                      <TableCell align='right'>
-                        {
-                          (() => {
-                            let label = row.prescription_record?.length + ' / ' + row.duration;
-                            let color = 'success';
-                            if (row.prescription_record?.length == row.duration) {
-                              color = 'success';
-                            } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {
-                              color = 'primary';
-                            }
-                            return <MCTFixedWidthChip label={label} color={color} />;
-                          })()
-                        }
-                      </TableCell>
-                    </ThemeProvider>
-{/*>>>>>>> 17457e69bd08dd85b8a88e5a49337f7f9e6ea744*/}
-                    <TableCell align='center'>
-                      {/*<ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>*/}
-                      {/*  <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>*/}
-                      {/*  <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>*/}
-                      {/*  <Button color="secondary" onClick={() => handleDeletePrescription(row.id)}>删除</Button>*/}
-                      {/*</ButtonGroup>*/}
-                      <Tooltip title="下发处方">
-                        <IconButton
-                            aria-label="edit"
-                            color="primary"
-                            onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
-                        >
-                          <SendAndArchiveIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+          <Tab label={row.created_at} {...a11yProps(row.id)} />
+          <Card key={row.id} sx={{ marginBottom: 2 }}>
+            <CardContent>
+              {/*<Typography variant="h6">编号：{row.created_at}</Typography>*/}
+              <Typography>模式: {row.mode}</Typography>
+              <Typography>部位: {row.part}</Typography>
+              <Typography>训练时长或次数: {row.zz}</Typography>
+              <Typography>弯曲定时值: {row.u}</Typography>
+              <Typography>伸展定时值: {row.v}</Typography>
+              <ThemeProvider theme={theme}>
+                 <Typography align='right'>
+                   {
+                     (() => {
+                       let label = row.prescription_record?.length + ' / ' + row.duration;
+                       let color = 'success';
+                       if (row.prescription_record?.length == row.duration) {
+                        color = 'success';
+                       } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {
+                        color = 'primary';
+                       }
+                      return <MCTFixedWidthChip label={label} color={color} />;
+                     })()
+                   }
+                 </Typography>
+              </ThemeProvider>
+            </CardContent>
+          </Card>
+      </Tabs>
+      <TabPanel value={value} index={row.id}>
+        Item One
+      </TabPanel>
+          ))}
+    </Box>
+        {/*<TableContainer>*/}
+        {/*  <Table stickyHeader aria-label="sticky table">*/}
+        {/*    <TableHead>*/}
+        {/*      <TableRow>*/}
+        {/*        {columns.map((column) => (*/}
+        {/*            <TableCell*/}
+        {/*                key={column.id}*/}
+        {/*                align={column.align}*/}
+        {/*                style={{ minWidth: column.minWidth }}*/}
+        {/*            >*/}
+        {/*              {column.label}*/}
+        {/*            </TableCell>*/}
+        {/*        ))}*/}
+        {/*      </TableRow>*/}
+        {/*    </TableHead>*/}
+        {/*    <TableBody>*/}
+        {/*      {params.prescription?.map(row => (*/}
+        {/*        <React.Fragment key={row.id}>*/}
+        {/*          <StyledTableRow*/}
+        {/*              style={{height:'30px'}}*/}
+        {/*              onClick={() => handleRowClick(row.id)}*/}
+        {/*          >*/}
+        {/*            <TableCell>*/}
+        {/*              <IconButton*/}
+        {/*                aria-label="expand row"*/}
+        {/*                size="small"*/}
+        {/*                // onClick={() => handleRowClick(row.id)}*/}
+        {/*              >*/}
+        {/*                {openRecord[row.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}*/}
+        {/*              </IconButton>*/}
+        {/*            </TableCell>*/}
+        {/*            <TableCell component='th' scope='row'>*/}
+        {/*              {row.created_at}*/}
+        {/*            </TableCell>*/}
+        {/*            <TableCell align='right'>{row.mode}</TableCell>*/}
+        {/*            <TableCell align='right'>{row.part}</TableCell>*/}
+        {/*            <TableCell align='right'>{row.zz}</TableCell>*/}
+        {/*            <TableCell align='right'>{row.u}</TableCell>*/}
+        {/*            <TableCell align='right'>{row.v}</TableCell>*/}
 
-                      <Tooltip title="修改处方">
-                        <IconButton
-                            aria-label="edit"
-                            color="secondary"
-                            onClick={(event) => {event.stopPropagation(); handleClickModify(row)}}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+        {/*            <ThemeProvider theme={theme}>*/}
+        {/*              <TableCell align='right'>*/}
+        {/*                {*/}
+        {/*                  (() => {*/}
+        {/*                    let label = row.prescription_record?.length + ' / ' + row.duration;*/}
+        {/*                    let color = 'success';*/}
+        {/*                    if (row.prescription_record?.length == row.duration) {*/}
+        {/*                      color = 'success';*/}
+        {/*                    } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {*/}
+        {/*                      color = 'primary';*/}
+        {/*                    }*/}
+        {/*                    return <MCTFixedWidthChip label={label} color={color} />;*/}
+        {/*                  })()*/}
+        {/*                }*/}
+        {/*              </TableCell>*/}
+        {/*            </ThemeProvider>*/}
+        {/*            <TableCell align='center'>*/}
+        {/*              /!*<ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>*!/*/}
+        {/*              /!*  <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>*!/*/}
+        {/*              /!*  <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>*!/*/}
+        {/*              /!*  <Button color="secondary" onClick={() => handleDeletePrescription(row.id)}>删除</Button>*!/*/}
+        {/*              /!*</ButtonGroup>*!/*/}
+        {/*              <Tooltip title="下发处方">*/}
+        {/*                <IconButton*/}
+        {/*                    aria-label="edit"*/}
+        {/*                    color="primary"*/}
+        {/*                    onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}*/}
+        {/*                >*/}
+        {/*                  <SendAndArchiveIcon fontSize="small" />*/}
+        {/*                </IconButton>*/}
+        {/*              </Tooltip>*/}
 
-                      <Tooltip title="删除处方">
-                        <IconButton
-                            aria-label="delete"
-                            // onClick={() => handleDeletePrescription(row.id)}
-                            onClick={(event) => {event.stopPropagation(); handleClickDel(row)}}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </StyledTableRow>
-                <StyledTableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
-                  <Collapse in={openRecord[row.id]} timeout="auto" unmountOnExit>
-                    <Box sx={{ margin: 1,backgroundColor: 'rgba(177,197,238,0.78)',paddingLeft:3,marginLeft:2}}>
-                      <Typography variant="h6" gutterBottom component="div">
-                        康复记录
-                      </Typography>
-                      <Table size="small" aria-label="purchases">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>康复开始时间</TableCell>
-                            <TableCell>康复结束时间</TableCell>
-                            <TableCell align="center">各项指标</TableCell>
-                            <TableCell align="center">医生评价</TableCell>
-                            <TableCell align="center">操作</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {
-                            row.prescription_record?.map((historyRow: PrescriptionRecord) => (
-                                <TableRow key={historyRow.id}>
-                                  <TableCell>{historyRow.eid}</TableCell>
-                                  <TableCell>{historyRow.pid}</TableCell>
-                                  <TableCell align="center">
-                                    <Button color="secondary" onClick={handleClickOpenTarget}>病人指标</Button>
-                                  </TableCell>
-                                  <TableCell align="center">
-                                    <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>
-                                  </TableCell>
-                                  <TableCell align="center">
-                                    <Button color="secondary" onClick={handleClickMove} >查看直方图</Button>
-                                  </TableCell>
-                                </TableRow>
-                            ))
-                          }
-                        </TableBody>
-                      </Table>
-                    </Box>
-                  </Collapse>
-                </TableCell>
-              </StyledTableRow>
-                </React.Fragment>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+        {/*              <Tooltip title="修改处方">*/}
+        {/*                <IconButton*/}
+        {/*                    aria-label="edit"*/}
+        {/*                    color="secondary"*/}
+        {/*                    onClick={(event) => {event.stopPropagation(); handleClickModify(row)}}*/}
+        {/*                >*/}
+        {/*                  <EditIcon fontSize="small" />*/}
+        {/*                </IconButton>*/}
+        {/*              </Tooltip>*/}
+
+        {/*              <Tooltip title="删除处方">*/}
+        {/*                <IconButton*/}
+        {/*                    aria-label="delete"*/}
+        {/*                    // onClick={() => handleDeletePrescription(row.id)}*/}
+        {/*                    onClick={(event) => {event.stopPropagation(); handleClickDel(row)}}*/}
+        {/*                >*/}
+        {/*                  <DeleteIcon fontSize="small" />*/}
+        {/*                </IconButton>*/}
+        {/*              </Tooltip>*/}
+        {/*            </TableCell>*/}
+        {/*          </StyledTableRow>*/}
+        {/*        <StyledTableRow>*/}
+        {/*        /!*  康复记录*!/*/}
+        {/*        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>*/}
+        {/*          <Collapse in={openRecord[row.id]} timeout="auto" unmountOnExit>*/}
+        {/*            <Box sx={{ margin: 1,backgroundColor: 'rgba(177,197,238,0.78)',paddingLeft:3,marginLeft:2}}>*/}
+        {/*              <Typography variant="h6" gutterBottom component="div">*/}
+        {/*                康复记录*/}
+        {/*              </Typography>*/}
+        {/*              <Table size="small" aria-label="purchases">*/}
+        {/*                <TableHead>*/}
+        {/*                  <TableRow>*/}
+        {/*                    <TableCell>康复开始时间</TableCell>*/}
+        {/*                    <TableCell>康复结束时间</TableCell>*/}
+        {/*                    <TableCell align="center">各项指标</TableCell>*/}
+        {/*                    <TableCell align="center">医生评价</TableCell>*/}
+        {/*                    <TableCell align="center">操作</TableCell>*/}
+        {/*                  </TableRow>*/}
+        {/*                </TableHead>*/}
+        {/*                <TableBody>*/}
+        {/*                  {*/}
+        {/*                    row.prescription_record?.map((historyRow: PrescriptionRecord) => (*/}
+        {/*                        <TableRow key={historyRow.id}>*/}
+        {/*                          <TableCell>{historyRow.eid}</TableCell>*/}
+        {/*                          <TableCell>{historyRow.pid}</TableCell>*/}
+        {/*                          <TableCell align="center">*/}
+        {/*                            <Button color="secondary" onClick={handleClickOpenTarget}>病人指标</Button>*/}
+        {/*                          </TableCell>*/}
+        {/*                          <TableCell align="center">*/}
+        {/*                            <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>*/}
+        {/*                          </TableCell>*/}
+        {/*                          <TableCell align="center">*/}
+        {/*                            <Button color="secondary" onClick={handleClickMove} >查看直方图</Button>*/}
+        {/*                          </TableCell>*/}
+        {/*                        </TableRow>*/}
+        {/*                    ))*/}
+        {/*                  }*/}
+        {/*                </TableBody>*/}
+        {/*              </Table>*/}
+        {/*            </Box>*/}
+        {/*          </Collapse>*/}
+        {/*        </TableCell>*/}
+        {/*      </StyledTableRow>*/}
+        {/*        </React.Fragment>*/}
+        {/*        ))}*/}
+        {/*    </TableBody>*/}
+        {/*  </Table>*/}
+        {/*</TableContainer>*/}
+      {/*</Paper>*/}
 
       {/*查看指标弹框*/}
       <Dialog
