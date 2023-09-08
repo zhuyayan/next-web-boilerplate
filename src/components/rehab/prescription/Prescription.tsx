@@ -12,9 +12,9 @@ import TableRow, {TableRowProps} from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-
+import {EChartsTest} from "@/components/rehab/echarts/EChartsTest";
 import {
-  Box, Card, CardContent, Chip, Collapse,
+  Box, Card, CardActions, CardContent, Chip, Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -30,11 +30,19 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 
 import {
-  addStaff, addStatus,
+  addStaff,
+  addStatus,
   editPrescription,
-  EquipmentOnline, MedicalStaff,
-  Prescription, PrescriptionRecord,
-  sendPrescriptionToEquipment, PatientStatus, addEvaluation, EvaluateFormProps
+  EquipmentOnline,
+  MedicalStaff,
+  Prescription,
+  PrescriptionRecord,
+  sendPrescriptionToEquipment,
+  PatientStatus,
+  addEvaluation,
+  EvaluateFormProps,
+  addPrescription,
+  Prescription as PrescriptionEntity, AddPrescriptionItem
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -46,7 +54,7 @@ import {
   NumToBodyPartMapping,
   NumToModeMapping
 } from "@/utils/mct-utils";
-import {AppDispatch, useAppDispatch} from "@/redux/store";
+import {AppDispatch, RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 import { deletePrescription } from "@/redux/features/rehab/rehab-slice";
 import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
@@ -72,6 +80,10 @@ import dayjs, { Dayjs } from "dayjs";
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import CardHeader from "@mui/material/CardHeader";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import {Simulate} from "react-dom/test-utils";
+
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -230,8 +242,9 @@ export default function StickyHeadTable(params: { id: string,PId:string,
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
+  const [openadd, setOpenAdd] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
-
+  const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
   const [openRecord, setOpenRecord] = React.useState<{ [key: number]: boolean }>(() => {
     const OpenState: { [key: number]: boolean } = {};
     if (params.prescription?.length > 0) {
@@ -348,6 +361,9 @@ export default function StickyHeadTable(params: { id: string,PId:string,
 
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleCloseAdd = () => {
+    setOpenAdd(false);
   };
 
   const handleSendCommand = () => {
@@ -522,59 +538,331 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     }))
     // setOpenAddStatus(false)
   };
+
   const [value, setValue] = React.useState(0);
 
   const handleChangeTest = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+  };
+  const handleClickOpenAddPrescription = () => {
+    setOpenAdd(true);
+  };
+  // 添加处方按钮
+  const { register: AddPrescriptionItemRegister,
+    formState: { errors: AddPrescriptionItemErrors },
+    clearErrors: AddPrescriptionItemClearErrors,
+    trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
+  const [timesError, setTimesError] = React.useState<string>('');
+  const [bendError, setBendError] = React.useState<string>('');
+  const [stretchError, setStretchError] = React.useState<string>('');
+  const [error, setError] = React.useState(false);
+  const [willAddPrescription, setWillAddPrescription] = React.useState<PrescriptionEntity>({
+    id: 0,
+    created_at: "",
+    part: "0",
+    mode: "0",
+    zz: 3,
+    u: 3,
+    v: 3,
+    duration: 1,
+    prescription_record: [
+      {
+        id: 123,
+        created_at: '2023-08-09 12:00:00',
+        eid: "100000",
+        pid: "11",
+        state: "H_END",
+        updated_at: '2023-08-09 12:20:00'
+      }
+    ],
+  })
+  const handleAddPrescriptionDuration = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    setWillAddPrescription((prevInputValues) => ({
+      ...prevInputValues,
+      [id]: parseInt(value),
+    }))
+  };
+  const handleAddPrescriptionModeChange = (event: SelectChangeEvent) => {
+    console.log(event.target)
+    console.log(ModeToNumMapping[parseInt(event.target.value)])
+    setWillAddPrescription((prevState) => ({
+      ...prevState,
+      mode: ModeToNumMapping[parseInt(event.target.value)]
+    }))
+  };
+  const handleAddPrescriptionPartChange = (event: SelectChangeEvent) => {
+    console.log(event.target)
+    console.log(BodyPartToNumMapping[parseInt(event.target.value)])
+    setWillAddPrescription((prevState) => ({
+      ...prevState,
+      part: BodyPartToNumMapping[parseInt(event.target.value)]
+    }))
+  };
+
+  const handleSaveAddPrescription = () => {
+    console.log(willAddPrescription)
+    console.log(NumToBodyPartMapping[willAddPrescription.part])
+    console.log(NumToModeMapping[willAddPrescription.mode])
+    thunkDispatch(addPrescription({
+      pid: parseInt(params.id),
+      x: NumToBodyPartMapping[willAddPrescription.part],
+      y: NumToModeMapping[willAddPrescription.mode],
+      zz: Number(willAddPrescription.zz),
+      u: Number(willAddPrescription.u),
+      v: Number(willAddPrescription.v)
+    }))
+    setOpenAdd(false);
+  };
+  const handleAddPrescriptionTimes = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    console.log(id, value);
+    if (value !== '' && value < '1') {
+      setTimesError('输入的数字不能小于1');
+    } else {
+      setTimesError('');
+      setWillAddPrescription((prevInputValues) => ({
+        ...prevInputValues,
+        [id]: parseInt(value),
+      }))
+    }
+  };
+  const handleAddPrescriptionBend = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    console.log(id, value);
+    if (value == '') {
+      setBendError('不能为空');
+      return
+    }
+    if (value !== '' && parseInt(value) < 3) {
+      setBendError('输入的数字不能小于3');
+    } else {
+      setBendError('');
+      setWillAddPrescription((prevInputValues) => ({
+        ...prevInputValues,
+        [id]: parseInt(value),
+      }))
+    }
+  };
+  const handleAddPrescriptionStretch = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    if (inputValue !== '' && inputValue < '3') {
+      setStretchError('输入的数字不能小于3');
+    } else {
+      setStretchError('');
+      const { id, value } = event.target;
+      console.log(id, value)
+      setWillAddPrescription((prevInputValues) => ({
+        ...prevInputValues,
+        [id]: parseInt(value),
+      }))
+    }
   };
 
   return (<>
     <Box
       sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: 800 }}
     >
-      {params.prescription?.map(row => (
       <Tabs
         orientation="vertical"
         variant="scrollable"
         value={value}
         onChange={handleChangeTest}
         aria-label="Vertical tabs example"
-        sx={{ borderRight: 1, borderColor: 'divider' }}
+        // sx={{ borderRight: 2, borderColor: 'divider', width: 230 }}
       >
-        {/*<Tab label="编号：20230906" {...a11yProps(1)} />*/}
-
-          <Tab label={row.created_at} {...a11yProps(row.id)} />
-          <Card key={row.id} sx={{ marginBottom: 2 }}>
-            <CardContent>
-              {/*<Typography variant="h6">编号：{row.created_at}</Typography>*/}
-              <Typography>模式: {row.mode}</Typography>
-              <Typography>部位: {row.part}</Typography>
-              <Typography>训练时长或次数: {row.zz}</Typography>
-              <Typography>弯曲定时值: {row.u}</Typography>
-              <Typography>伸展定时值: {row.v}</Typography>
-              <ThemeProvider theme={theme}>
-                 <Typography align='right'>
-                   {
-                     (() => {
-                       let label = row.prescription_record?.length + ' / ' + row.duration;
-                       let color = 'success';
-                       if (row.prescription_record?.length == row.duration) {
-                        color = 'success';
-                       } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {
-                        color = 'primary';
-                       }
-                      return <MCTFixedWidthChip label={label} color={color} />;
-                     })()
-                   }
-                 </Typography>
-              </ThemeProvider>
-            </CardContent>
-          </Card>
+        <Tab
+          sx={{width: '230px'}}
+          label={
+          <>
+            <div>
+              <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h6' }} />
+              <Typography style={{display:'inline-block'}} variant="h7" gutterBottom>
+                (共
+              </Typography>
+              <Typography color="primary" style={{display:'inline-block'}} variant="h6" gutterBottom>
+                {prescription.length}
+              </Typography>
+              <Typography style={{display:'inline-block'}} variant="h7" gutterBottom>
+                条处方)
+              </Typography>
+              <Tooltip title="新建处方">
+                <IconButton
+                  style={{float: 'right'}}
+                  aria-label="add"
+                  onClick={handleClickOpenAddPrescription}
+                >
+                  <AddCircleIcon sx={{ fontSize: 30 }} color="secondary"/>
+                </IconButton>
+              </Tooltip>
+            </div>
+          </>
+        }>
+        </Tab>
+        {params.prescription?.map(row => (
+          <Tab
+            sx={{width: '230px'}}
+            key={row.id}
+            label={<>
+            <Card key={row.id} sx={{ marginBottom: 0 }}>
+              <CardContent>
+                <Typography>{row.created_at}</Typography>
+                <Typography>模式: {row.mode}</Typography>
+                <Typography>部位: {row.part}</Typography>
+                <Typography>训练时长或次数: {row.zz}</Typography>
+                <Typography>弯曲定时值: {row.u}</Typography>
+                <Typography>伸展定时值: {row.v}</Typography>
+                <ThemeProvider theme={theme}>
+                  <Typography align='right'>进度：
+                    {
+                      (() => {
+                        let label = row.prescription_record?.length + ' / ' + row.duration;
+                        let color = 'success';
+                        if (row.prescription_record?.length == row.duration) {
+                          color = 'success';
+                        } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {
+                          color = 'primary';
+                        }
+                        return <MCTFixedWidthChip label={label} color={color} />;
+                      })()
+                    }
+                  </Typography>
+                </ThemeProvider>
+                <Tooltip title="修改处方">
+                  <IconButton
+                    aria-label="edit"
+                    color="secondary"
+                    onClick={(event) => {event.stopPropagation(); handleClickModify(row)}}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="删除处方">
+                  <IconButton
+                    aria-label="delete"
+                    // onClick={() => handleDeletePrescription(row.id)}
+                    onClick={(event) => {event.stopPropagation(); handleClickDel(row)}}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </CardContent>
+            </Card>
+          </>} {...a11yProps(1)} />
+        ))}
       </Tabs>
-      <TabPanel value={value} index={row.id}>
-        Item One
-      </TabPanel>
-          ))}
+      <TabPanel index={0} value={value}></TabPanel>
+      {params.prescription?.map(row => (
+        <>
+          <TabPanel value={value} index={1}>
+            {/*一天三次，一次十分钟，共需做5天，已做3天*/}
+            <Grid container spacing={2}>
+              <Grid item xs={8} md={8}>
+                <Card sx={{ minWidth: 500,backgroundColor: '#74b2f1' ,display: 'flex', justifyContent: 'space-between'}}>
+                  <CardContent>
+                    <Typography sx={{ fontSize: 16 ,fontWeight: 'bold'}} color="text.secondary" gutterBottom>
+                      一天三次，一次十分钟，共需做 5 天，已做 3 天
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button style={{backgroundColor: '#2152f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>修改</Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+              <Grid item xs={4}>
+                <Tooltip title="下发处方">
+
+                  <IconButton
+                    aria-label="edit"
+                    color="primary"
+                    onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
+                  >
+                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                      下发处方：
+                    </Typography>
+                    <SendAndArchiveIcon sx={{ fontSize: 40 }} />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                {/* 康复记录*/}
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom component="div">
+                      康复记录
+                    </Typography>
+                    <Table aria-label="purchases">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="center">状态</TableCell>
+                          <TableCell>康复开始时间</TableCell>
+                          <TableCell>康复结束时间</TableCell>
+                          <TableCell align="center">时长</TableCell>
+                          <TableCell align="center">指标</TableCell>
+                          <TableCell align="center">量表及评价</TableCell>
+                          <TableCell align="center">操作</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell>
+                            <Button style={{backgroundColor: '#f32148', color: '#ffffff', float: 'right'}}>完成</Button>
+                          </TableCell>
+                          <TableCell>2023-9-8 14:10</TableCell>
+                          <TableCell>2023-9-8 14:30</TableCell>
+                          <TableCell>20min</TableCell>
+                          <TableCell align="center">
+                            <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>填写指标</Button>
+                          </TableCell>
+                          <TableCell align="center">
+                            <a href={`/rehab/assessment`} target="_blank" rel="noopener noreferrer">
+                              <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
+                            </a>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={handleClickMove}>查看直方图</Button>
+                          </TableCell>
+                        </TableRow>
+                        {/*{*/}
+                        {/*  row.prescription_record?.map((historyRow: PrescriptionRecord) => (*/}
+                        {/*    <TableRow key={historyRow.id}>*/}
+                        {/*      <TableCell>完成</TableCell>*/}
+                        {/*      <TableCell>{historyRow.eid}</TableCell>*/}
+                        {/*      <TableCell>{historyRow.pid}</TableCell>*/}
+                        {/*      <TableCell>20min</TableCell>*/}
+                        {/*      <TableCell align="center">*/}
+                        {/*        <Button color="secondary" onClick={handleClickOpenTarget}>指标</Button>*/}
+                        {/*      </TableCell>*/}
+                        {/*      <TableCell align="center">*/}
+                        {/*        <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>*/}
+                        {/*      </TableCell>*/}
+                        {/*      <TableCell align="center">*/}
+                        {/*        <Button color="secondary" onClick={handleClickMove}>查看直方图</Button>*/}
+                        {/*      </TableCell>*/}
+                        {/*    </TableRow>*/}
+                        {/*  ))*/}
+                        {/*}*/}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+
+
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Card id="target-element">
+                  <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
+                  <CardContent>
+                    <EChartsTest/>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+
+            <Card></Card>
+          </TabPanel>
+        </>
+      ))}
     </Box>
         {/*<TableContainer>*/}
         {/*  <Table stickyHeader aria-label="sticky table">*/}
@@ -718,51 +1006,8 @@ export default function StickyHeadTable(params: { id: string,PId:string,
         {/*</TableContainer>*/}
       {/*</Paper>*/}
 
-      {/*查看指标弹框*/}
-      <Dialog
-        open={openTarget}
-        onClose={handleCloseTarget}
-        aria-describedby="Target"
-      >
-        <DialogTitle>{"病人各项指标"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="Target">
-            <Table sx={{ minWidth: 500 }} aria-label="a dense table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>发病时间</TableCell>
-                  <TableCell align="right">用药</TableCell>
-                  <TableCell align="right">痉挛状态</TableCell>
-                  <TableCell align="right">最小心率</TableCell>
-                  <TableCell align="right">最大心率</TableCell>
-                  <TableCell align="right">平均心率</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow
-                    key={row.onsetTime}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {row.onsetTime}
-                    </TableCell>
-                    <TableCell align="right">{row.medication}</TableCell>
-                    <TableCell align="right">{row.spasmStatus}</TableCell>
-                    <TableCell align="right">{row.minHeartRate}</TableCell>
-                    <TableCell align="right">{row.maxHeartRate}</TableCell>
-                    <TableCell align="right">{row.avgHeartRate}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseTarget}>关闭</Button>
-        </DialogActions>
-      </Dialog>
 
+      {/*查看指标弹框*/}
       <Dialog
         open={openTarget}
         onClose={handleCloseTarget}
@@ -812,13 +1057,13 @@ export default function StickyHeadTable(params: { id: string,PId:string,
               {/*/>*/}
               {/* Add more input fields for other indicators */}
               <Grid container spacing={0}>
-                <Grid item xs={4.5}>
+                <Grid item xs={6}>
                   <Box sx={{padding: '8px' }}>
                     <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={3}>
+                      <Grid item xs={4}>
                         <label htmlFor="input9">发病时间:</label>
                       </Grid>
-                      <Grid item xs={9}>
+                      <Grid item xs={8}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DateTimePicker
                             value={willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null}
@@ -846,7 +1091,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Grid>
                   </Box>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={6}>
                   <Box sx={{padding: '8px' }}>
                     <Grid container spacing={0} alignItems="center">
                       <Grid item xs={4}>
@@ -864,7 +1109,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Grid>
                   </Box>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={6}>
                   <Box sx={{padding: '8px' }}>
                     <Grid container spacing={0} alignItems="center">
                       <Grid item xs={4}>
@@ -882,17 +1127,13 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Grid>
                   </Box>
                 </Grid>
-                <Grid item xs={1.5}>
-                  <Box sx={{padding: '8px' }}>
-                  </Box>
-                </Grid>
-                <Grid item xs={4.5}>
+                <Grid item xs={6}>
                   <Box sx={{padding: '8px' }}>
                     <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={3}>
+                      <Grid item xs={4}>
                         <label htmlFor="input9">最小心率:</label>
                       </Grid>
-                      <Grid item xs={9}>
+                      <Grid item xs={8}>
                         <TextField
                           id="min_heart_rate"
                           value={willAddStatus.min_heart_rate}
@@ -903,7 +1144,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Grid>
                   </Box>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={6}>
                   <Box sx={{padding: '8px' }}>
                     <Grid container spacing={0} alignItems="center">
                       <Grid item xs={4}>
@@ -921,7 +1162,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Grid>
                   </Box>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={6}>
                   <Box sx={{padding: '8px' }}>
                     <Grid container spacing={0} alignItems="center">
                       <Grid item xs={4}>
@@ -939,21 +1180,13 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Grid>
                   </Box>
                 </Grid>
-                <Grid item xs={1.5}>
-                  <Box sx={{padding: '8px' }}>
-                    <Button
-                      style={{float: 'right'}}
-                      variant="outlined"
-                      size="small"
-                      onClick={handleSaveAddStatus}>保存指标</Button>
-                  </Box>
-                </Grid>
               </Grid>
 
             </div>
           )}
         </DialogContent>
         <DialogActions>
+          <Button onClick={handleSaveAddStatus}>保存指标</Button>
           <Button onClick={handleCloseTarget}>关闭</Button>
         </DialogActions>
       </Dialog>
@@ -1351,6 +1584,114 @@ export default function StickyHeadTable(params: { id: string,PId:string,
           <Button onClick={handleEditPrescription} disabled={isSubmitting}>确定</Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog open={openadd} onClose={handleCloseAdd}>
+        <DialogTitle>新建处方</DialogTitle>
+        <DialogContent>
+          <DialogContentText style={{display:'inline-block'}}>
+            确保正确填写所有处方信息
+          </DialogContentText>
+          <Typography variant='body2' style={{display:'inline-block', color: 'red' }} >（建议：伸展定时值=弯曲定时值的 1.5 倍）</Typography>
+          <StyledDiv>
+            <Box>
+              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                <InputLabel>训练模式</InputLabel>
+                <Select
+                  id="y"
+                  name="mode"
+                  label="模式"
+                  value={String(NumToModeMapping[willAddPrescription.mode])}
+                  onChange={handleAddPrescriptionModeChange}>
+                  <MenuItem value={1}>被动计次模式</MenuItem>
+                  <MenuItem value={2}>被动定时模式</MenuItem>
+                  <MenuItem value={3}>主动计次模式</MenuItem>
+                  <MenuItem value={4}>主动定时模式</MenuItem>
+                  <MenuItem value={5}>助力计次模式</MenuItem>
+                  <MenuItem value={6}>助力定时模式</MenuItem>
+                  <MenuItem value={7}>手动计次模式</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                <InputLabel id="demo-select-small-label">训练部位</InputLabel>
+                <Select
+                  id="x"
+                  name="part"
+                  label="部位"
+                  value={String(NumToBodyPartMapping[willAddPrescription.part])}
+                  onChange={handleAddPrescriptionPartChange}>
+                  <MenuItem value={1}>左手</MenuItem>
+                  <MenuItem value={2}>右手</MenuItem>
+                  <MenuItem value={3}>左腕</MenuItem>
+                  <MenuItem value={4}>右腕</MenuItem>
+                  <MenuItem value={5}>左踝</MenuItem>
+                  <MenuItem value={6}>右踝</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                <TextField
+                  {...AddPrescriptionItemRegister('duration', {
+                    required: '不能为空',
+                    validate: value => {
+                      if (typeof value === 'undefined') {
+                        return false;
+                      }
+                      if (typeof value === 'string') {
+                        const numberValue = parseFloat(value);
+                        return (!isNaN(numberValue) && numberValue >= 1) || '值须大于等于1';
+                      }
+                      return (!isNaN(value) && value >= 3) || '值须大于等于3';
+                    }
+                  })}
+                  value={willAddPrescription.duration}
+                  onChange={handleAddPrescriptionDuration}
+                  error={!!AddPrescriptionItemErrors.duration}
+                  helperText={AddPrescriptionItemErrors.duration?.message}
+                  inputProps={{ type: 'number', min: 1 }}
+                  sx={{ m: 1, minWidth: 160 }}
+                  id="duration"
+                  label="疗程" variant="outlined" size="small"/>
+              </FormControl>
+            </Box>
+            <Box>
+              <TextField
+                value={willAddPrescription.zz}
+                onChange={handleAddPrescriptionTimes}
+                error={timesError != ''}
+                helperText={timesError}
+                inputProps={{ type: 'number' }}
+                sx={{ m: 1, minWidth: 160 }}
+                id="zz"
+                label="训练次数或时间" variant="outlined" size="small"/>
+              <TextField
+                value={willAddPrescription.u}
+                onChange={handleAddPrescriptionBend}
+                error={bendError !== ''}
+                helperText={bendError}
+                inputProps={{ type: 'number' }}
+                sx={{ m: 1, minWidth: 160 }}
+                id="u"
+                label="弯曲定时值" variant="outlined" size="small"/>
+              <TextField
+                value={willAddPrescription.v}
+                onChange={handleAddPrescriptionStretch}
+                error={stretchError !== ""}
+                helperText={stretchError}
+                inputProps={{ type: 'number' }}
+                sx={{ m: 1, minWidth: 160 }}
+                id="v"
+                label="伸展定时值" variant="outlined" size="small"/>
+            </Box>
+          </StyledDiv>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAdd}>取消</Button>
+          <Button
+            onClick={handleSaveAddPrescription}
+            disabled={Boolean(error)}
+          >确定</Button>
+        </DialogActions>
+      </Dialog>
+
     </>
   );
 }

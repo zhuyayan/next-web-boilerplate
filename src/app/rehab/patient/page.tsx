@@ -382,13 +382,15 @@ export default function PatientList() {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{m: 1, minWidth: 100}} align='center'>姓名</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 100}} align='center'>年龄</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 100}} align='center'>性别</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 150}} align='center'>病史</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>姓名</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 80}} align='center'>年龄</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 80}} align='center'>性别</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>病史</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 110}} align='center'>分类</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 80}} align='center'>分级</TableCell>
                   <TableCell sx={{m: 1, minWidth: 100}} align='center'>主治医生</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>身份证号</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 300}} align='center'>操作</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 200}} align='center'>操作</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -400,6 +402,8 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.age}</TableCell>
                           <TableCell align='center'>{patient.genderLabel}</TableCell>
                           <TableCell align='center'>{patient.medicalHistory}</TableCell>
+                          <TableCell align='center'>缺血性脑卒中</TableCell>
+                          <TableCell align='center'>2级</TableCell>
                           <TableCell align='center'>{patient.physician}</TableCell>
                           <TableCell align='center'>{patient.i18d}</TableCell>
                           <TableCell align='center'>
