@@ -57,6 +57,9 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
   const [alignment5, setAlignment5] = React.useState<string | null>('000');
   const [alignment6, setAlignment6] = React.useState<string | null>('000');
   const [alignment7, setAlignment7] = React.useState<string | null>('000');
+  const [alignment8, setAlignment8] = React.useState<string | null>('000');
+  const [alignment9, setAlignment9] = React.useState<string | null>('000');
+  const [alignment10, setAlignment10] = React.useState<string | null>('000');
 
   // 医生评价表单
   const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
@@ -141,6 +144,25 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
     setAlignment7(newAlignment);
   };
 
+  const handleAlignment8 = (
+    event: React.MouseEvent<HTMLElement>,
+    newAlignment: string | null,
+  ) => {
+    setAlignment8(newAlignment);
+  };
+  const handleAlignment9 = (
+    event: React.MouseEvent<HTMLElement>,
+    newAlignment: string | null,
+  ) => {
+    setAlignment9(newAlignment);
+  };
+  const handleAlignment10 = (
+    event: React.MouseEvent<HTMLElement>,
+    newAlignment: string | null,
+  ) => {
+    setAlignment10(newAlignment);
+  };
+
   const selectedStyle = {
     height: '40px',
     margin: '0 16px 0 16px',
@@ -191,6 +213,10 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
   const [showAlignment5, setShowAlignment5] = useState(true);
   const [showAlignment6, setShowAlignment6] = useState(true);
   const [showAlignment7, setShowAlignment7] = useState(true);
+  const [showAlignment8, setShowAlignment8] = useState(true);
+  const [showAlignment9, setShowAlignment9] = useState(true);
+  const [showAlignment10, setShowAlignment10] = useState(true);
+
 
   const [showEvaluate1, setShowEvaluate1] = useState(true);
   const [showEvaluate2, setShowEvaluate2] = useState(true);
@@ -199,11 +225,14 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
   const [showEvaluate5, setShowEvaluate5] = useState(true);
   const [showEvaluate6, setShowEvaluate6] = useState(true);
   const [showEvaluate7, setShowEvaluate7] = useState(true);
+  const [showEvaluate8, setShowEvaluate8] = useState(true);
+  const [showEvaluate9, setShowEvaluate9] = useState(true);
+  const [showEvaluate10, setShowEvaluate10] = useState(true);
 
 
   return (
     <Container>
-      <Title>Fugl-Meyer评定量表</Title>
+      <Title>Fugl-Meyer评定量表（手部）</Title>
       <FormControl fullWidth>
         <Grid container spacing={0}>
           <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
@@ -415,6 +444,87 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
                     <ToggleButton value="072" style={alignment7 === "072" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
                       2分: 可牢牢捏住球形物体
                     </ToggleButton>
+                  </ToggleButtonGroup>}
+            </Grid>
+            <Grid item xs={12} alignItems="center">
+              {showAlignment8 &&
+                  <Typography variant="h6">
+                      手协调性与速度 : 指鼻试验 (快速连续进行5次)
+                  </Typography>}
+            </Grid>
+            <Grid item xs={12} alignItems="center">
+              {showAlignment8 &&
+                  <Typography variant="h6">
+                      &gt; 震颤
+                  </Typography>}
+            </Grid>
+            <Grid item xs={12} alignItems="center">
+              {showAlignment8 &&
+                  <ToggleButtonGroup
+                      value={alignment8}
+                      exclusive
+                      onChange={handleAlignment8}
+                      aria-label="test8"
+                  >
+                      <ToggleButton value="080" style={alignment8 === "080" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
+                          0分: 明显震颤
+                      </ToggleButton>
+                      <ToggleButton value="081" style={alignment8 === "081" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
+                          1分: 轻度震颤
+                      </ToggleButton>
+                      <ToggleButton value="082" style={alignment8 === "082" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
+                          2分: 无震颤
+                      </ToggleButton>
+                  </ToggleButtonGroup>}
+            </Grid>
+            <Grid item xs={12} alignItems="center">
+              {showAlignment9 &&
+                  <Typography variant="h6">
+                      &gt; 辩距不良
+                  </Typography>}
+            </Grid>
+            <Grid item xs={12} alignItems="center">
+              {showAlignment9 &&
+                  <ToggleButtonGroup
+                      value={alignment9}
+                      exclusive
+                      onChange={handleAlignment9}
+                      aria-label="test9"
+                  >
+                      <ToggleButton value="090" style={alignment9 === "090" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
+                          0分: 明显的或不规则辨距障碍
+                      </ToggleButton>
+                      <ToggleButton value="091" style={alignment9 === "091" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
+                          1分: 轻度的规则的辩距障碍
+                      </ToggleButton>
+                      <ToggleButton value="092" style={alignment9 === "092" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
+                          2分: 无辩距障碍
+                      </ToggleButton>
+                  </ToggleButtonGroup>}
+            </Grid>
+            <Grid item xs={12} alignItems="center">
+              {showAlignment8 &&
+                  <Typography variant="h6">
+                      &gt; 速度
+                  </Typography>}
+            </Grid>
+            <Grid item xs={12} alignItems="center">
+              {showAlignment10 &&
+                  <ToggleButtonGroup
+                      value={alignment10}
+                      exclusive
+                      onChange={handleAlignment10}
+                      aria-label="test10"
+                  >
+                      <ToggleButton value="100" style={alignment10 === "100" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
+                          0分: 较健侧慢6秒
+                      </ToggleButton>
+                      <ToggleButton value="101" style={alignment10 === "101" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
+                          1分: 较健侧慢2-5秒
+                      </ToggleButton>
+                      <ToggleButton value="102" style={alignment10 === "102" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
+                          2分: 两侧差别少于2秒
+                      </ToggleButton>
                   </ToggleButtonGroup>}
             </Grid>
             <Grid item xs={12} alignItems="center">
@@ -705,6 +815,36 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
               <Grid item xs={3} style={{display: 'flex', alignItems: 'center'}}>
                 <Button color={showAlignment7 ? "primary" : "error"} onClick={() => setShowAlignment7(!showAlignment7)}>
                   {showAlignment7 ? "将会显示" : "不会显示"}
+                </Button>
+              </Grid>
+              <Grid item xs={9} style={{display: 'flex', alignItems: 'center'}}>
+                <Typography variant="body1">
+                  &gt; 震颤
+                </Typography>
+              </Grid>
+              <Grid item xs={3} style={{display: 'flex', alignItems: 'center'}}>
+                <Button color={showAlignment8 ? "primary" : "error"} onClick={() => setShowAlignment8(!showAlignment7)}>
+                  {showAlignment8 ? "将会显示" : "不会显示"}
+                </Button>
+              </Grid>
+              <Grid item xs={9} style={{display: 'flex', alignItems: 'center'}}>
+                <Typography variant="body1">
+                  &gt; 辩距不良
+                </Typography>
+              </Grid>
+              <Grid item xs={3} style={{display: 'flex', alignItems: 'center'}}>
+                <Button color={showAlignment9 ? "primary" : "error"} onClick={() => setShowAlignment9(!showAlignment7)}>
+                  {showAlignment9 ? "将会显示" : "不会显示"}
+                </Button>
+              </Grid>
+              <Grid item xs={9} style={{display: 'flex', alignItems: 'center'}}>
+                <Typography variant="body1">
+                  &gt; 速度
+                </Typography>
+              </Grid>
+              <Grid item xs={3} style={{display: 'flex', alignItems: 'center'}}>
+                <Button color={showAlignment10 ? "primary" : "error"} onClick={() => setShowAlignment10(!showAlignment7)}>
+                  {showAlignment10 ? "将会显示" : "不会显示"}
                 </Button>
               </Grid>
             </Grid>

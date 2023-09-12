@@ -119,7 +119,8 @@ function a11yProps(index: number) {
 }
 
 
-const nextSunday = dayjs().endOf('week').startOf('day');
+// const nextSunday = dayjs().endOf('week').startOf('day');
+const nextSunday = dayjs().endOf('week').startOf('day').toDate();
 
 const isWeekend = (date: Dayjs) => {
   const day = date.day();
@@ -658,6 +659,8 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       }))
     }
   };
+  const onsetTime = willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null;
+
 
   return (<>
     <Box
@@ -859,7 +862,6 @@ export default function StickyHeadTable(params: { id: string,PId:string,
               </Grid>
             </Grid>
 
-            <Card></Card>
           </TabPanel>
         </>
       ))}
@@ -1066,7 +1068,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                       <Grid item xs={8}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DateTimePicker
-                            value={willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null}
+                            value={onsetTime as any}
                             onChange={(newValue) => {
                               // newValue is the selected date and time object
                               const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';
@@ -1075,7 +1077,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                                 onset_time: formattedDate,
                               }));
                             }}
-                            defaultValue={nextSunday}
+                            defaultValue={nextSunday as any}
                             shouldDisableDate={isWeekend}
                             views={['year', 'month', 'day', 'hours', 'minutes']}
                           />
