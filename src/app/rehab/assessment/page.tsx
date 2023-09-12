@@ -461,115 +461,115 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
           <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
           <form>
             <Grid container spacing={0}>
-              <Grid item xs={3}>
+              {showEvaluate1 && <Grid item xs={3}>
                 <Box sx={{padding: '8px' }}>
                   <Grid container spacing={0} alignItems="center">
                     <Grid item xs={4}>
-                      {showEvaluate1 && <label htmlFor="input9">耐受状态:</label>}
+                      <label htmlFor="input9">耐受状态:</label>
                     </Grid>
                     <Grid item xs={8}>
-                      {showEvaluate1 && <TextField
-                          name="tolerance"
-                          value={evaluateFormData.tolerance}
-                          onChange={handleEvaluationFormDataFormChange}
-                          size="small"
-                          fullWidth
-                      />}
+                      <TextField
+                        name="tolerance"
+                        value={evaluateFormData.tolerance}
+                        onChange={handleEvaluationFormDataFormChange}
+                        size="small"
+                        fullWidth
+                      />
                     </Grid>
                   </Grid>
                 </Box>
-              </Grid>
-              <Grid item xs={3}>
+              </Grid>}
+              {showEvaluate2 && <Grid item xs={3}>
                 <Box sx={{padding: '8px' }}>
                   <Grid container spacing={0} alignItems="center">
                     <Grid item xs={4}>
-                      {showEvaluate2 && <label htmlFor="input10">运动评价:</label>}
+                      <label htmlFor="input10">运动评价:</label>
                     </Grid>
                     <Grid item xs={8}>
-                      {showEvaluate2 && <TextField
-                          name="motionReview"
-                          value={evaluateFormData.motionReview}
-                          onChange={handleEvaluationFormDataFormChange}
-                          size="small"
-                          fullWidth
-                      />}
+                      <TextField
+                        name="motionReview"
+                        value={evaluateFormData.motionReview}
+                        onChange={handleEvaluationFormDataFormChange}
+                        size="small"
+                        fullWidth
+                      />
                     </Grid>
                   </Grid>
                 </Box>
-              </Grid>
-              <Grid item xs={3}>
+              </Grid>}
+              {showEvaluate3 && <Grid item xs={3}>
                 <Box sx={{padding: '8px' }}>
                   <Grid container spacing={0} alignItems="center">
                     <Grid item xs={4}>
-                      {showEvaluate3 && <label htmlFor="input11">痉挛评价:</label>}
+                      <label htmlFor="input11">痉挛评价:</label>
                     </Grid>
                     <Grid item xs={8}>
-                      {showEvaluate3 && <TextField
-                          name="spasmReview"
-                          value={evaluateFormData.spasmReview}
-                          onChange={handleEvaluationFormDataFormChange}
-                          size="small"
-                          fullWidth
-                      />}
+                      <TextField
+                        name="spasmReview"
+                        value={evaluateFormData.spasmReview}
+                        onChange={handleEvaluationFormDataFormChange}
+                        size="small"
+                        fullWidth
+                      />
                     </Grid>
                   </Grid>
                 </Box>
-              </Grid>
-              <Grid item xs={3}>
+              </Grid>}
+              {showEvaluate4 && <Grid item xs={3}>
                 <Box sx={{padding: '8px' }}>
                   <Grid container spacing={0} alignItems="center">
                     <Grid item xs={4}>
-                      {showEvaluate4 && <label htmlFor="input9">肌张力:</label>}
+                      <label htmlFor="input9">肌张力:</label>
                     </Grid>
                     <Grid item xs={8}>
-                      {showEvaluate4 && <TextField
-                          name="muscleTone"
-                          value={evaluateFormData.muscleTone}
-                          onChange={handleEvaluationFormDataFormChange}
-                          size="small"
-                          fullWidth
-                      />}
+                      <TextField
+                        name="muscleTone"
+                        value={evaluateFormData.muscleTone}
+                        onChange={handleEvaluationFormDataFormChange}
+                        size="small"
+                        fullWidth
+                      />
                     </Grid>
                   </Grid>
                 </Box>
-              </Grid>
-              <Grid item xs={3}>
+              </Grid>}
+              {showEvaluate5 && <Grid item xs={3}>
                 <Box sx={{padding: '8px' }}>
                   <Grid container spacing={0} alignItems="center">
                     <Grid item xs={4}>
-                      {showEvaluate5 && <label htmlFor="input9">急性期情况:</label>}
+                      <label htmlFor="input9">急性期情况:</label>
                     </Grid>
                     <Grid item xs={8}>
-                      {showEvaluate5 && <TextField
-                          name="acuteState"
-                          value={evaluateFormData.acuteState}
-                          onChange={handleEvaluationFormDataFormChange}
-                          size="small"
-                          fullWidth
-                      />}
+                      <TextField
+                        name="acuteState"
+                        value={evaluateFormData.acuteState}
+                        onChange={handleEvaluationFormDataFormChange}
+                        size="small"
+                        fullWidth
+                      />
                     </Grid>
                   </Grid>
                 </Box>
-              </Grid>
-              <Grid item xs={3}>
+              </Grid>}
+              {showEvaluate6 && <Grid item xs={3}>
                 <Box sx={{padding: '8px' }}>
                   <Grid container spacing={0} alignItems="center">
                     <Grid item xs={4}>
-                      {showEvaluate6 && <label htmlFor="input9">神经科判断:</label>}
+                      <label htmlFor="input9">神经科判断:</label>
                     </Grid>
                     <Grid item xs={8}>
-                      {showEvaluate6 && <TextField
-                          name="neuroJudgment"
-                          value={evaluateFormData.neuroJudgment}
-                          onChange={handleEvaluationFormDataFormChange}
-                          size="small"
-                          fullWidth
-                      />}
+                      <TextField
+                        name="neuroJudgment"
+                        value={evaluateFormData.neuroJudgment}
+                        onChange={handleEvaluationFormDataFormChange}
+                        size="small"
+                        fullWidth
+                      />
                     </Grid>
                   </Grid>
                 </Box>
-              </Grid>
-              <Grid item xs={3}>
+              </Grid>}
+              {showEvaluate7 && <Grid item xs={3}>
                 <Box sx={{padding: '8px' }}>
                   <Grid container spacing={0} alignItems="center">
                     <Grid item xs={4}>
@@ -586,15 +586,20 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
                     </Grid>
                   </Grid>
                 </Box>
-              </Grid>
+              </Grid>}
               <Grid item xs={3}>
-                <Box sx={{padding: '8px' }}>
-                  <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>
-                </Box>
+
               </Grid>
               <Grid item xs={12}>
                 <Box sx={{padding: '8px' }}>
-                  <Typography variant='body2' style={{ color: 'red' }}>注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。</Typography>
+                  <Grid container alignItems="center" justifyContent="space-between">
+                    <Grid item>
+                      <Typography variant='body2' style={{ color: 'red' }}>注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。</Typography>
+                    </Grid>
+                    <Grid item>
+                      <Button variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>
+                    </Grid>
+                  </Grid>
                 </Box>
               </Grid>
             </Grid>
