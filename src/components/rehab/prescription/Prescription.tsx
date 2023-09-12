@@ -606,7 +606,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     console.log(NumToBodyPartMapping[willAddPrescription.part])
     console.log(NumToModeMapping[willAddPrescription.mode])
     thunkDispatch(addPrescription({
-      pid: parseInt(params.id),
+      pid: parseInt(params.PId),
       x: NumToBodyPartMapping[willAddPrescription.part],
       y: NumToModeMapping[willAddPrescription.mode],
       zz: Number(willAddPrescription.zz),
@@ -663,6 +663,33 @@ export default function StickyHeadTable(params: { id: string,PId:string,
 
 
   return (<>
+    <Grid container alignItems="center" justifyContent="space-between" sx={{ height: 50 }}>
+      <Grid item style={{display: 'flex', alignItems: 'center'}} >
+        <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h6' }} />
+        <Typography style={{display:'inline-block'}} variant="body1" gutterBottom>
+          (共
+        </Typography>
+        <Typography color="primary" style={{display:'inline-block'}} variant="h6" gutterBottom>
+          {prescription.length}
+        </Typography>
+        <Typography style={{display:'inline-block'}} variant="body1" gutterBottom>
+          条处方)
+        </Typography>
+        <Tooltip title="新建处方">
+          <IconButton
+              style={{float: 'right'}}
+              aria-label="add"
+              onClick={handleClickOpenAddPrescription}
+          >
+            <AddCircleIcon sx={{ fontSize: 30 }} color="secondary"/>
+          </IconButton>
+        </Tooltip>
+      </Grid>
+      <Grid item>
+
+      </Grid>
+    </Grid>
+
     <Box
       sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: 800 }}
     >
@@ -672,40 +699,18 @@ export default function StickyHeadTable(params: { id: string,PId:string,
         value={value}
         onChange={handleChangeTest}
         aria-label="Vertical tabs example"
-        // sx={{ borderRight: 2, borderColor: 'divider', width: 230 }}
+        sx={{ borderRight: 2, borderColor: 'divider', width: 230 }}
       >
-        <Tab
-          sx={{width: '230px'}}
-          label={
-          <>
-            <div>
-              <CardHeader style={{display:'inline-block'}} title='处方' titleTypographyProps={{ variant: 'h6' }} />
-              <Typography style={{display:'inline-block'}} variant="h7" gutterBottom>
-                (共
-              </Typography>
-              <Typography color="primary" style={{display:'inline-block'}} variant="h6" gutterBottom>
-                {prescription.length}
-              </Typography>
-              <Typography style={{display:'inline-block'}} variant="h7" gutterBottom>
-                条处方)
-              </Typography>
-              <Tooltip title="新建处方">
-                <IconButton
-                  style={{float: 'right'}}
-                  aria-label="add"
-                  onClick={handleClickOpenAddPrescription}
-                >
-                  <AddCircleIcon sx={{ fontSize: 30 }} color="secondary"/>
-                </IconButton>
-              </Tooltip>
-            </div>
-          </>
-        }>
-        </Tab>
-        {params.prescription?.map(row => (
+        {/*<Tab*/}
+        {/*  sx={{width: '230px'}}*/}
+        {/*  label={*/}
+
+        {/*}>*/}
+        {/*</Tab>*/}
+        {params.prescription?.map((row, index) => (
           <Tab
             sx={{width: '230px'}}
-            key={row.id}
+            key={index}
             label={<>
             <Card key={row.id} sx={{ marginBottom: 0 }}>
               <CardContent>
@@ -751,120 +756,128 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                 </Tooltip>
               </CardContent>
             </Card>
-          </>} {...a11yProps(1)} />
+          </>} {...a11yProps(index)} />
         ))}
       </Tabs>
-      <TabPanel index={0} value={value}></TabPanel>
-      {params.prescription?.map(row => (
-        <>
-          <TabPanel value={value} index={1}>
-            {/*一天三次，一次十分钟，共需做5天，已做3天*/}
-            <Grid container spacing={2}>
-              <Grid item xs={8} md={8}>
-                <Card sx={{ minWidth: 500,backgroundColor: '#74b2f1' ,display: 'flex', justifyContent: 'space-between'}}>
-                  <CardContent>
-                    <Typography sx={{ fontSize: 16 ,fontWeight: 'bold'}} color="text.secondary" gutterBottom>
-                      一天三次，一次十分钟，共需做 5 天，已做 3 天
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button style={{backgroundColor: '#2152f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>修改</Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-              <Grid item xs={4}>
-                <Tooltip title="下发处方">
+      <Box sx={{ width: '80%', padding: '16px' }}>
+        <TabPanel index={0} value={value}>
+          <Typography sx={{ fontSize: 16 ,fontWeight: 'bold'}} color="text.secondary" gutterBottom>
+            请从左侧选择处方
+          </Typography>
+        </TabPanel>
+        {params.prescription?.map((row, index) => (
+            <>
+              <TabPanel key={index} value={value} index={index}>
+                {/*一天三次，一次十分钟，共需做5天，已做3天*/}
+                <Grid container spacing={2}>
+                  <Grid item xs={8} md={8}>
+                    <Card sx={{ minWidth: 500,backgroundColor: '#74b2f1' ,display: 'flex', justifyContent: 'space-between'}}>
+                      <CardContent>
+                        <Typography sx={{ fontSize: 16 ,fontWeight: 'bold'}} color="text.secondary" gutterBottom>
+                          一天三次，一次十分钟，共需做 5 天，已做 3 天
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Button style={{backgroundColor: '#2152f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>修改</Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Tooltip title="下发处方">
 
-                  <IconButton
-                    aria-label="edit"
-                    color="primary"
-                    onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
-                  >
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                      下发处方：
-                    </Typography>
-                    <SendAndArchiveIcon sx={{ fontSize: 40 }} />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                {/* 康复记录*/}
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom component="div">
-                      康复记录
-                    </Typography>
-                    <Table aria-label="purchases">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell align="center">状态</TableCell>
-                          <TableCell>康复开始时间</TableCell>
-                          <TableCell>康复结束时间</TableCell>
-                          <TableCell align="center">时长</TableCell>
-                          <TableCell align="center">指标</TableCell>
-                          <TableCell align="center">量表及评价</TableCell>
-                          <TableCell align="center">操作</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell>
-                            <Button style={{backgroundColor: '#f32148', color: '#ffffff', float: 'right'}}>完成</Button>
-                          </TableCell>
-                          <TableCell>2023-9-8 14:10</TableCell>
-                          <TableCell>2023-9-8 14:30</TableCell>
-                          <TableCell>20min</TableCell>
-                          <TableCell align="center">
-                            <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>填写指标</Button>
-                          </TableCell>
-                          <TableCell align="center">
-                            <a href={`/rehab/assessment`} target="_blank" rel="noopener noreferrer">
-                              <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
-                            </a>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={handleClickMove}>查看直方图</Button>
-                          </TableCell>
-                        </TableRow>
-                        {/*{*/}
-                        {/*  row.prescription_record?.map((historyRow: PrescriptionRecord) => (*/}
-                        {/*    <TableRow key={historyRow.id}>*/}
-                        {/*      <TableCell>完成</TableCell>*/}
-                        {/*      <TableCell>{historyRow.eid}</TableCell>*/}
-                        {/*      <TableCell>{historyRow.pid}</TableCell>*/}
-                        {/*      <TableCell>20min</TableCell>*/}
-                        {/*      <TableCell align="center">*/}
-                        {/*        <Button color="secondary" onClick={handleClickOpenTarget}>指标</Button>*/}
-                        {/*      </TableCell>*/}
-                        {/*      <TableCell align="center">*/}
-                        {/*        <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>*/}
-                        {/*      </TableCell>*/}
-                        {/*      <TableCell align="center">*/}
-                        {/*        <Button color="secondary" onClick={handleClickMove}>查看直方图</Button>*/}
-                        {/*      </TableCell>*/}
-                        {/*    </TableRow>*/}
-                        {/*  ))*/}
-                        {/*}*/}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
+                      <IconButton
+                          aria-label="edit"
+                          color="primary"
+                          onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
+                      >
+                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                          下发处方：
+                        </Typography>
+                        <SendAndArchiveIcon sx={{ fontSize: 40 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={12} md={12}>
+                    {/* 康复记录*/}
+                    <Card>
+                      <CardContent>
+                        <Typography variant="h6" gutterBottom component="div">
+                          康复记录
+                        </Typography>
+                        <Table aria-label="purchases">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell align="center">状态</TableCell>
+                              <TableCell>康复开始时间</TableCell>
+                              <TableCell>康复结束时间</TableCell>
+                              <TableCell align="center">时长</TableCell>
+                              <TableCell align="center">指标</TableCell>
+                              <TableCell align="center">量表及评价</TableCell>
+                              <TableCell align="center">操作</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell>
+                                <Button style={{backgroundColor: '#f32148', color: '#ffffff', float: 'right'}}>完成</Button>
+                              </TableCell>
+                              <TableCell>2023-9-8 14:10</TableCell>
+                              <TableCell>2023-9-8 14:30</TableCell>
+                              <TableCell>20min</TableCell>
+                              <TableCell align="center">
+                                <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>填写指标</Button>
+                              </TableCell>
+                              <TableCell align="center">
+                                <a href={`/rehab/assessment`} target="_blank" rel="noopener noreferrer">
+                                  <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
+                                </a>
+                              </TableCell>
+                              <TableCell align="center">
+                                <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={handleClickMove}>查看直方图</Button>
+                              </TableCell>
+                            </TableRow>
+                            {/*{*/}
+                            {/*  row.prescription_record?.map((historyRow: PrescriptionRecord) => (*/}
+                            {/*    <TableRow key={historyRow.id}>*/}
+                            {/*      <TableCell>完成</TableCell>*/}
+                            {/*      <TableCell>{historyRow.eid}</TableCell>*/}
+                            {/*      <TableCell>{historyRow.pid}</TableCell>*/}
+                            {/*      <TableCell>20min</TableCell>*/}
+                            {/*      <TableCell align="center">*/}
+                            {/*        <Button color="secondary" onClick={handleClickOpenTarget}>指标</Button>*/}
+                            {/*      </TableCell>*/}
+                            {/*      <TableCell align="center">*/}
+                            {/*        <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>*/}
+                            {/*      </TableCell>*/}
+                            {/*      <TableCell align="center">*/}
+                            {/*        <Button color="secondary" onClick={handleClickMove}>查看直方图</Button>*/}
+                            {/*      </TableCell>*/}
+                            {/*    </TableRow>*/}
+                            {/*  ))*/}
+                            {/*}*/}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
 
 
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Card id="target-element">
-                  <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
-                  <CardContent>
-                    <EChartsTest/>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
+                  </Grid>
+                  <Grid item xs={12} md={12}>
+                    <Card id="target-element">
+                      <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
+                      <CardContent>
+                        <EChartsTest/>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </Grid>
 
-          </TabPanel>
-        </>
-      ))}
+                <Card></Card>
+              </TabPanel>
+            </>
+        ))}
+      </Box>
+
     </Box>
         {/*<TableContainer>*/}
         {/*  <Table stickyHeader aria-label="sticky table">*/}

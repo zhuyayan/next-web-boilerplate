@@ -495,7 +495,6 @@ export default function MUITable({ params }: { params: { id: string } }) {
             <Grid item xs={12} md={12}>
               <Card sx={{ padding: '10px' }}>
                 <div>
-                  <br/>
                   <CardHeader style={{display:'inline-block'}} title='康复仪训练报告' titleTypographyProps={{ variant: 'h5' }} />
                   <Tooltip title="新建处方">
                     <IconButton
