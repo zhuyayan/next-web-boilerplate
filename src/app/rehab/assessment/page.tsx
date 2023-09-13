@@ -26,10 +26,45 @@ import {useDispatch} from "react-redux";
 import DialogContentText from "@mui/material/DialogContentText";
 import {NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { useCallback } from 'react';
 
 export default function FuglMeyerAssessment( params: { PId: string} ) {
   const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
+  const [components, setComponents] = useState<JSX.Element[]>([]);
+  const [inputValue, setInputValue] = useState('');
+
+  const handleAddComponent = useCallback(() => {
+    if (inputValue.trim() !== '') {
+      const newComponent = (
+          <Grid item xs={3}>
+            <Box sx={{ padding: '8px' }}>
+              <Grid container spacing={0} alignItems="center">
+                <Grid item xs={4}>
+                  <label htmlFor={inputValue}>{inputValue}:</label>
+                </Grid>
+                <Grid item xs={8}>
+                  <TextField
+                      name={inputValue}
+                      value=""
+                      //需要有内容变化函数
+                      size="small"
+                      fullWidth
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </Grid>
+      );
+
+      setComponents((prevComponents) => [...prevComponents, newComponent]);
+      setInputValue('');
+    }
+  }, [inputValue]);
+
+  const handleInputChange = useCallback((event) => {
+    setInputValue(event.target.value);
+  }, []);
 
   // 评定量表选项
   const assessmentOptions = [
@@ -447,7 +482,7 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
                   </ToggleButtonGroup>}
             </Grid>
             <Grid item xs={12} alignItems="center">
-              {showAlignment8 &&
+              {(showAlignment8 || showAlignment9 || showAlignment10) &&
                   <Typography variant="h6">
                       手协调性与速度 : 指鼻试验 (快速连续进行5次)
                   </Typography>}
@@ -503,7 +538,7 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
                   </ToggleButtonGroup>}
             </Grid>
             <Grid item xs={12} alignItems="center">
-              {showAlignment8 &&
+              {showAlignment10 &&
                   <Typography variant="h6">
                       &gt; 速度
                   </Typography>}
@@ -537,7 +572,7 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
 
         <Grid container spacing={0}>
           <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-            <Title>医生评价：</Title>
+            <Title>训练后状态：</Title>
           </Grid>
           <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
             {/*<InputLabel id="assessment-label">评定量表</InputLabel>*/}
@@ -697,9 +732,9 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
                   </Grid>
                 </Box>
               </Grid>}
-              <Grid item xs={3}>
 
-              </Grid>
+              {components.map((component, index) => component)}
+
               <Grid item xs={12}>
                 <Box sx={{padding: '8px' }}>
                   <Grid container alignItems="center" justifyContent="space-between">
@@ -822,33 +857,36 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
                   {showAlignment7 ? "将会显示" : "不会显示"}
                 </Button>
               </Grid>
+
               <Grid item xs={9} style={{display: 'flex', alignItems: 'center'}}>
                 <Typography variant="body1">
                   &gt; 震颤
                 </Typography>
               </Grid>
               <Grid item xs={3} style={{display: 'flex', alignItems: 'center'}}>
-                <Button color={showAlignment8 ? "primary" : "error"} onClick={() => setShowAlignment8(!showAlignment7)}>
+                <Button color={showAlignment8 ? "primary" : "error"} onClick={() => setShowAlignment8(!showAlignment8)}>
                   {showAlignment8 ? "将会显示" : "不会显示"}
                 </Button>
               </Grid>
+
               <Grid item xs={9} style={{display: 'flex', alignItems: 'center'}}>
                 <Typography variant="body1">
                   &gt; 辩距不良
                 </Typography>
               </Grid>
               <Grid item xs={3} style={{display: 'flex', alignItems: 'center'}}>
-                <Button color={showAlignment9 ? "primary" : "error"} onClick={() => setShowAlignment9(!showAlignment7)}>
+                <Button color={showAlignment9 ? "primary" : "error"} onClick={() => setShowAlignment9(!showAlignment9)}>
                   {showAlignment9 ? "将会显示" : "不会显示"}
                 </Button>
               </Grid>
+
               <Grid item xs={9} style={{display: 'flex', alignItems: 'center'}}>
                 <Typography variant="body1">
                   &gt; 速度
                 </Typography>
               </Grid>
               <Grid item xs={3} style={{display: 'flex', alignItems: 'center'}}>
-                <Button color={showAlignment10 ? "primary" : "error"} onClick={() => setShowAlignment10(!showAlignment7)}>
+                <Button color={showAlignment10 ? "primary" : "error"} onClick={() => setShowAlignment10(!showAlignment10)}>
                   {showAlignment10 ? "将会显示" : "不会显示"}
                 </Button>
               </Grid>
@@ -939,6 +977,32 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
                 <Button color={showEvaluate7 ? "primary" : "error"} onClick={() => setShowEvaluate7(!showEvaluate7)}>
                   {showEvaluate7 ? "将会显示" : "不会显示"}
                 </Button>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Box sx={{padding: '8px' }}>
+                  <Grid container spacing={0} alignItems="center" justifyContent="space-between">
+                    <Grid item xs={2.5}>
+                      <label>输入新增项：</label>
+                    </Grid>
+                    <Grid item xs={5.5}>
+                      <TextField
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          size="small"
+                          fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={1}>
+
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Button onClick={handleAddComponent}>
+                        添加新增项
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Box>
               </Grid>
             </Grid>
           </DialogContent>
