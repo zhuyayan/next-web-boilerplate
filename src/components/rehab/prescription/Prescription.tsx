@@ -83,6 +83,7 @@ import Tab from '@mui/material/Tab';
 import CardHeader from "@mui/material/CardHeader";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {Simulate} from "react-dom/test-utils";
+import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
 
 
 interface TabPanelProps {
@@ -239,7 +240,8 @@ export default function StickyHeadTable(params: { id: string,PId:string,
   prescription:Prescription[],
   onlineEquipment: EquipmentOnline[]}) {
   const appDispatch = useAppDispatch()
-  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -542,6 +544,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
 
   const [value, setValue] = React.useState(0);
 
+
   const handleChangeTest = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -661,6 +664,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
   };
   const onsetTime = willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null;
 
+  const [selectedTab, setSelectedTab] = React.useState(0); // 初始选中的 tab
 
   return (<>
     <Grid container alignItems="center" justifyContent="space-between" sx={{ height: 50 }}>
@@ -691,33 +695,29 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     </Grid>
 
     <Box
-      sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: 800 }}
+      sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex',height:800 }}
     >
       <Tabs
         orientation="vertical"
         variant="scrollable"
-        value={value}
-        onChange={handleChangeTest}
+        value={selectedTab}
+        onChange={(event, newValue) => {
+          setSelectedTab(newValue);
+          handleChangeTest(event, newValue); // 调用原来的事件处理程序
+        }}
         aria-label="Vertical tabs example"
         sx={{ borderRight: 2, borderColor: 'divider', width: 230 }}
       >
-        {/*<Tab*/}
-        {/*  sx={{width: '230px'}}*/}
-        {/*  label={*/}
-
-        {/*}>*/}
-        {/*</Tab>*/}
         {params.prescription?.map((row, index) => (
           <Tab
-            sx={{width: '230px'}}
+            sx={{width: '230px', backgroundColor: selectedTab === index ? '#74b2f1' : 'transparent' }}
             key={index}
             label={<>
-            <Card key={row.id} sx={{ marginBottom: 0 }}>
+            <Card key={row.id} sx={{ marginBottom: 0 , backgroundColor: selectedTab === index ? '#b5d3f5' : 'transparent'}}>
               <CardContent>
                 <Typography>{row.created_at}</Typography>
-                <Typography>模式: {row.mode}</Typography>
-                <Typography>部位: {row.part}</Typography>
-                <Typography>训练时长或次数: {row.zz}</Typography>
+                <Typography>{row.mode}  {row.part}</Typography>
+                <Typography>训练时长: {row.zz}</Typography>
                 <Typography>弯曲定时值: {row.u}</Typography>
                 <Typography>伸展定时值: {row.v}</Typography>
                 <ThemeProvider theme={theme}>
@@ -759,12 +759,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
           </>} {...a11yProps(index)} />
         ))}
       </Tabs>
-      <Box sx={{ width: '80%', padding: '16px' }}>
-        <TabPanel index={0} value={value}>
-          <Typography sx={{ fontSize: 16 ,fontWeight: 'bold'}} color="text.secondary" gutterBottom>
-            请从左侧选择处方
-          </Typography>
-        </TabPanel>
+      <Box sx={{ width: '85%', paddingLeft: '5px' }}>
         {params.prescription?.map((row, index) => (
             <>
               <TabPanel key={index} value={value} index={index}>
@@ -772,14 +767,9 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                 <Grid container spacing={2}>
                   <Grid item xs={8} md={8}>
                     <Card sx={{ minWidth: 500,backgroundColor: '#74b2f1' ,display: 'flex', justifyContent: 'space-between'}}>
-                      <CardContent>
-                        <Typography sx={{ fontSize: 16 ,fontWeight: 'bold'}} color="text.secondary" gutterBottom>
-                          一天三次，一次十分钟，共需做 5 天，已做 3 天
+                        <Typography sx={{ fontSize: 16 ,fontWeight: 'bold',padding:2}} color="text.secondary" gutterBottom>
+                          一天 3 次，一次 20 分钟，共需做 5 天，已做 3 天
                         </Typography>
-                      </CardContent>
-                      <CardActions>
-                        <Button style={{backgroundColor: '#2152f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>修改</Button>
-                      </CardActions>
                     </Card>
                   </Grid>
                   <Grid item xs={4}>
@@ -798,69 +788,10 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Tooltip>
                   </Grid>
                   <Grid item xs={12} md={12}>
-                    {/* 康复记录*/}
-                    <Card>
-                      <CardContent>
-                        <Typography variant="h6" gutterBottom component="div">
-                          康复记录
-                        </Typography>
-                        <Table aria-label="purchases">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell align="center">状态</TableCell>
-                              <TableCell>康复开始时间</TableCell>
-                              <TableCell>康复结束时间</TableCell>
-                              <TableCell align="center">时长</TableCell>
-                              <TableCell align="center">指标</TableCell>
-                              <TableCell align="center">量表及评价</TableCell>
-                              <TableCell align="center">操作</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            <TableRow>
-                              <TableCell>
-                                <Button style={{backgroundColor: '#f32148', color: '#ffffff', float: 'right'}}>完成</Button>
-                              </TableCell>
-                              <TableCell>2023-9-8 14:10</TableCell>
-                              <TableCell>2023-9-8 14:30</TableCell>
-                              <TableCell>20min</TableCell>
-                              <TableCell align="center">
-                                <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>填写指标</Button>
-                              </TableCell>
-                              <TableCell align="center">
-                                <a href={`/rehab/assessment`} target="_blank" rel="noopener noreferrer">
-                                  <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
-                                </a>
-                              </TableCell>
-                              <TableCell align="center">
-                                <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={handleClickMove}>查看直方图</Button>
-                              </TableCell>
-                            </TableRow>
-                            {/*{*/}
-                            {/*  row.prescription_record?.map((historyRow: PrescriptionRecord) => (*/}
-                            {/*    <TableRow key={historyRow.id}>*/}
-                            {/*      <TableCell>完成</TableCell>*/}
-                            {/*      <TableCell>{historyRow.eid}</TableCell>*/}
-                            {/*      <TableCell>{historyRow.pid}</TableCell>*/}
-                            {/*      <TableCell>20min</TableCell>*/}
-                            {/*      <TableCell align="center">*/}
-                            {/*        <Button color="secondary" onClick={handleClickOpenTarget}>指标</Button>*/}
-                            {/*      </TableCell>*/}
-                            {/*      <TableCell align="center">*/}
-                            {/*        <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>*/}
-                            {/*      </TableCell>*/}
-                            {/*      <TableCell align="center">*/}
-                            {/*        <Button color="secondary" onClick={handleClickMove}>查看直方图</Button>*/}
-                            {/*      </TableCell>*/}
-                            {/*    </TableRow>*/}
-                            {/*  ))*/}
-                            {/*}*/}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
+                    <Card sx={{ height: 265 ,padding: '5px'}}>
+                      <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
+                      <PrescriptionTable record={record} pid={params.id}/>
                     </Card>
-
-
                   </Grid>
                   <Grid item xs={12} md={12}>
                     <Card id="target-element">
@@ -879,6 +810,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       </Box>
 
     </Box>
+
         {/*<TableContainer>*/}
         {/*  <Table stickyHeader aria-label="sticky table">*/}
         {/*    <TableHead>*/}
@@ -1548,6 +1480,32 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                   <MenuItem value={6}>右踝</MenuItem>
                 </Select>
               </FormControl>
+              <TextField
+                {...register('zz', {
+                  required: '不能为空',
+                  validate: value => (!isNaN(value) && value >= 3) || '值须大于等于3'
+                })}
+                sx={{ m: 1, minWidth: 160 }}
+                value={willEditPrescription.zz}
+                id="outlined-zz" label="共需训练天数"
+                onChange={handleZZChange}
+                error={!!errors.zz}
+                helperText={errors.zz?.message}
+                inputProps={{ type: 'number' }}
+                variant="outlined" size="small"/>
+              <TextField
+                {...register('zz', {
+                  required: '不能为空',
+                  validate: value => (!isNaN(value) && value >= 3) || '值须大于等于3'
+                })}
+                sx={{ m: 1, minWidth: 160 }}
+                value={willEditPrescription.zz}
+                id="outlined-zz" label="每天训练次数"
+                onChange={handleZZChange}
+                error={!!errors.zz}
+                helperText={errors.zz?.message}
+                inputProps={{ type: 'number' }}
+                variant="outlined" size="small"/>
               </Box>
             <Box>
               <TextField
@@ -1644,7 +1602,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
               </FormControl>
               <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
                 <TextField
-                  {...AddPrescriptionItemRegister('duration', {
+                  {...AddPrescriptionItemRegister<AddPrescriptionItem>('duration', {
                     required: '不能为空',
                     validate: value => {
                       if (typeof value === 'undefined') {

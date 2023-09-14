@@ -110,6 +110,8 @@ export function GetDefaultPatient() {
     gender: '',
     genderLabel: '',
     medicalHistory: '',
+    mediaStrokeType:0,
+    mediaStrokeLevel:0,
     physician:'',
     physicianId:0,
     i18d:'',

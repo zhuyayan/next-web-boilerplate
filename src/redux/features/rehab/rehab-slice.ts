@@ -54,6 +54,8 @@ export interface Patient {
   gender: string;
   genderLabel: string;
   medicalHistory: string;
+  mediaStrokeType:number;
+  mediaStrokeLevel:number;
   physician:string;
   physicianId:number;
   i18d:string;
@@ -139,6 +141,8 @@ let patient: Patient = {
   gender: getDefaultGenderValue(),
   genderLabel: getDefaultGenderLabel(),
   medicalHistory: '',
+  mediaStrokeType:0,
+  mediaStrokeLevel:0,
   physician: '',
   physicianId: 0,
   i18d: '',
@@ -363,6 +367,8 @@ function convertAPIPatientToPatient(p: any): Patient {
     gender: genderLabelToValue(p.sex),
     genderLabel: p.sex,
     medicalHistory: p.medical_history,
+    mediaStrokeType:p.media_stroke_level,
+    mediaStrokeLevel:p.media_stroke_level,
     physician: p.staff.name,
     physicianId: p.staff.id,
     i18d: p.i_18_d,
@@ -484,14 +490,14 @@ export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fe
 });
 
 // 添加病人
-export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, staff_id: number, i_18_d: string}, {}>('addPatient', async ({name, age, sex, medical_history, staff_id, i_18_d}, thunkAPI):Promise<any> => {
+export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, media_stroke_type:number, media_stroke_level:number,staff_id: number, i_18_d: string}, {}>('addPatient', async ({name, age, sex, medical_history, staff_id, i_18_d}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('patient',{name, age, sex, medical_history, staff_id, i_18_d})
   console.log("add patient async thunk: ", response.data.data.patients[0])
   return convertAPIPatientToPatient(response.data.data.patients[0])
 });
 
 // 修改病人
-export const editPatient = createAsyncThunk<Patient, { id: number, name: string, age: number, sex: string, medical_history: string, staff_id: number, i_18_d: string }, {}>('editPatient', async ({id, name, age, sex, medical_history, staff_id,i_18_d}, thunkAPI):Promise<any> => {
+export const editPatient = createAsyncThunk<Patient, { id: number, name: string, age: number, sex: string, medical_history: string, media_stroke_type:number, media_stroke_level:number, staff_id: number, i_18_d: string }, {}>('editPatient', async ({id, name, age, sex, medical_history, staff_id,i_18_d}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('patient',{id, name, age, sex, medical_history, staff_id, i_18_d})
   console.log("edit patient async thunk: ", response.data.data.patients[0])
   return convertAPIPatientToPatient(response.data.data.patients[0])
@@ -575,6 +581,14 @@ export const editPrescription = createAsyncThunk<Prescription, {id: number, x: n
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('prescription', { id, x, y, zz, u, v});
   console.log("edit prescription: ", response.data)
   return convertAPIPrescriptionToPrescription(response.data.data.prescriptions[0])
+});
+
+export const fetchEvaluationById = createAsyncThunk<Prescription[], { task_id: number}, {}>('fetchEvaluationById', async ({task_id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('train/evaluation', {params:{task_id}});
+  console.log("fetch Evaluation by id async thunk: ", response.data.data)
+  let p = response.data.data.prescriptions.map(convertAPIEvaluationToEvaluation)
+  console.log('Evaluation', p)
+  return p
 });
 
 export const fetchPrescriptionById = createAsyncThunk<Prescription[], { id: number}, {}>('fetchPrescriptionById', async ({ id}):Promise<any> => {
@@ -803,6 +817,10 @@ const RehabSlice = createSlice({
           console.log("fetch prescription by id", action.payload)
           state.prescription = action.payload
         })
+      .addCase(fetchEvaluationById.fulfilled, (state, action) => {
+        console.log("fetch hEvaluation by id", action.payload)
+        state.prescription = action.payload
+      })
         .addCase(fetchPrescriptionByPId.fulfilled, (state, action) => {
           console.log("fetch prescription by pid", action.payload)
           state.prescription = action.payload

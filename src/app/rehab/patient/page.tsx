@@ -85,6 +85,8 @@ export default function PatientList() {
     gender: getDefaultGenderValue(),
     genderLabel: getDefaultGenderLabel(),
     medicalHistory: '',
+    mediaStrokeType:0,
+    mediaStrokeLevel:0,
     physician: '',
     physicianId: 0,
     i18d: '',
@@ -96,6 +98,8 @@ export default function PatientList() {
     gender: getDefaultGenderValue(),
     genderLabel: getDefaultGenderLabel(),
     medicalHistory: '',
+    mediaStrokeType:0,
+    mediaStrokeLevel:0,
     physician: '',
     physicianId: 0,
     i18d: '',
@@ -116,6 +120,8 @@ export default function PatientList() {
       age: willAddPatient.age,
       sex: willAddPatient.genderLabel,
       medical_history: willAddPatient.medicalHistory,
+      media_stroke_type:willAddPatient.mediaStrokeType,
+      media_stroke_level:willAddPatient.mediaStrokeLevel,
       staff_id: willAddPatient.physicianId,
       i_18_d: willAddPatient.i18d
     }))
@@ -165,6 +171,8 @@ export default function PatientList() {
       age: willEditPatient.age,
       sex: willEditPatient.genderLabel,
       medical_history: willEditPatient.medicalHistory,
+      media_stroke_type:willEditPatient.mediaStrokeType,
+      media_stroke_level:willEditPatient.mediaStrokeLevel,
       staff_id: willEditPatient.physicianId,
       i_18_d: willEditPatient.i18d,
     }))
@@ -213,6 +221,7 @@ export default function PatientList() {
 
   const [gender, setGender] = React.useState('');
   const [physician, setPhysician] = React.useState('');
+  const [mediaStrokeLevel, setMediaStrokeLevel] = React.useState('');
 
   const handleChange = (event: SelectChangeEvent) => {
     const {value} = event.target;
@@ -237,6 +246,29 @@ export default function PatientList() {
     setPhysician(event.target.value);
   };
 
+
+  const handleChangeClassify = (event: SelectChangeEvent) => {
+    const {value} = event.target;
+    console.log("value: ", value)
+    console.log("event.target.value", event.target.value)
+    setWillEditPatient((prevInputValues) => ({
+      ...prevInputValues,
+      ["mediaStrokeType"]: value,
+    }));
+    setMediaStrokeLevel(event.target.value);
+  };
+
+  const handleChangeMediaStrokeLevel = (event: SelectChangeEvent) => {
+    const {value} = event.target;
+    console.log("value: ", value)
+    console.log("event.target.value", event.target.value)
+    setWillEditPatient((prevInputValues) => ({
+      ...prevInputValues,
+      ["mediaStrokeLevel"]: value,
+    }));
+    setMediaStrokeLevel(event.target.value);
+  };
+
   //分页
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -256,6 +288,24 @@ export default function PatientList() {
       ...prevInputValues,
       ["gender"]: value,
       ["genderLabel"]: genderValueToLabel(String(value)),
+    }));
+  };
+
+
+  const handleAddPatientClassifyChange = (event: SelectChangeEvent) => {
+    const {value} = event.target;
+    setWillAddPatient((prevInputValues) => ({
+      ...prevInputValues,
+      ["gender"]: value,
+      ["genderLabel"]: genderValueToLabel(String(value)),
+    }));
+  };
+
+  const handleAddMediaStrokeLevelChange = (event: SelectChangeEvent) => {
+    const {value} = event.target;
+    setWillAddPatient((prevInputValues) => ({
+      ...prevInputValues,
+      ["gender"]: value,
     }));
   };
 
@@ -385,9 +435,9 @@ export default function PatientList() {
                   <TableCell sx={{m: 1, minWidth: 90}} align='center'>姓名</TableCell>
                   <TableCell sx={{m: 1, minWidth: 80}} align='center'>年龄</TableCell>
                   <TableCell sx={{m: 1, minWidth: 80}} align='center'>性别</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>病史</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>诊断</TableCell>
                   <TableCell sx={{m: 1, minWidth: 110}} align='center'>分类</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 80}} align='center'>分级</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 80}} align='center'>Brunnstrom分期</TableCell>
                   <TableCell sx={{m: 1, minWidth: 100}} align='center'>主治医生</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>身份证号</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>操作</TableCell>
@@ -402,8 +452,8 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.age}</TableCell>
                           <TableCell align='center'>{patient.genderLabel}</TableCell>
                           <TableCell align='center'>{patient.medicalHistory}</TableCell>
-                          <TableCell align='center'>缺血性脑卒中</TableCell>
-                          <TableCell align='center'>2级</TableCell>
+                          <TableCell align='center'>{patient.mediaStrokeType}</TableCell>
+                          <TableCell align='center'>{patient.mediaStrokeLevel}</TableCell>
                           <TableCell align='center'>{patient.physician}</TableCell>
                           <TableCell align='center'>{patient.i18d}</TableCell>
                           <TableCell align='center'>
@@ -539,12 +589,45 @@ export default function PatientList() {
                     </Select>
                   </FormControl>
                 </StyledDiv>
+                <StyledDiv>
+                  <FormControl sx={{m: 1, minWidth: 200}} size="small">
+                    <InputLabel id="Classify">分类</InputLabel>
+                    <Select
+                      labelId="Classify"
+                      id="Classify"
+                      label="分类"
+                      value={willEditPatient.mediaStrokeType}
+                      onChange={handleChangeClassify}
+                    >
+                      <MenuItem value={10}>缺血性脑卒中</MenuItem>
+                      <MenuItem value={21}>出血性脑卒中</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl sx={{m: 1, minWidth: 200}} size="small">
+                    <InputLabel id="mediaStrokeLevel">Brunnstrom分期</InputLabel>
+                    <Select
+                      labelId="mediaStrokeLevel"
+                      id="mediaStrokeLevel"
+                      label="分期"
+                      value={willEditPatient.mediaStrokeLevel}
+                      onChange={handleChangeMediaStrokeLevel}
+                    >
+                      <MenuItem value={10}>1 期</MenuItem>
+                      <MenuItem value={21}>2 期</MenuItem>
+                      <MenuItem value={21}>3 期</MenuItem>
+                      <MenuItem value={21}>4 期</MenuItem>
+                      <MenuItem value={21}>5 期</MenuItem>
+                      <MenuItem value={21}>6 期</MenuItem>
+
+                    </Select>
+                  </FormControl>
+                </StyledDiv>
                 <TextField
                     sx={{ m: 1, minWidth: 400 }}
                     id="medicalHistory"
                     value={willEditPatient.medicalHistory}
                     onChange={handleEditPatientInput}
-                    label="病史" variant="outlined" size="small"
+                    label="诊断" variant="outlined" size="small"
                     multiline
                     rows={4} />
               </Box>
@@ -604,11 +687,42 @@ export default function PatientList() {
                     </Select>
                   </FormControl>
                 </StyledDiv>
+                <StyledDiv>
+                  <FormControl sx={{m: 1, minWidth: 200}} size="small">
+                    <InputLabel id="gender">分类</InputLabel>
+                    <Select
+                      labelId="gender"
+                      id="gender"
+                      label="分类"
+                      onChange={handleAddPatientClassifyChange}
+                    >
+                      <MenuItem value={10}>缺血性脑卒中</MenuItem>
+                      <MenuItem value={21}>出血性脑卒中</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl sx={{m: 1, minWidth: 200}} size="small">
+                    <InputLabel id="gender">Brunnstrom分期</InputLabel>
+                    <Select
+                      labelId="mediaStrokeLevel"
+                      id="mediaStrokeLevel"
+                      label="分期"
+                      onChange={handleAddMediaStrokeLevelChange}
+                    >
+                      <MenuItem value={10}>1 期</MenuItem>
+                      <MenuItem value={21}>2 期</MenuItem>
+                      <MenuItem value={21}>3 期</MenuItem>
+                      <MenuItem value={21}>4 期</MenuItem>
+                      <MenuItem value={21}>5 期</MenuItem>
+                      <MenuItem value={21}>6 期</MenuItem>
+
+                    </Select>
+                  </FormControl>
+                </StyledDiv>
                 <TextField sx={{m: 1, minWidth: 400}}
                            id="medicalHistory"
                            value={willAddPatient.medicalHistory}
                            onChange={handleAddPatientInput}
-                           label="病史" variant="outlined" size="small"
+                           label="诊断" variant="outlined" size="small"
                            multiline
                            rows={4}/>
               </Box>

@@ -7,38 +7,47 @@ import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow, { TableRowProps } from '@mui/material/TableRow'
 import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/TableCell'
-import {Button, IconButton} from "@mui/material";
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton} from "@mui/material";
 import {
-  exportTaskPressureData,
+  addStatus,
+  exportTaskPressureData, PatientStatus,
   PrescriptionRecord,
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
 import Tooltip from "@mui/material/Tooltip";
-import React from "react";
+import React, {ChangeEvent} from "react";
 import DownloadIcon from "@mui/icons-material/Download";
+import {string} from "postcss-selector-parser";
+import DialogTitle from "@mui/material/DialogTitle";
+import Grid from "@mui/material/Grid";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
+import TextField from "@mui/material/TextField";
+import dayjs, {Dayjs} from "dayjs";
 
 
-const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    color: theme.palette.common.black,
-    backgroundColor: theme.palette.common.white
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14
-  }
-}))
-
-const StyledTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  // hide last border
-  '&:last-of-type td, &:last-of-type th': {
-    border: 0
-  }
-}))
+// const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({
+//   [`&.${tableCellClasses.head}`]: {
+//     color: theme.palette.common.black,
+//     backgroundColor: theme.palette.common.white
+//   },
+//   [`&.${tableCellClasses.body}`]: {
+//     fontSize: 14
+//   }
+// }))
+//
+// const StyledTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
+//   '&:nth-of-type(odd)': {
+//     backgroundColor: theme.palette.action.hover
+//   },
+//   // hide last border
+//   '&:last-of-type td, &:last-of-type th': {
+//     border: 0
+//   }
+// }))
 
 const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) => {
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
@@ -46,50 +55,329 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
     appThunkDispatch(exportTaskPressureData({pId: Number(params.pid), tId: row.id}))
   }
 
+  // 查看指标弹框
+  const [openTarget, setOpenTarget] = React.useState(false);
+  const handleClickOpenTarget = () => {
+    setOpenTarget(true);
+  };
+  const handleCloseTarget = () => {
+    setOpenTarget(false);
+  };
+  function createTargetData(
+    onsetTime: string,
+    medication: string,
+    spasmStatus: string,
+    minHeartRate: string,
+    maxHeartRate: string,
+    avgHeartRate: string,
+  ) {
+    return { onsetTime, medication, spasmStatus, minHeartRate, maxHeartRate,avgHeartRate };
+  }
+  const rows = [
+    // createTargetData('1314', '159', '6.0', '24', '4.0','9'),
+  ];
+
+  // 查看评价弹框
+  const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
+    pid:0,
+    onset_time : "",
+    medication : "",
+    spasm_status : "",
+    min_heart_rate : 0,
+    max_heart_rate : 0,
+    avg_heart_rate : 0,
+  })
+  const [openEvaluate, setOpenEvaluate] = React.useState(false);
+  const handleClickOpenEvaluate = () => {
+    setOpenEvaluate(true);
+  };
+  const handleCloseEvaluate = () => {
+    setOpenEvaluate(false);
+  };
+  const onsetTime = willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null;
+  const nextSunday = dayjs().endOf('week').startOf('day').toDate();
+  const isWeekend = (date: Dayjs) => {
+    const day = date.day();
+
+    return day === 0 || day === 6;
+  };
+
+  //跳转
+  const handleClickMove = () => {
+    const targetElement = document.getElementById('target-element');
+    targetElement?.scrollIntoView({ behavior: 'smooth'});
+  };
+
+
+
+  const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    let processedValue: string | number = value;
+    if (["avg_heart_rate", "max_heart_rate", "min_heart_rate"].includes(id)) {
+      processedValue = Number(value);
+    }
+    console.log('handleAddStatus', id, processedValue)
+    setWillAddStatus((prevInputValues) => ({
+      ...prevInputValues,
+      [id]: processedValue,
+    }))
+  };
+
+  const handleSaveAddStatus = () => {
+    appThunkDispatch(addStatus({
+      pid: parseInt(params.pid),
+      onset_time: willAddStatus.onset_time,
+      medication: willAddStatus.medication,
+      spasm_status: willAddStatus.spasm_status,
+      min_heart_rate: willAddStatus.min_heart_rate,
+      max_heart_rate: willAddStatus.max_heart_rate,
+      avg_heart_rate: willAddStatus.avg_heart_rate
+    }))
+  }
+
   return (
+    <>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 280 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <StyledTableCell sx={{minWidth: 165}}>康复开始时间</StyledTableCell>
-                <StyledTableCell sx={{minWidth: 165}} align='right'>康复结束时间</StyledTableCell>
-                <StyledTableCell align='right' sx={{minWidth: 70}}>状态</StyledTableCell>
-                {/*<StyledTableCell align='right'>康复次数</StyledTableCell>*/}
-                <StyledTableCell sx={{minWidth: 160}} align='center'>操作</StyledTableCell>
+                <TableCell align="center">状态</TableCell>
+                <TableCell>康复开始时间</TableCell>
+                <TableCell>康复结束时间</TableCell>
+                <TableCell align="center">指标</TableCell>
+                <TableCell align="center">量表及评价</TableCell>
+                <TableCell align="center">操作</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {params.record.map(row => (
-                  <StyledTableRow key={row.id}>
-                    <StyledTableCell component='th' scope='row'>
-                      {row.created_at}
-                    </StyledTableCell>
-                    <StyledTableCell align='right'>{row.updated_at}</StyledTableCell>
-                    {/*<StyledTableCell align='right'>{row.state}</StyledTableCell>*/}
-                    <StyledTableCell align='right'>{row.state}</StyledTableCell>
-                    <StyledTableCell align='center'>
-                      <Tooltip title="导出">
-                        <IconButton
-                          aria-label="download"
-                          color="primary"
-                          onClick={(event)=>{event.stopPropagation(); handleExport(row);}}>
-                          <DownloadIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      {/*<Tooltip title="删除">*/}
-                      {/*  <IconButton*/}
-                      {/*    aria-label="delete">*/}
-                      {/*    <DeleteIcon fontSize="small" />*/}
-                      {/*  </IconButton>*/}
-                      {/*</Tooltip>*/}
-                    </StyledTableCell>
-                  </StyledTableRow>
+                  <TableRow key={row.id}>
+                    <TableCell>
+                      <Button
+                        style={{
+                          backgroundColor:
+                            row.state === 'N_END' || row.state === 'H_END' ? '#06c426' : '#f32148',
+                          color: '#ffffff',
+                          float: 'right',
+                        }}
+                      >
+                        {row.state === 'N_END' || row.state === 'H_END' ? '完成' : '进行中'}
+                      </Button>
+                    </TableCell>
+                    <TableCell>{row.created_at}</TableCell>
+                    <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
+                    <TableCell>
+                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>填写指标</Button>
+                    </TableCell>
+                    <TableCell align="center">
+                      <a href={`/rehab/assessment`} target="_blank" rel="noopener noreferrer">
+                        <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
+                      </a>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={handleClickMove}>查看直方图</Button>
+                    </TableCell>
+                    {/*<TableCell align='center'>*/}
+                    {/*  <Tooltip title="导出">*/}
+                    {/*    <IconButton*/}
+                    {/*      aria-label="download"*/}
+                    {/*      color="primary"*/}
+                    {/*      onClick={(event)=>{event.stopPropagation(); handleExport(row);}}>*/}
+                    {/*      <DownloadIcon fontSize="small" />*/}
+                    {/*    </IconButton>*/}
+                    {/*  </Tooltip>*/}
+                    {/*</TableCell>*/}
+                  </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
+      {/*查看指标弹框*/}
+  <Dialog
+    open={openTarget}
+    onClose={handleCloseTarget}
+    aria-describedby="Target"
+  >
+    <DialogTitle>{"病人各项指标"}</DialogTitle>
+    <DialogContent>
+      {rows.length > 0 ? (
+        <DialogContentText id="Target">
+          <Table sx={{ minWidth: 500 }} aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableCell>发病时间</TableCell>
+                {/*<TableCell align="right">用药</TableCell>*/}
+                <TableCell align="right">痉挛状态</TableCell>
+                <TableCell align="right">最小心率</TableCell>
+                <TableCell align="right">最大心率</TableCell>
+                <TableCell align="right">平均心率</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow
+                  key={row.onsetTime}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {row.onsetTime}
+                  </TableCell>
+                  {/*<TableCell align="right">{row.medication}</TableCell>*/}
+                  <TableCell align="right">{row.spasmStatus}</TableCell>
+                  <TableCell align="right">{row.minHeartRate}</TableCell>
+                  <TableCell align="right">{row.maxHeartRate}</TableCell>
+                  <TableCell align="right">{row.avgHeartRate}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DialogContentText>
+      ) : (
+        <div>
+          {/*<TextField*/}
+          {/*  label="发病时间"*/}
+          {/*  value={willAddStatus.onset_time}*/}
+          {/*  onChange={handleAddStatus}*/}
+          {/*  fullWidth*/}
+          {/*/>*/}
+          {/* Add more input fields for other indicators */}
+          <Grid container spacing={0}>
+            <Grid item xs={6}>
+              <Box sx={{padding: '8px' }}>
+                <Grid container spacing={0} alignItems="center">
+                  <Grid item xs={4}>
+                    <label htmlFor="input9">发病时间:</label>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DateTimePicker
+                        value={onsetTime as any}
+                        onChange={(newValue) => {
+                          // newValue is the selected date and time object
+                          const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';
+                          setWillAddStatus((prevStatus) => ({
+                            ...prevStatus,
+                            onset_time: formattedDate,
+                          }));
+                        }}
+                        defaultValue={nextSunday as any}
+                        shouldDisableDate={isWeekend}
+                        views={['year', 'month', 'day', 'hours', 'minutes']}
+                      />
+                    </LocalizationProvider>
+                    {/*<TextField*/}
+                    {/*  id="onset_time"*/}
+                    {/*  value={willAddStatus.onset_time}*/}
+                    {/*  onChange={handleAddStatus}*/}
+                    {/*  size="small"*/}
+                    {/*  fullWidth*/}
+                    {/*/>*/}
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+            {/*<Grid item xs={6}>*/}
+            {/*  <Box sx={{padding: '8px' }}>*/}
+            {/*    <Grid container spacing={0} alignItems="center">*/}
+            {/*      <Grid item xs={4}>*/}
+            {/*        <label htmlFor="input10">用药:</label>*/}
+            {/*      </Grid>*/}
+            {/*      <Grid item xs={8}>*/}
+            {/*        <TextField*/}
+            {/*          id="medication"*/}
+            {/*          value={willAddStatus.medication}*/}
+            {/*          onChange={handleAddStatus}*/}
+            {/*          size="small"*/}
+            {/*          fullWidth*/}
+            {/*        />*/}
+            {/*      </Grid>*/}
+            {/*    </Grid>*/}
+            {/*  </Box>*/}
+            {/*</Grid>*/}
+            <Grid item xs={6}>
+              <Box sx={{padding: '8px' }}>
+                <Grid container spacing={0} alignItems="center">
+                  <Grid item xs={4}>
+                    <label htmlFor="input11">痉挛状态:</label>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <TextField
+                      id="spasm_status"
+                      value={willAddStatus.spasm_status}
+                      onChange={handleAddStatus}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box sx={{padding: '8px' }}>
+                <Grid container spacing={0} alignItems="center">
+                  <Grid item xs={4}>
+                    <label htmlFor="input9">最小心率:</label>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <TextField
+                      id="min_heart_rate"
+                      value={willAddStatus.min_heart_rate}
+                      onChange={handleAddStatus}
+                      size="small"
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box sx={{padding: '8px' }}>
+                <Grid container spacing={0} alignItems="center">
+                  <Grid item xs={4}>
+                    <label htmlFor="input9">最大心率:</label>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <TextField
+                      id="max_heart_rate"
+                      value={willAddStatus.max_heart_rate}
+                      onChange={handleAddStatus}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box sx={{padding: '8px' }}>
+                <Grid container spacing={0} alignItems="center">
+                  <Grid item xs={4}>
+                    <label htmlFor="input9">平均心率:</label>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <TextField
+                      id="avg_heart_rate"
+                      value={willAddStatus.avg_heart_rate}
+                      onChange={handleAddStatus}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+          </Grid>
+
+        </div>
+      )}
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleSaveAddStatus}>保存指标</Button>
+      <Button onClick={handleCloseTarget}>关闭</Button>
+    </DialogActions>
+  </Dialog>
+    </>
   )
 }
 export default PrescriptionTable
