@@ -70,7 +70,31 @@ export interface Prescription {
   u: number | string;
   v: number | string;
   duration?: number;
+  frequency_per_day: number;
+  total_days: number;
   prescription_record?: PrescriptionRecord[];
+}
+
+export interface Evaluation {
+  pid: number;
+  acute_state: string;
+  motion_injury: string;
+  motion_review: string;
+  muscle_tone: string;
+  neuro_judgment: string;
+  rehab_session_id: number;
+  spasm_review: string;
+  tolerance: string
+}
+
+export interface Status {
+  avg_heart_rate: number;
+  max_heart_rate: number;
+  medication: string;
+  min_heart_rate: number;
+  onset_time: string;
+  pid: number;
+  spasm_status: string
 }
 
 export interface AddPrescriptionItem {
@@ -80,6 +104,8 @@ export interface AddPrescriptionItem {
   u: number | string;
   v: number | string;
   duration?: number | string;
+  frequency_per_day:number;
+  total_days:number;
 }
 
 export interface PrescriptionRecord {
@@ -91,7 +117,7 @@ export interface PrescriptionRecord {
   updated_at: string;
 }
 
-export interface TargetFormProps {
+export interface StatusFormProps {
   onsetTime: string;
   medication: string;
   spasmStatus: string;
@@ -117,6 +143,7 @@ let status: PatientStatus[] = []
 let patients: Patient[] = []
 let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
+let evluation:Evaluation[]=[]
 let onlineEquipment: EquipmentOnline[] = []
 let equipmentAll: equipmentAll[] = []
 let sysInfo: systemInformation = {
@@ -155,6 +182,8 @@ interface RehabState {
   activePatient: Patient[]
   rehabPatient: Patient
   prescription: Prescription[]
+  status:Status[]
+  evluation:Evaluation[]
   prescriptionRecord: PrescriptionRecord[]
   onlineEquipment: EquipmentOnline[]
   equipmentAll: equipmentAll[]
@@ -170,6 +199,8 @@ const initialState: RehabState = {
   activePatient: [],
   rehabPatient: patient,
   prescription: prescriptions,
+  status: status,
+  evluation: evluation,
   prescriptionRecord: prescriptionRecord,
   onlineEquipment: onlineEquipment,
   equipmentAll: equipmentAll,
@@ -417,6 +448,8 @@ function convertAPIPrescriptionToPrescription(apiPrescription: any): Prescriptio
     u: apiPrescription.u,
     v: apiPrescription.v,
     duration: apiPrescription.duration,
+    frequency_per_day:apiPrescription.frequency_per_day,
+    total_days:apiPrescription.total_days,
     prescription_record: apiPrescription.rehabilitation_tasks
     ? apiPrescription.rehabilitation_tasks.map((t:any) => {
       return {
@@ -511,7 +544,7 @@ export const deletePatient = createAsyncThunk<{id: number}, {id: number}, {}>('d
 });
 
 export const deletePrescription = createAsyncThunk<{id: number}, {id: number}, {}>('deletePrescription', async ({id}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete('prescription', {params:{ id }});
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete(`prescription/${id}`);
   console.log("delete prescription async thunk: ", response.data)
   return {id: id}
 });
@@ -570,24 +603,33 @@ export const addEvaluation = createAsyncThunk<RehabEvaluation, {
   return convertAPIEvaluationToEvaluation(response.data.data.evaluation[0])
 });
 
-export const addPrescription = createAsyncThunk<Prescription, { pid: number, x: number, y: number , zz: number, u: number, v: number},
-    {}>('addPrescription', async ({pid, x, y , zz, u, v}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('prescription',{pid, x, y , zz, u, v})
+export const addPrescription = createAsyncThunk<Prescription, { pid: number, x: number, y: number , zz: number, u: number, v: number,duration:number,frequency_per_day:number,total_days:number},
+    {}>('addPrescription', async ({pid, x, y , zz, u, v,duration,frequency_per_day,total_days}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('prescription',{pid, x, y , zz, u, v,duration,frequency_per_day,total_days})
   console.log("add prescription async thunk: ", response.data.data.prescriptions[0])
   return convertAPIPrescriptionToPrescription(response.data.data.prescriptions[0])
 });
 
-export const editPrescription = createAsyncThunk<Prescription, {id: number, x: number, y: number, zz: number, u: number, v:number}, {}>('editPrescription', async ({id, x, y, zz, u, v}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('prescription', { id, x, y, zz, u, v});
+export const editPrescription = createAsyncThunk<Prescription, {id: number, x: number, y: number, zz: number, u: number, v:number,duration:number,frequency_per_day:number,total_days:number},
+  {}>('editPrescription', async ({id, x, y, zz, u, v,duration,frequency_per_day,total_days}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('prescription', { id, x, y, zz, u, v,duration,frequency_per_day,total_days});
   console.log("edit prescription: ", response.data)
   return convertAPIPrescriptionToPrescription(response.data.data.prescriptions[0])
 });
 
-export const fetchEvaluationById = createAsyncThunk<Prescription[], { task_id: number}, {}>('fetchEvaluationById', async ({task_id}):Promise<any> => {
+export const fetchEvaluationById = createAsyncThunk<Evaluation[], { task_id: number}, {}>('fetchEvaluationById', async ({task_id}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('train/evaluation', {params:{task_id}});
   console.log("fetch Evaluation by id async thunk: ", response.data.data)
-  let p = response.data.data.prescriptions.map(convertAPIEvaluationToEvaluation)
+  let p = response.data.data.map(convertAPIEvaluationToEvaluation)
   console.log('Evaluation', p)
+  return p
+});
+
+export const fetchStatusById = createAsyncThunk<Status[], { pid:number,task_id: number}, {}>('fetchStatusById', async ({pid,task_id}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('train/status', {params:{pid,task_id}});
+  console.log("fetch Status by id async thunk: ", response.data.data)
+  let p = response.data.data.map(convertAPIStatusToStatus)
+  console.log('Status', p)
   return p
 });
 
@@ -817,10 +859,14 @@ const RehabSlice = createSlice({
           console.log("fetch prescription by id", action.payload)
           state.prescription = action.payload
         })
-      .addCase(fetchEvaluationById.fulfilled, (state, action) => {
-        console.log("fetch hEvaluation by id", action.payload)
-        state.prescription = action.payload
-      })
+        .addCase(fetchEvaluationById.fulfilled, (state, action) => {
+          console.log("fetch Evaluation by id", action.payload)
+          state.evluation = action.payload
+        })
+        .addCase(fetchStatusById.fulfilled, (state, action) => {
+          console.log("fetch Status by id", action.payload)
+          state.status = action.payload
+        })
         .addCase(fetchPrescriptionByPId.fulfilled, (state, action) => {
           console.log("fetch prescription by pid", action.payload)
           state.prescription = action.payload

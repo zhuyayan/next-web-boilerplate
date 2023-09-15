@@ -242,6 +242,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
   const appDispatch = useAppDispatch()
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
+  const status = useAppSelector((state: RootState) => state.rehab.status)
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -263,6 +264,9 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     zz: 10,
     u: 3,
     v: 3,
+    duration: 1,
+    frequency_per_day: 1,
+    total_days: 1,
   })
   const [willEditPrescription, setWillEditPrescription] = useState<Prescription>({
     id: 0,
@@ -272,44 +276,10 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     zz: 10,
     u: 3,
     v: 3,
+    duration: 1,
+    frequency_per_day: 1,
+    total_days: 1,
   })
-
-
-  function createTargetData(
-    onsetTime: string,
-    medication: string,
-    spasmStatus: string,
-    minHeartRate: string,
-    maxHeartRate: string,
-    avgHeartRate: string,
-  ) {
-    return { onsetTime, medication, spasmStatus, minHeartRate, maxHeartRate,avgHeartRate };
-  }
-  const rows = [
-    // createTargetData('1314', '159', '6.0', '24', '4.0','9'),
-  ];
-
-  function createEvaluateData(
-    tolerance: number,
-    sportsEvaluation: number,
-    spasmEvaluation: number,
-    muscularTension: number,
-    acutePhase: number,
-    neurological: number,
-    sportsInjury: number
-  ) {
-    return {
-      tolerance,
-      sportsEvaluation,
-      spasmEvaluation,
-      muscularTension,
-      acutePhase,
-      neurological,
-      sportsInjury
-    };
-  }
-  const evaluateData = [createEvaluateData(1314, 159, 6.0, 24, 4.0, 5, 4)];
-
 
   const [clientId, setClientId] = useState("")
   const [openDelPrescription, setOpenDelPrescription] = useState(false);
@@ -391,6 +361,9 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       zz: Number(willEditPrescription.zz),
       u: Number(willEditPrescription.u),
       v: Number(willEditPrescription.v),
+      duration:Number(willEditPrescription.duration),
+      frequency_per_day: willEditPrescription.frequency_per_day,
+      total_days: willEditPrescription.total_days,
     })).then((prescription) => {
       console.log('The updated prescription is: ', prescription);
       console.log('The updated prescription is: ', typeof prescription);
@@ -468,11 +441,6 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     setOpenEvaluate(false);
   };
 
-  //跳转
-  const handleClickMove = () => {
-    const targetElement = document.getElementById('target-element');
-    targetElement?.scrollIntoView({ behavior: 'smooth'});
-  };
 
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
@@ -569,6 +537,8 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     u: 3,
     v: 3,
     duration: 1,
+    frequency_per_day: 1,
+    total_days: 1,
     prescription_record: [
       {
         id: 123,
@@ -614,7 +584,10 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       y: NumToModeMapping[willAddPrescription.mode],
       zz: Number(willAddPrescription.zz),
       u: Number(willAddPrescription.u),
-      v: Number(willAddPrescription.v)
+      v: Number(willAddPrescription.v),
+      duration:Number(willEditPrescription.duration),
+      frequency_per_day: willEditPrescription.frequency_per_day,
+      total_days: willEditPrescription.total_days,
     }))
     setOpenAdd(false);
   };
@@ -766,15 +739,14 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                 {/*一天三次，一次十分钟，共需做5天，已做3天*/}
                 <Grid container spacing={2}>
                   <Grid item xs={8} md={8}>
-                    <Card sx={{ minWidth: 500,backgroundColor: '#74b2f1' ,display: 'flex', justifyContent: 'space-between'}}>
+                    <Card key={row.id} sx={{ minWidth: 500,backgroundColor: '#74b2f1' ,display: 'flex', justifyContent: 'space-between'}}>
                         <Typography sx={{ fontSize: 16 ,fontWeight: 'bold',padding:2}} color="text.secondary" gutterBottom>
-                          一天 3 次，一次 20 分钟，共需做 5 天，已做 3 天
+                          一天 {row.frequency_per_day} 次，一次 {row.zz} 分钟，共需做 {row.total_days} 天，已做 3 天
                         </Typography>
                     </Card>
                   </Grid>
                   <Grid item xs={4}>
                     <Tooltip title="下发处方">
-
                       <IconButton
                           aria-label="edit"
                           color="primary"
@@ -790,7 +762,8 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                   <Grid item xs={12} md={12}>
                     <Card sx={{ height: 265 ,padding: '5px'}}>
                       <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                      <PrescriptionTable record={record} pid={params.id}/>
+                      <PrescriptionTable record={prescription} pid={params.id} status={status}/>
+                    {/*  prescription_record*/}
                     </Card>
                   </Grid>
                   <Grid item xs={12} md={12}>
@@ -802,342 +775,153 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Card>
                   </Grid>
                 </Grid>
-
-                <Card></Card>
               </TabPanel>
             </>
         ))}
       </Box>
 
     </Box>
+      {/*<TableContainer>*/}
+      {/*  <Table stickyHeader aria-label="sticky table">*/}
+      {/*    <TableHead>*/}
+      {/*      <TableRow>*/}
+      {/*        {columns.map((column) => (*/}
+      {/*            <TableCell*/}
+      {/*                key={column.id}*/}
+      {/*                align={column.align}*/}
+      {/*                style={{ minWidth: column.minWidth }}*/}
+      {/*            >*/}
+      {/*              {column.label}*/}
+      {/*            </TableCell>*/}
+      {/*        ))}*/}
+      {/*      </TableRow>*/}
+      {/*    </TableHead>*/}
+      {/*    <TableBody>*/}
+      {/*      {params.prescription?.map(row => (*/}
+      {/*        <React.Fragment key={row.id}>*/}
+      {/*          <StyledTableRow*/}
+      {/*              style={{height:'30px'}}*/}
+      {/*              onClick={() => handleRowClick(row.id)}*/}
+      {/*          >*/}
+      {/*            <TableCell>*/}
+      {/*              <IconButton*/}
+      {/*                aria-label="expand row"*/}
+      {/*                size="small"*/}
+      {/*                // onClick={() => handleRowClick(row.id)}*/}
+      {/*              >*/}
+      {/*                {openRecord[row.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}*/}
+      {/*              </IconButton>*/}
+      {/*            </TableCell>*/}
+      {/*            <TableCell component='th' scope='row'>*/}
+      {/*              {row.created_at}*/}
+      {/*            </TableCell>*/}
+      {/*            <TableCell align='right'>{row.mode}</TableCell>*/}
+      {/*            <TableCell align='right'>{row.part}</TableCell>*/}
+      {/*            <TableCell align='right'>{row.zz}</TableCell>*/}
+      {/*            <TableCell align='right'>{row.u}</TableCell>*/}
+      {/*            <TableCell align='right'>{row.v}</TableCell>*/}
 
-        {/*<TableContainer>*/}
-        {/*  <Table stickyHeader aria-label="sticky table">*/}
-        {/*    <TableHead>*/}
-        {/*      <TableRow>*/}
-        {/*        {columns.map((column) => (*/}
-        {/*            <TableCell*/}
-        {/*                key={column.id}*/}
-        {/*                align={column.align}*/}
-        {/*                style={{ minWidth: column.minWidth }}*/}
-        {/*            >*/}
-        {/*              {column.label}*/}
-        {/*            </TableCell>*/}
-        {/*        ))}*/}
-        {/*      </TableRow>*/}
-        {/*    </TableHead>*/}
-        {/*    <TableBody>*/}
-        {/*      {params.prescription?.map(row => (*/}
-        {/*        <React.Fragment key={row.id}>*/}
-        {/*          <StyledTableRow*/}
-        {/*              style={{height:'30px'}}*/}
-        {/*              onClick={() => handleRowClick(row.id)}*/}
-        {/*          >*/}
-        {/*            <TableCell>*/}
-        {/*              <IconButton*/}
-        {/*                aria-label="expand row"*/}
-        {/*                size="small"*/}
-        {/*                // onClick={() => handleRowClick(row.id)}*/}
-        {/*              >*/}
-        {/*                {openRecord[row.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}*/}
-        {/*              </IconButton>*/}
-        {/*            </TableCell>*/}
-        {/*            <TableCell component='th' scope='row'>*/}
-        {/*              {row.created_at}*/}
-        {/*            </TableCell>*/}
-        {/*            <TableCell align='right'>{row.mode}</TableCell>*/}
-        {/*            <TableCell align='right'>{row.part}</TableCell>*/}
-        {/*            <TableCell align='right'>{row.zz}</TableCell>*/}
-        {/*            <TableCell align='right'>{row.u}</TableCell>*/}
-        {/*            <TableCell align='right'>{row.v}</TableCell>*/}
+      {/*            <ThemeProvider theme={theme}>*/}
+      {/*              <TableCell align='right'>*/}
+      {/*                {*/}
+      {/*                  (() => {*/}
+      {/*                    let label = row.prescription_record?.length + ' / ' + row.duration;*/}
+      {/*                    let color = 'success';*/}
+      {/*                    if (row.prescription_record?.length == row.duration) {*/}
+      {/*                      color = 'success';*/}
+      {/*                    } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {*/}
+      {/*                      color = 'primary';*/}
+      {/*                    }*/}
+      {/*                    return <MCTFixedWidthChip label={label} color={color} />;*/}
+      {/*                  })()*/}
+      {/*                }*/}
+      {/*              </TableCell>*/}
+      {/*            </ThemeProvider>*/}
+      {/*            <TableCell align='center'>*/}
+      {/*              /!*<ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>*!/*/}
+      {/*              /!*  <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>*!/*/}
+      {/*              /!*  <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>*!/*/}
+      {/*              /!*  <Button color="secondary" onClick={() => handleDeletePrescription(row.id)}>删除</Button>*!/*/}
+      {/*              /!*</ButtonGroup>*!/*/}
+      {/*              <Tooltip title="下发处方">*/}
+      {/*                <IconButton*/}
+      {/*                    aria-label="edit"*/}
+      {/*                    color="primary"*/}
+      {/*                    onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}*/}
+      {/*                >*/}
+      {/*                  <SendAndArchiveIcon fontSize="small" />*/}
+      {/*                </IconButton>*/}
+      {/*              </Tooltip>*/}
 
-        {/*            <ThemeProvider theme={theme}>*/}
-        {/*              <TableCell align='right'>*/}
-        {/*                {*/}
-        {/*                  (() => {*/}
-        {/*                    let label = row.prescription_record?.length + ' / ' + row.duration;*/}
-        {/*                    let color = 'success';*/}
-        {/*                    if (row.prescription_record?.length == row.duration) {*/}
-        {/*                      color = 'success';*/}
-        {/*                    } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {*/}
-        {/*                      color = 'primary';*/}
-        {/*                    }*/}
-        {/*                    return <MCTFixedWidthChip label={label} color={color} />;*/}
-        {/*                  })()*/}
-        {/*                }*/}
-        {/*              </TableCell>*/}
-        {/*            </ThemeProvider>*/}
-        {/*            <TableCell align='center'>*/}
-        {/*              /!*<ButtonGroup variant="outlined" aria-label="outlined button group" style={{height:'20px'}}>*!/*/}
-        {/*              /!*  <Button color="primary"  onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}>下发</Button>*!/*/}
-        {/*              /!*  <Button color="primary" onClick={(event) => {event.stopPropagation();handleClickModify(row)}}>修改</Button>*!/*/}
-        {/*              /!*  <Button color="secondary" onClick={() => handleDeletePrescription(row.id)}>删除</Button>*!/*/}
-        {/*              /!*</ButtonGroup>*!/*/}
-        {/*              <Tooltip title="下发处方">*/}
-        {/*                <IconButton*/}
-        {/*                    aria-label="edit"*/}
-        {/*                    color="primary"*/}
-        {/*                    onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}*/}
-        {/*                >*/}
-        {/*                  <SendAndArchiveIcon fontSize="small" />*/}
-        {/*                </IconButton>*/}
-        {/*              </Tooltip>*/}
+      {/*              <Tooltip title="修改处方">*/}
+      {/*                <IconButton*/}
+      {/*                    aria-label="edit"*/}
+      {/*                    color="secondary"*/}
+      {/*                    onClick={(event) => {event.stopPropagation(); handleClickModify(row)}}*/}
+      {/*                >*/}
+      {/*                  <EditIcon fontSize="small" />*/}
+      {/*                </IconButton>*/}
+      {/*              </Tooltip>*/}
 
-        {/*              <Tooltip title="修改处方">*/}
-        {/*                <IconButton*/}
-        {/*                    aria-label="edit"*/}
-        {/*                    color="secondary"*/}
-        {/*                    onClick={(event) => {event.stopPropagation(); handleClickModify(row)}}*/}
-        {/*                >*/}
-        {/*                  <EditIcon fontSize="small" />*/}
-        {/*                </IconButton>*/}
-        {/*              </Tooltip>*/}
-
-        {/*              <Tooltip title="删除处方">*/}
-        {/*                <IconButton*/}
-        {/*                    aria-label="delete"*/}
-        {/*                    // onClick={() => handleDeletePrescription(row.id)}*/}
-        {/*                    onClick={(event) => {event.stopPropagation(); handleClickDel(row)}}*/}
-        {/*                >*/}
-        {/*                  <DeleteIcon fontSize="small" />*/}
-        {/*                </IconButton>*/}
-        {/*              </Tooltip>*/}
-        {/*            </TableCell>*/}
-        {/*          </StyledTableRow>*/}
-        {/*        <StyledTableRow>*/}
-        {/*        /!*  康复记录*!/*/}
-        {/*        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>*/}
-        {/*          <Collapse in={openRecord[row.id]} timeout="auto" unmountOnExit>*/}
-        {/*            <Box sx={{ margin: 1,backgroundColor: 'rgba(177,197,238,0.78)',paddingLeft:3,marginLeft:2}}>*/}
-        {/*              <Typography variant="h6" gutterBottom component="div">*/}
-        {/*                康复记录*/}
-        {/*              </Typography>*/}
-        {/*              <Table size="small" aria-label="purchases">*/}
-        {/*                <TableHead>*/}
-        {/*                  <TableRow>*/}
-        {/*                    <TableCell>康复开始时间</TableCell>*/}
-        {/*                    <TableCell>康复结束时间</TableCell>*/}
-        {/*                    <TableCell align="center">各项指标</TableCell>*/}
-        {/*                    <TableCell align="center">医生评价</TableCell>*/}
-        {/*                    <TableCell align="center">操作</TableCell>*/}
-        {/*                  </TableRow>*/}
-        {/*                </TableHead>*/}
-        {/*                <TableBody>*/}
-        {/*                  {*/}
-        {/*                    row.prescription_record?.map((historyRow: PrescriptionRecord) => (*/}
-        {/*                        <TableRow key={historyRow.id}>*/}
-        {/*                          <TableCell>{historyRow.eid}</TableCell>*/}
-        {/*                          <TableCell>{historyRow.pid}</TableCell>*/}
-        {/*                          <TableCell align="center">*/}
-        {/*                            <Button color="secondary" onClick={handleClickOpenTarget}>病人指标</Button>*/}
-        {/*                          </TableCell>*/}
-        {/*                          <TableCell align="center">*/}
-        {/*                            <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>*/}
-        {/*                          </TableCell>*/}
-        {/*                          <TableCell align="center">*/}
-        {/*                            <Button color="secondary" onClick={handleClickMove} >查看直方图</Button>*/}
-        {/*                          </TableCell>*/}
-        {/*                        </TableRow>*/}
-        {/*                    ))*/}
-        {/*                  }*/}
-        {/*                </TableBody>*/}
-        {/*              </Table>*/}
-        {/*            </Box>*/}
-        {/*          </Collapse>*/}
-        {/*        </TableCell>*/}
-        {/*      </StyledTableRow>*/}
-        {/*        </React.Fragment>*/}
-        {/*        ))}*/}
-        {/*    </TableBody>*/}
-        {/*  </Table>*/}
-        {/*</TableContainer>*/}
+      {/*              <Tooltip title="删除处方">*/}
+      {/*                <IconButton*/}
+      {/*                    aria-label="delete"*/}
+      {/*                    // onClick={() => handleDeletePrescription(row.id)}*/}
+      {/*                    onClick={(event) => {event.stopPropagation(); handleClickDel(row)}}*/}
+      {/*                >*/}
+      {/*                  <DeleteIcon fontSize="small" />*/}
+      {/*                </IconButton>*/}
+      {/*              </Tooltip>*/}
+      {/*            </TableCell>*/}
+      {/*          </StyledTableRow>*/}
+      {/*        <StyledTableRow>*/}
+      {/*        /!*  康复记录*!/*/}
+      {/*        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>*/}
+      {/*          <Collapse in={openRecord[row.id]} timeout="auto" unmountOnExit>*/}
+      {/*            <Box sx={{ margin: 1,backgroundColor: 'rgba(177,197,238,0.78)',paddingLeft:3,marginLeft:2}}>*/}
+      {/*              <Typography variant="h6" gutterBottom component="div">*/}
+      {/*                康复记录*/}
+      {/*              </Typography>*/}
+      {/*              <Table size="small" aria-label="purchases">*/}
+      {/*                <TableHead>*/}
+      {/*                  <TableRow>*/}
+      {/*                    <TableCell>康复开始时间</TableCell>*/}
+      {/*                    <TableCell>康复结束时间</TableCell>*/}
+      {/*                    <TableCell align="center">各项指标</TableCell>*/}
+      {/*                    <TableCell align="center">医生评价</TableCell>*/}
+      {/*                    <TableCell align="center">操作</TableCell>*/}
+      {/*                  </TableRow>*/}
+      {/*                </TableHead>*/}
+      {/*                <TableBody>*/}
+      {/*                  {*/}
+      {/*                    row.prescription_record?.map((historyRow: PrescriptionRecord) => (*/}
+      {/*                        <TableRow key={historyRow.id}>*/}
+      {/*                          <TableCell>{historyRow.eid}</TableCell>*/}
+      {/*                          <TableCell>{historyRow.pid}</TableCell>*/}
+      {/*                          <TableCell align="center">*/}
+      {/*                            <Button color="secondary" onClick={handleClickOpenTarget}>病人指标</Button>*/}
+      {/*                          </TableCell>*/}
+      {/*                          <TableCell align="center">*/}
+      {/*                            <Button color="secondary" onClick={handleClickOpenEvaluate}>康复评价</Button>*/}
+      {/*                          </TableCell>*/}
+      {/*                          <TableCell align="center">*/}
+      {/*                            <Button color="secondary" onClick={handleClickMove} >查看直方图</Button>*/}
+      {/*                          </TableCell>*/}
+      {/*                        </TableRow>*/}
+      {/*                    ))*/}
+      {/*                  }*/}
+      {/*                </TableBody>*/}
+      {/*              </Table>*/}
+      {/*            </Box>*/}
+      {/*          </Collapse>*/}
+      {/*        </TableCell>*/}
+      {/*      </StyledTableRow>*/}
+      {/*        </React.Fragment>*/}
+      {/*        ))}*/}
+      {/*    </TableBody>*/}
+      {/*  </Table>*/}
+      {/*</TableContainer>*/}
       {/*</Paper>*/}
-
-
-      {/*查看指标弹框*/}
-      <Dialog
-        open={openTarget}
-        onClose={handleCloseTarget}
-        aria-describedby="Target"
-      >
-        <DialogTitle>{"病人各项指标"}</DialogTitle>
-        <DialogContent>
-          {rows.length > 0 ? (
-            <DialogContentText id="Target">
-              <Table sx={{ minWidth: 500 }} aria-label="a dense table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>发病时间</TableCell>
-                    <TableCell align="right">用药</TableCell>
-                    <TableCell align="right">痉挛状态</TableCell>
-                    <TableCell align="right">最小心率</TableCell>
-                    <TableCell align="right">最大心率</TableCell>
-                    <TableCell align="right">平均心率</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow
-                      key={row.onsetTime}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        {row.onsetTime}
-                      </TableCell>
-                      <TableCell align="right">{row.medication}</TableCell>
-                      <TableCell align="right">{row.spasmStatus}</TableCell>
-                      <TableCell align="right">{row.minHeartRate}</TableCell>
-                      <TableCell align="right">{row.maxHeartRate}</TableCell>
-                      <TableCell align="right">{row.avgHeartRate}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </DialogContentText>
-          ) : (
-            <div>
-              {/*<TextField*/}
-              {/*  label="发病时间"*/}
-              {/*  value={willAddStatus.onset_time}*/}
-              {/*  onChange={handleAddStatus}*/}
-              {/*  fullWidth*/}
-              {/*/>*/}
-              {/* Add more input fields for other indicators */}
-              <Grid container spacing={0}>
-                <Grid item xs={6}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input9">发病时间:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DateTimePicker
-                            value={onsetTime as any}
-                            onChange={(newValue) => {
-                              // newValue is the selected date and time object
-                              const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';
-                              setWillAddStatus((prevStatus) => ({
-                                ...prevStatus,
-                                onset_time: formattedDate,
-                              }));
-                            }}
-                            defaultValue={nextSunday as any}
-                            shouldDisableDate={isWeekend}
-                            views={['year', 'month', 'day', 'hours', 'minutes']}
-                          />
-                        </LocalizationProvider>
-                        {/*<TextField*/}
-                        {/*  id="onset_time"*/}
-                        {/*  value={willAddStatus.onset_time}*/}
-                        {/*  onChange={handleAddStatus}*/}
-                        {/*  size="small"*/}
-                        {/*  fullWidth*/}
-                        {/*/>*/}
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input10">用药:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                          id="medication"
-                          value={willAddStatus.medication}
-                          onChange={handleAddStatus}
-                          size="small"
-                          fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input11">痉挛状态:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                          id="spasm_status"
-                          value={willAddStatus.spasm_status}
-                          onChange={handleAddStatus}
-                          size="small"
-                          fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input9">最小心率:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                          id="min_heart_rate"
-                          value={willAddStatus.min_heart_rate}
-                          onChange={handleAddStatus}
-                          size="small"
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input9">最大心率:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                          id="max_heart_rate"
-                          value={willAddStatus.max_heart_rate}
-                          onChange={handleAddStatus}
-                          size="small"
-                          fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input9">平均心率:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                          id="avg_heart_rate"
-                          value={willAddStatus.avg_heart_rate}
-                          onChange={handleAddStatus}
-                          size="small"
-                          fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-              </Grid>
-
-            </div>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleSaveAddStatus}>保存指标</Button>
-          <Button onClick={handleCloseTarget}>关闭</Button>
-        </DialogActions>
-      </Dialog>
-
 
       {/*查看评价弹框*/}
       <Dialog
@@ -1277,11 +1061,6 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                     </Grid>
                   </Box>
                 </Grid>
-                <Grid item xs={6}>
-                  <Box sx={{padding: '8px' }}>
-                    {/*<Button style={{float: 'right'}} variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>*/}
-                  </Box>
-                </Grid>
                 <Grid item xs={12}>
                   <Box sx={{padding: '8px' }}>
                     <Typography variant='body2' style={{ color: 'red' }}>注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。</Typography>
@@ -1289,96 +1068,6 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                 </Grid>
               </Grid>
             </form>
-            {/*{evaluateData.map((row, index) => (*/}
-            {/*    <Grid container spacing={0} key={index}>*/}
-            {/*      <Grid item xs={6}>*/}
-            {/*        <Box sx={{padding: '8px' }}>*/}
-            {/*          <Grid container spacing={0} alignItems="center">*/}
-            {/*            <label htmlFor="input9">耐受状态: {row.tolerance.toFixed(1)}</label>*/}
-            {/*          </Grid>*/}
-            {/*        </Box>*/}
-            {/*      </Grid>*/}
-            {/*      <Grid item xs={6}>*/}
-            {/*        <Box sx={{padding: '8px' }}>*/}
-            {/*          <Grid container spacing={0} alignItems="center">*/}
-            {/*            <label htmlFor="input10">运动评价: {row.sportsEvaluation.toFixed(1)}</label>*/}
-            {/*          </Grid>*/}
-            {/*        </Box>*/}
-            {/*      </Grid>*/}
-            {/*      <Grid item xs={6}>*/}
-            {/*        <Box sx={{padding: '8px' }}>*/}
-            {/*          <Grid container spacing={0} alignItems="center">*/}
-            {/*            <label htmlFor="input11">痉挛评价: {row.spasmEvaluation.toFixed(1)}</label>*/}
-            {/*          </Grid>*/}
-            {/*        </Box>*/}
-            {/*      </Grid>*/}
-            {/*      <Grid item xs={6}>*/}
-            {/*        <Box sx={{padding: '8px' }}>*/}
-            {/*          <Grid container spacing={0} alignItems="center">*/}
-            {/*            <label htmlFor="input11">肌张力: {row.muscularTension.toFixed(1)}</label>*/}
-            {/*          </Grid>*/}
-            {/*        </Box>*/}
-            {/*      </Grid>*/}
-            {/*      <Grid item xs={6}>*/}
-            {/*        <Box sx={{padding: '8px' }}>*/}
-            {/*          <Grid container spacing={0} alignItems="center">*/}
-            {/*            <label htmlFor="input11">急性期情况: {row.acutePhase.toFixed(1)}</label>*/}
-            {/*          </Grid>*/}
-            {/*        </Box>*/}
-            {/*      </Grid>*/}
-            {/*      <Grid item xs={6}>*/}
-            {/*        <Box sx={{padding: '8px' }}>*/}
-            {/*          <Grid container spacing={0} alignItems="center">*/}
-            {/*            <label htmlFor="input11">神经科判断: {row.neurological.toFixed(1)}</label>*/}
-            {/*          </Grid>*/}
-            {/*        </Box>*/}
-            {/*      </Grid>*/}
-            {/*      <Grid item xs={6}>*/}
-            {/*        <Box sx={{padding: '8px' }}>*/}
-            {/*          <Grid container spacing={0} alignItems="center">*/}
-            {/*            <label htmlFor="input11">运动损伤度: {row.sportsInjury.toFixed(1)}</label>*/}
-            {/*          </Grid>*/}
-            {/*        </Box>*/}
-            {/*      </Grid>*/}
-            {/*      <Grid item xs={6}>*/}
-            {/*        <Box sx={{padding: '8px' }}>*/}
-
-            {/*        </Box>*/}
-            {/*      </Grid>*/}
-            {/*    </Grid>*/}
-            {/*))}*/}
-
-            {/*<Table sx={{ minWidth: 700 }}>*/}
-            {/*  <TableHead>*/}
-            {/*    <TableRow>*/}
-            {/*      <TableCell>耐受程度</TableCell>*/}
-            {/*      <TableCell align="right">运动评价</TableCell>*/}
-            {/*      <TableCell align="right">痉挛评价</TableCell>*/}
-            {/*      <TableCell align="right">肌张力</TableCell>*/}
-            {/*      <TableCell align="right">急性期情况</TableCell>*/}
-            {/*      <TableCell align="right">神经科判断</TableCell>*/}
-            {/*      <TableCell align="right">运动损伤度</TableCell>*/}
-            {/*    </TableRow>*/}
-            {/*  </TableHead>*/}
-            {/*  <TableBody>*/}
-            {/*    {evaluateData.map((row) => (*/}
-            {/*      <TableRow*/}
-            {/*        key={row.tolerance}*/}
-            {/*        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}*/}
-            {/*      >*/}
-            {/*        <TableCell component="th" scope="row">*/}
-            {/*          {row.tolerance}*/}
-            {/*        </TableCell>*/}
-            {/*        <TableCell align="right">{row.sportsEvaluation}</TableCell>*/}
-            {/*        <TableCell align="right">{row.spasmEvaluation}</TableCell>*/}
-            {/*        <TableCell align="right">{row.muscularTension}</TableCell>*/}
-            {/*        <TableCell align="right">{row.acutePhase}</TableCell>*/}
-            {/*        <TableCell align="right">{row.neurological}</TableCell>*/}
-            {/*        <TableCell align="right">{row.sportsInjury}</TableCell>*/}
-            {/*      </TableRow>*/}
-            {/*    ))}*/}
-            {/*  </TableBody>*/}
-            {/*</Table>*/}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -10,8 +10,8 @@ import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/Table
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton} from "@mui/material";
 import {
   addStatus,
-  exportTaskPressureData, PatientStatus,
-  PrescriptionRecord,
+  exportTaskPressureData, PatientStatus, Prescription,
+  PrescriptionRecord, StatusFormProps,
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
@@ -49,35 +49,22 @@ import dayjs, {Dayjs} from "dayjs";
 //   }
 // }))
 
-const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) => {
+const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProps[], pid: string}) => {
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   function handleExport(row: PrescriptionRecord) {
     appThunkDispatch(exportTaskPressureData({pId: Number(params.pid), tId: row.id}))
   }
 
   // 查看指标弹框
-  const [openTarget, setOpenTarget] = React.useState(false);
-  const handleClickOpenTarget = () => {
-    setOpenTarget(true);
+  const [openStatus, setOpenStatus] = React.useState(false);
+  const handleClickOpenStatus = () => {
+    setOpenStatus(true);
   };
-  const handleCloseTarget = () => {
-    setOpenTarget(false);
+  const handleCloseStatus = () => {
+    setOpenStatus(false);
   };
-  function createTargetData(
-    onsetTime: string,
-    medication: string,
-    spasmStatus: string,
-    minHeartRate: string,
-    maxHeartRate: string,
-    avgHeartRate: string,
-  ) {
-    return { onsetTime, medication, spasmStatus, minHeartRate, maxHeartRate,avgHeartRate };
-  }
-  const rows = [
-    // createTargetData('1314', '159', '6.0', '24', '4.0','9'),
-  ];
 
-  // 查看评价弹框
+
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
     onset_time : "",
@@ -87,6 +74,8 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
     max_heart_rate : 0,
     avg_heart_rate : 0,
   })
+
+  // 查看评价弹框
   const [openEvaluate, setOpenEvaluate] = React.useState(false);
   const handleClickOpenEvaluate = () => {
     setOpenEvaluate(true);
@@ -132,7 +121,8 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
       min_heart_rate: willAddStatus.min_heart_rate,
       max_heart_rate: willAddStatus.max_heart_rate,
       avg_heart_rate: willAddStatus.avg_heart_rate
-    }))
+    }));
+    setOpenStatus(false);
   }
 
   return (
@@ -151,24 +141,34 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
               </TableRow>
             </TableHead>
             <TableBody>
+
               {params.record.map(row => (
-                  <TableRow key={row.id}>
+                row.prescription_record?.map((historyRow: PrescriptionRecord) => (
+                  <TableRow key={historyRow.id}>
                     <TableCell>
                       <Button
                         style={{
                           backgroundColor:
-                            row.state === 'N_END' || row.state === 'H_END' ? '#06c426' : '#f32148',
+                            // historyRow.created_at === historyRow.updated_at ? '#f32148' : '#06c426' ,
+                            historyRow.state === 'N_END' || historyRow.state === 'H_END' ? '#06c426' : '#f32148',
                           color: '#ffffff',
                           float: 'right',
                         }}
                       >
-                        {row.state === 'N_END' || row.state === 'H_END' ? '完成' : '进行中'}
+                        {historyRow.state === 'N_END' || historyRow.state === 'H_END' ? '完成' : '进行中'}
+                        {/*BEGIN：正常启动
+                        N_END ：正常结束
+                        H_END ：手动结束
+                        PAUSE ：暂停
+                        RENEW：恢复 */}
+                        {/*{historyRow.created_at === historyRow.updated_at ? '进行中' : '完成'}*/}
                       </Button>
                     </TableCell>
-                    <TableCell>{row.created_at}</TableCell>
-                    <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
+                    <TableCell>{historyRow.created_at}</TableCell>
+                    {/*<TableCell>{historyRow.updated_at}</TableCell>*/}
+                    <TableCell>{historyRow.created_at === historyRow.updated_at ? ' ' : historyRow.updated_at}</TableCell>
                     <TableCell>
-                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenTarget}>填写指标</Button>
+                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus}>填写指标</Button>
                     </TableCell>
                     <TableCell align="center">
                       <a href={`/rehab/assessment`} target="_blank" rel="noopener noreferrer">
@@ -189,21 +189,22 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
                     {/*  </Tooltip>*/}
                     {/*</TableCell>*/}
                   </TableRow>
+                ))
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
-      {/*查看指标弹框*/}
+      {/*查看/填写指标弹框*/}
   <Dialog
-    open={openTarget}
-    onClose={handleCloseTarget}
-    aria-describedby="Target"
+    open={openStatus}
+    onClose={handleCloseStatus}
+    aria-describedby="Status"
   >
     <DialogTitle>{"病人各项指标"}</DialogTitle>
     <DialogContent>
-      {rows.length > 0 ? (
-        <DialogContentText id="Target">
+      {params.status.length > 0 ? (
+        <DialogContentText id="Status">
           <Table sx={{ minWidth: 500 }} aria-label="a dense table">
             <TableHead>
               <TableRow>
@@ -216,7 +217,7 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {params.status.map(row => (
                 <TableRow
                   key={row.onsetTime}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -374,7 +375,7 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[], pid: string}) 
     </DialogContent>
     <DialogActions>
       <Button onClick={handleSaveAddStatus}>保存指标</Button>
-      <Button onClick={handleCloseTarget}>关闭</Button>
+      <Button onClick={handleCloseStatus}>关闭</Button>
     </DialogActions>
   </Dialog>
     </>

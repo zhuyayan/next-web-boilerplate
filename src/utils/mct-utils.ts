@@ -150,6 +150,10 @@ export function GetDefaultPrescription() {
     zz: 0,
     u: 0,
     v: 0,
+    duration: 1,
+    frequency_per_day: 1,
+    total_days: 1,
+    rehabilitation_tasks:'',
   }
 }
 

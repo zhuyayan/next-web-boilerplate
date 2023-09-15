@@ -32,7 +32,14 @@ import {
   fetchPatientStatisticsById,
   fetchPrescriptionByPId,
   Prescription as PrescriptionEntity,
-  EvaluateFormProps, TargetFormProps, AddPrescriptionItem, PatientStatus, addStatus, addEvaluation, fetchEvaluationById
+  EvaluateFormProps,
+  TargetFormProps,
+  AddPrescriptionItem,
+  PatientStatus,
+  addStatus,
+  addEvaluation,
+  fetchEvaluationById,
+  fetchStatusById
 } from "@/redux/features/rehab/rehab-slice";
 import {
   addPrescription,
@@ -94,6 +101,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
   const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
+  const status = useAppSelector((state: RootState) => state.rehab.status)
   const patientDuration = useAppSelector((state:RootState) => state.rehab.patientDuration)
   const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
@@ -248,6 +256,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
     // thunkDispatch(fetchPrescriptionById({id: parseInt(params.id)}))
     thunkDispatch(fetchPrescriptionByPId({pid: parseInt(params.id)}))
     thunkDispatch(fetchEvaluationById({task_id: parseInt(params.id)}))
+    // thunkDispatch(fetchStatusById({pid,task_id: parseInt(params.id)}))
     thunkDispatch(fetchPatientById({id: parseInt(params.id)}))
     thunkDispatch(fetchPrescriptionRecordById({id: parseInt(params.id)}))
     thunkDispatch(fetchPatientStatisticsById({id: parseInt(params.id)}))
@@ -490,7 +499,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   <CardHeader style={{display:'inline-block'}} title='康复仪训练报告' titleTypographyProps={{ variant: 'h5' }} />
                 </div>
                 <Divider />
-                <Prescription PId={params.id} prescription={prescription} onlineEquipment={onlineData || []}/>
+                <Prescription PId={params.id} prescription={prescription} status={status} onlineEquipment={onlineData || []}/>
               </Card>
             </Grid>
             <br/>
