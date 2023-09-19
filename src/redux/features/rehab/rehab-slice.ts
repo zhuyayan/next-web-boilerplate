@@ -1,22 +1,18 @@
-import {
-  ActionReducerMapBuilder,
-  createAction,
-  createAsyncThunk,
-  createSlice,
-  PayloadAction,
-} from "@reduxjs/toolkit";
+import {ActionReducerMapBuilder, createAction, createAsyncThunk, createSlice, PayloadAction,} from "@reduxjs/toolkit";
 import {AxiosResponse} from "axios";
 import {WritableDraft} from "immer/dist/types/types-external";
 import MCTAxiosInstance from "@/utils/mct-request";
 import {
   BodyPartToNumMapping,
-  genderLabelToValue, GetCurrentDate,
+  genderLabelToValue,
+  GetCurrentDate,
   getDefaultGenderLabel,
-  getDefaultGenderValue, GetOneYearAgoDate,
+  getDefaultGenderValue,
+  GetOneYearAgoDate,
   ModeToNumMapping,
   timeSampleFormat
 } from "@/utils/mct-utils";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {string} from "postcss-selector-parser";
 import {saveAs} from "file-saver";
 import {Assessment} from "@mui/icons-material";
@@ -69,7 +65,7 @@ export interface AssessmentLevel {
   description: string;
 }
 
-export interface Assessment {
+export interface Assessments {
   id: number;
   body: {
     id: number;
@@ -81,24 +77,22 @@ export interface Assessment {
   };
   examination: string;
   levels: AssessmentLevel[];
+  selectedAssessment: SelectedAssessment
 }
 
 export interface SelectedAssessment {
   id: number;
   selected_assessment_id: number;
   selected_assessment_level: number;
-  task_id: number;
 }
 
-export interface AssessmentResponse {
-  code: number;
-  data: {
-    task_id: number;
-    assessment: Assessment[];
-    selected_assessment: SelectedAssessment[];
-  };
-  msg: string;
-}
+// export interface AssessmentResponse {
+//   part: string;
+//   exam_id: number;
+//   examination: string;
+//   levels: Array;
+//   selected_assessment: SelectedAssessment;
+// }
 
 export interface Prescription {
   id: number;
@@ -164,6 +158,7 @@ let patients: Patient[] = []
 let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
 let evluation:Evaluation[]=[]
+let assessmentResponse: Assessments[]=[]
 let onlineEquipment: EquipmentOnline[] = []
 let equipmentAll: equipmentAll[] = []
 let sysInfo: systemInformation = {
@@ -209,6 +204,7 @@ interface RehabState {
   systemInformation: systemInformation
   patientDuration: PatientDuration
   selectedMenu: string
+  assessmentData: Assessments[]
 }
 
 const initialState: RehabState = {
@@ -225,6 +221,7 @@ const initialState: RehabState = {
   systemInformation: sysInfo,
   patientDuration: patientDuration,
   selectedMenu: '',
+  assessmentData: assessmentResponse
 }
 
 export type Channel = 'redux' | 'general'
@@ -549,7 +546,7 @@ export const addPatient = createAsyncThunk<Patient, { name: string, age: number,
   return convertAPIPatientToPatient(response.data.data.patients[0])
 });
 
-export const addAssessment = createAsyncThunk<Assessment, {
+export const addAssessment = createAsyncThunk<Assessments, {
   body: {
     id: number;
     name: string;
@@ -567,10 +564,36 @@ export const addAssessment = createAsyncThunk<Assessment, {
     examination,
     levels,
   });
-  const addedAssessment: Assessment = response.data; // 这里假设API返回了新添加的评估数据
+  const addedAssessment: Assessments = response.data; // 这里假设API返回了新添加的评估数据
   console.log("add assessment async thunk: ", addedAssessment);
   return addedAssessment;
 });
+
+function convertApiAssessmentToAssessmentModel(apiAssessment: any): Assessments {
+  return {
+    id: number;
+    body: {
+      id: number;
+      name: string;
+    };
+    part: {
+      id: number;
+      name: string;
+    };
+    examination: string;
+    levels: AssessmentLevel[];
+    selectedAssessment: SelectedAssessment
+  }
+}
+//获取量表信息
+export const getAssessment = createAsyncThunk<Assessments[], {task_id: number}, {}>(
+    'getAssessment',
+    async ({task_id}):Promise<any> => {
+      const response:AxiosResponse<any, any> = await MCTAxiosInstance.get(`assessment/${task_id}`)
+      console.log("get assessment async thunk: ", response.data.data)
+      return response.data.data.map(convertApiAssessmentToAssessmentModel)
+    });
+
 
 // 修改病人
 export const editPatient = createAsyncThunk<Patient, { id: number, name: string, age: number, sex: string, medical_history: string, media_stroke_type:number, media_stroke_level:number, staff_id: number, i_18_d: string }, {}>('editPatient', async ({id, name, age, sex, medical_history, staff_id,i_18_d}, thunkAPI):Promise<any> => {
@@ -967,6 +990,9 @@ const RehabSlice = createSlice({
         })
         .addCase(getEquipmentAll.fulfilled, (state, action) => {
           state.equipmentAll = action.payload
+        })
+        .addCase(getAssessment.fulfilled, (state, action) => {
+          state.assessmentData = [action.payload];
         })
         .addMatcher(rehabApi.endpoints?.getOnlineEquipments.matchFulfilled, (state, action) => {
           console.log("addMatcher rehabApi getOnlineEquipments fulfilled -> ", action.payload, action.type)

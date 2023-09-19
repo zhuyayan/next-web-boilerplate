@@ -3,7 +3,7 @@ import {Container, IconButton} from "@mui/material";
 import { Title } from '@/components/rehab/styles';
 import { Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
@@ -17,7 +17,7 @@ import { Card } from '@mui/material';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import Tooltip from "@mui/material/Tooltip";
 import {
-  addEvaluation, EvaluateFormProps
+  addEvaluation, Assessment, AssessmentResponse, EvaluateFormProps, getAssessment, SelectedAssessment
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {string} from "postcss-selector-parser";
@@ -28,12 +28,20 @@ import {NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useCallback } from 'react';
 import {addAssessment, editPatient, deletePatient} from "@/redux/features/rehab/rehab-slice";
+import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 
-export default function FuglMeyerAssessment( params: { PId: string} ) {
+export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
   const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const [components, setComponents] = useState<JSX.Element[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const appDispatch = useAppDispatch()
+  const assessmentResponseData = useAppSelector((state: RootState) => state.rehab.assessmentData);
+
+  useEffect(()=>{
+    console.log("params->TaskID", params.id)
+    thunkDispatch(getAssessment({task_id: parseInt(params.id)}))
+  },[params.id,thunkDispatch])
 
   const handleAddComponent = useCallback(() => {
     if (inputValue.trim() !== '') {
@@ -94,16 +102,16 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
   };
 
 
-  const [alignment1, setAlignment1] = React.useState<string | null>('000');
-  const [alignment2, setAlignment2] = React.useState<string | null>('000');
-  const [alignment3, setAlignment3] = React.useState<string | null>('000');
-  const [alignment4, setAlignment4] = React.useState<string | null>('000');
-  const [alignment5, setAlignment5] = React.useState<string | null>('000');
-  const [alignment6, setAlignment6] = React.useState<string | null>('000');
-  const [alignment7, setAlignment7] = React.useState<string | null>('000');
-  const [alignment8, setAlignment8] = React.useState<string | null>('000');
-  const [alignment9, setAlignment9] = React.useState<string | null>('000');
-  const [alignment10, setAlignment10] = React.useState<string | null>('000');
+  const [alignment1, setAlignment1] = React.useState<string>('000');
+  const [alignment2, setAlignment2] = React.useState<string>('000');
+  const [alignment3, setAlignment3] = React.useState<string>('000');
+  const [alignment4, setAlignment4] = React.useState<string>('000');
+  const [alignment5, setAlignment5] = React.useState<string>('000');
+  const [alignment6, setAlignment6] = React.useState<string>('000');
+  const [alignment7, setAlignment7] = React.useState<string>('000');
+  const [alignment8, setAlignment8] = React.useState<string>('000');
+  const [alignment9, setAlignment9] = React.useState<string>('000');
+  const [alignment10, setAlignment10] = React.useState<string>('000');
 
   // 医生评价表单
   const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
@@ -141,68 +149,68 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
 
   const handleAlignment1 = (
     event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null,
+    newAlignment: string,
   ) => {
     setAlignment1(newAlignment);
   };
 
   const handleAlignment2 = (
       event: React.MouseEvent<HTMLElement>,
-      newAlignment: string | null,
+      newAlignment: string,
   ) => {
     setAlignment2(newAlignment);
   };
 
   const handleAlignment3 = (
       event: React.MouseEvent<HTMLElement>,
-      newAlignment: string | null,
+      newAlignment: string,
   ) => {
     setAlignment3(newAlignment);
   };
 
   const handleAlignment4 = (
       event: React.MouseEvent<HTMLElement>,
-      newAlignment: string | null,
+      newAlignment: string,
   ) => {
     setAlignment4(newAlignment);
   };
 
   const handleAlignment5 = (
       event: React.MouseEvent<HTMLElement>,
-      newAlignment: string | null,
+      newAlignment: string,
   ) => {
     setAlignment5(newAlignment);
   };
 
   const handleAlignment6 = (
       event: React.MouseEvent<HTMLElement>,
-      newAlignment: string | null,
+      newAlignment: string,
   ) => {
     setAlignment6(newAlignment);
   };
 
   const handleAlignment7 = (
       event: React.MouseEvent<HTMLElement>,
-      newAlignment: string | null,
+      newAlignment: string,
   ) => {
     setAlignment7(newAlignment);
   };
 
   const handleAlignment8 = (
     event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null,
+    newAlignment: string,
   ) => {
     setAlignment8(newAlignment);
   };
   const handleAlignment9 = (
     event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null,
+    newAlignment: string,
   ) => {
     setAlignment9(newAlignment);
   };
   const handleAlignment10 = (
     event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null,
+    newAlignment: string,
   ) => {
     setAlignment10(newAlignment);
   };
@@ -311,270 +319,44 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
 
         <Card style={{ marginBottom: '20px' }} sx={{ paddingLeft: '40px', paddingTop: '10px', paddingRight: '10px', paddingBottom: '10px' }}>
           <Grid container spacing={0}>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment1 &&
-                  <Typography variant="h6">
-                    &gt; 手指共同屈曲
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment1 &&
-                  <ToggleButtonGroup
-                      value={alignment1}
-                      exclusive
-                      onChange={handleAlignment1}
-                      aria-label="test1"
-                  >
-                    <ToggleButton value="010" style={alignment1 === "010" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                      0分: 不能屈曲
-                    </ToggleButton>
-                    <ToggleButton value="011" style={alignment1 === "011" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                      1分: 能屈曲但不充分
-                    </ToggleButton>
-                    <ToggleButton value="012" style={alignment1 === "012" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                      2分: (与健侧比较)能完全主动屈曲
-                    </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment2 &&
-                  <Typography variant="h6">
-                    &gt; 手指共同伸展
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment2 &&
-                  <ToggleButtonGroup
-                      value={alignment2}
-                      exclusive
-                      onChange={handleAlignment2}
-                      aria-label="test2"
-                  >
-                    <ToggleButton value="020" style={alignment2 === "020" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                      0分: 不能伸
-                    </ToggleButton>
-                    <ToggleButton value="021" style={alignment2 === "021" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                      1分: 能放松主动屈曲的手指
-                    </ToggleButton>
-                    <ToggleButton value="022" style={alignment2 === "022" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                      2分: 能充分主动的伸展
-                    </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment3 &&
-                  <Typography variant="h6">
-                    &gt; 握力1: 掌指关节伸展并且近端和远端指间关节屈曲，检测抗阻握力
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment3 &&
-                  <ToggleButtonGroup
-                      value={alignment3}
-                      exclusive
-                      onChange={handleAlignment3}
-                      aria-label="test3"
-                  >
-                    <ToggleButton value="030" style={alignment3 === "030" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                      0分: 不能保持要求位置
-                    </ToggleButton>
-                    <ToggleButton value="031" style={alignment3 === "031" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                      1分: 握力微弱
-                    </ToggleButton>
-                    <ToggleButton value="032" style={alignment3 === "032" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                      2分: 能够抵抗相当大的阻力抓握
-                    </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment4 &&
-                  <Typography variant="h6">
-                    &gt; 握力2: 所有关节于0位时，拇指内收
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment4 &&
-                  <ToggleButtonGroup
-                      value={alignment4}
-                      exclusive
-                      onChange={handleAlignment4}
-                      aria-label="test4"
-                  >
-                    <ToggleButton value="040" style={alignment4=== "040" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                      0分: 不能进行
-                    </ToggleButton>
-                    <ToggleButton value="041" style={alignment4 === "041" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                      1分: 能用拇指捏住一张纸但不能抵抗拉力
-                    </ToggleButton>
-                    <ToggleButton value="042" style={alignment4 === "042" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                      2分: 可牢牢捏住纸
-                    </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment5 &&
-                  <Typography variant="h6">
-                    &gt; 握力3: 患者拇食指可夹住一支铅笔
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment5 &&
-                  <ToggleButtonGroup
-                      value={alignment5}
-                      exclusive
-                      onChange={handleAlignment5}
-                      aria-label="test5"
-                  >
-                    <ToggleButton value="050" style={alignment5 === "050" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                      0分: 不能进行
-                    </ToggleButton>
-                    <ToggleButton value="051" style={alignment5 === "051" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                      1分: 能用拇指捏住一支铅笔但不能抵抗拉力
-                    </ToggleButton>
-                    <ToggleButton value="052" style={alignment5 === "052" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                      2分: 可牢牢捏住铅笔
-                    </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment6 &&
-                  <Typography variant="h6">
-                    &gt; 握力4: 能握住个圆筒物体
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment6 &&
-                  <ToggleButtonGroup
-                      value={alignment6}
-                      exclusive
-                      onChange={handleAlignment6}
-                      aria-label="test6"
-                  >
-                    <ToggleButton value="060" style={alignment6 === "060" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                      0分: 不能进行
-                    </ToggleButton>
-                    <ToggleButton value="061" style={alignment6 === "061" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                      1分: 能用拇指捏住圆筒物体但不能抵抗拉力
-                    </ToggleButton>
-                    <ToggleButton value="062" style={alignment6 === "062" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                      2分: 可牢牢捏住圆筒物体
-                    </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment7 &&
-                  <Typography variant="h6">
-                    &gt; 握力5: 查握球形物体，如网球
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment7 &&
-                  <ToggleButtonGroup
-                      value={alignment7}
-                      exclusive
-                      onChange={handleAlignment7}
-                      aria-label="test7"
-                  >
-                    <ToggleButton value="070" style={alignment7 === "070" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                      0分: 不能进行
-                    </ToggleButton>
-                    <ToggleButton value="071" style={alignment7 === "071" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                      1分: 能用拇指捏住球形物体但不能抵抗拉力
-                    </ToggleButton>
-                    <ToggleButton value="072" style={alignment7 === "072" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                      2分: 可牢牢捏住球形物体
-                    </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {(showAlignment8 || showAlignment9 || showAlignment10) &&
-                  <Typography variant="h6">
-                      手协调性与速度 : 指鼻试验 (快速连续进行5次)
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment8 &&
-                  <Typography variant="h6">
-                      &gt; 震颤
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment8 &&
-                  <ToggleButtonGroup
-                      value={alignment8}
-                      exclusive
-                      onChange={handleAlignment8}
-                      aria-label="test8"
-                  >
-                      <ToggleButton value="080" style={alignment8 === "080" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                          0分: 明显震颤
-                      </ToggleButton>
-                      <ToggleButton value="081" style={alignment8 === "081" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                          1分: 轻度震颤
-                      </ToggleButton>
-                      <ToggleButton value="082" style={alignment8 === "082" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                          2分: 无震颤
-                      </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment9 &&
-                  <Typography variant="h6">
-                      &gt; 辩距不良
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment9 &&
-                  <ToggleButtonGroup
-                      value={alignment9}
-                      exclusive
-                      onChange={handleAlignment9}
-                      aria-label="test9"
-                  >
-                      <ToggleButton value="090" style={alignment9 === "090" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                          0分: 明显的或不规则辨距障碍
-                      </ToggleButton>
-                      <ToggleButton value="091" style={alignment9 === "091" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                          1分: 轻度的规则的辩距障碍
-                      </ToggleButton>
-                      <ToggleButton value="092" style={alignment9 === "092" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                          2分: 无辩距障碍
-                      </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment10 &&
-                  <Typography variant="h6">
-                      &gt; 速度
-                  </Typography>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              {showAlignment10 &&
-                  <ToggleButtonGroup
-                      value={alignment10}
-                      exclusive
-                      onChange={handleAlignment10}
-                      aria-label="test10"
-                  >
-                      <ToggleButton value="100" style={alignment10 === "100" ? selectedStyle : notSelectedStyle} aria-label="test1 0">
-                          0分: 较健侧慢6秒
-                      </ToggleButton>
-                      <ToggleButton value="101" style={alignment10 === "101" ? selectedStyle : notSelectedStyle} aria-label="test1 1">
-                          1分: 较健侧慢2-5秒
-                      </ToggleButton>
-                      <ToggleButton value="102" style={alignment10 === "102" ? selectedStyle : notSelectedStyle} aria-label="test1 2">
-                          2分: 两侧差别少于2秒
-                      </ToggleButton>
-                  </ToggleButtonGroup>}
-            </Grid>
-            <Grid item xs={12} alignItems="center">
-              <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleSubmit}>
-                提交
-              </Button>
-            </Grid>
+            {assessmentResponseData.map((assessment: Assessment) => (
+                <div key={assessment.id}>
+                  <Grid item xs={12} alignItems="center">
+                    <Typography variant="h6">
+                      &gt; {assessment.examination}
+                    </Typography>
+                  </Grid>
+                </div>
+            ))}
           </Grid>
         </Card>
 
+
+        {/*<Grid item xs={12} alignItems="center">*/}
+        {/*  <ToggleButtonGroup*/}
+        {/*      value={alignment1}*/}
+        {/*      exclusive*/}
+        {/*      onChange={handleAlignment1}*/}
+        {/*      aria-label="test1"*/}
+        {/*  >*/}
+        {/*    <ToggleButton value="010" style={alignment1 === "010" ? selectedStyle : notSelectedStyle} aria-label="test1 0">*/}
+        {/*      0分: 不能屈曲*/}
+        {/*    </ToggleButton>*/}
+        {/*    <ToggleButton value="011" style={alignment1 === "011" ? selectedStyle : notSelectedStyle} aria-label="test1 1">*/}
+        {/*      1分: 能屈曲但不充分*/}
+        {/*    </ToggleButton>*/}
+        {/*    <ToggleButton value="012" style={alignment1 === "012" ? selectedStyle : notSelectedStyle} aria-label="test1 2">*/}
+        {/*      2分: (与健侧比较)能完全主动屈曲*/}
+        {/*    </ToggleButton>*/}
+        {/*  </ToggleButtonGroup>*/}
+        {/*</Grid>*/}
+
+
+        {/*  <Grid item xs={12} alignItems="center">*/}
+        {/*    <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleSubmit}>*/}
+        {/*      提交*/}
+        {/*    </Button>*/}
+        {/*  </Grid>*/}
         <Grid container spacing={0}>
           <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
             <Title>训练后状态：</Title>
