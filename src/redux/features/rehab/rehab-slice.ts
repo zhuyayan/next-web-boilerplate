@@ -19,6 +19,7 @@ import {
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {string} from "postcss-selector-parser";
 import {saveAs} from "file-saver";
+import {Assessment} from "@mui/icons-material";
 
 export interface MedicalStaff {
   id: number;
@@ -61,6 +62,43 @@ export interface Patient {
   i18d:string;
 }
 
+export interface AssessmentLevel {
+  id: number;
+  level_label: number;
+  description: string;
+}
+
+export interface Assessment {
+  id: number;
+  body: {
+    id: number;
+    name: string;
+  };
+  part: {
+    id: number;
+    name: string;
+  };
+  examination: string;
+  levels: AssessmentLevel[];
+}
+
+export interface SelectedAssessment {
+  id: number;
+  selected_assessment_id: number;
+  selected_assessment_level: number;
+  task_id: number;
+}
+
+export interface AssessmentResponse {
+  code: number;
+  data: {
+    task_id: number;
+    assessment: Assessment[];
+    selected_assessment: SelectedAssessment[];
+  };
+  msg: string;
+}
+
 export interface Prescription {
   id: number;
   created_at: string;
@@ -70,8 +108,8 @@ export interface Prescription {
   u: number | string;
   v: number | string;
   duration?: number;
-  frequency_per_day: number;
-  total_days: number;
+  frequency_per_day: number | string;
+  total_days: number | string;
   prescription_record?: PrescriptionRecord[];
 }
 
@@ -523,10 +561,34 @@ export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fe
 });
 
 // 添加病人
-export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, media_stroke_type:number, media_stroke_level:number,staff_id: number, i_18_d: string}, {}>('addPatient', async ({name, age, sex, medical_history, staff_id, i_18_d}, thunkAPI):Promise<any> => {
+export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, media_stroke_type:number, media_stroke_level:number,staff_id: number, i_18_d: string},
+  {}>('addPatient', async ({name, age, sex, medical_history, staff_id, i_18_d}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('patient',{name, age, sex, medical_history, staff_id, i_18_d})
   console.log("add patient async thunk: ", response.data.data.patients[0])
   return convertAPIPatientToPatient(response.data.data.patients[0])
+});
+
+export const addAssessment = createAsyncThunk<Assessment, {
+  body: {
+    id: number;
+    name: string;
+  };
+  part: {
+    id: number;
+    name: string;
+  };
+  examination: string;
+  levels: AssessmentLevel[];
+}, {}>('addAssessment', async ({ body, part, examination, levels }, thunkAPI): Promise<Assessment> => {
+  const response: AxiosResponse<any, any> = await MCTAxiosInstance.post('assessment', {
+    body,
+    part,
+    examination,
+    levels,
+  });
+  const addedAssessment: Assessment = response.data; // 这里假设API返回了新添加的评估数据
+  console.log("add assessment async thunk: ", addedAssessment);
+  return addedAssessment;
 });
 
 // 修改病人
@@ -603,6 +665,7 @@ export const addEvaluation = createAsyncThunk<RehabEvaluation, {
   return convertAPIEvaluationToEvaluation(response.data.data.evaluation[0])
 });
 
+// 添加处方
 export const addPrescription = createAsyncThunk<Prescription, { pid: number, x: number, y: number , zz: number, u: number, v: number,duration:number,frequency_per_day:number,total_days:number},
     {}>('addPrescription', async ({pid, x, y , zz, u, v,duration,frequency_per_day,total_days}, thunkAPI):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('prescription',{pid, x, y , zz, u, v,duration,frequency_per_day,total_days})
@@ -610,6 +673,7 @@ export const addPrescription = createAsyncThunk<Prescription, { pid: number, x: 
   return convertAPIPrescriptionToPrescription(response.data.data.prescriptions[0])
 });
 
+// 修改处方
 export const editPrescription = createAsyncThunk<Prescription, {id: number, x: number, y: number, zz: number, u: number, v:number,duration:number,frequency_per_day:number,total_days:number},
   {}>('editPrescription', async ({id, x, y, zz, u, v,duration,frequency_per_day,total_days}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('prescription', { id, x, y, zz, u, v,duration,frequency_per_day,total_days});

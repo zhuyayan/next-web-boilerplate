@@ -141,7 +141,6 @@ const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProp
               </TableRow>
             </TableHead>
             <TableBody>
-
               {params.record.map(row => (
                 row.prescription_record?.map((historyRow: PrescriptionRecord) => (
                   <TableRow key={historyRow.id}>
@@ -171,7 +170,7 @@ const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProp
                       <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus}>填写指标</Button>
                     </TableCell>
                     <TableCell align="center">
-                      <a href={`/rehab/assessment`} target="_blank" rel="noopener noreferrer">
+                      <a href={`/rehab/assessment/${historyRow.id}`} passHref target="_blank" rel="noopener noreferrer">
                         <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
                       </a>
                     </TableCell>

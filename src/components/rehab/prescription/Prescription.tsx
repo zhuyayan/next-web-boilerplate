@@ -145,6 +145,8 @@ interface IFormInput {
   zz: number;
   u: number;
   v: number;
+  frequency_per_day: number;
+  total_days: number;
 }
 
 const StyledDiv = styled.div`
@@ -362,8 +364,8 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       u: Number(willEditPrescription.u),
       v: Number(willEditPrescription.v),
       duration:Number(willEditPrescription.duration),
-      frequency_per_day: willEditPrescription.frequency_per_day,
-      total_days: willEditPrescription.total_days,
+      frequency_per_day: Number(willEditPrescription.frequency_per_day),
+      total_days: Number(willEditPrescription.total_days),
     })).then((prescription) => {
       console.log('The updated prescription is: ', prescription);
       console.log('The updated prescription is: ', typeof prescription);
@@ -391,6 +393,20 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     setWillEditPrescription(prevState => ({
       ...prevState,
       zz: e.target.value === '' ? '' : parseInt(e.target.value)
+    }))
+  }
+
+  function handleFrequencyPerDayChange(e: ChangeEvent<HTMLInputElement>) {
+    setWillEditPrescription(prevState => ({
+      ...prevState,
+      frequency_per_day: e.target.value === '' ? '' : parseInt(e.target.value)
+    }))
+  }
+
+  function handleTotalDaysChange(e: ChangeEvent<HTMLInputElement>) {
+    setWillEditPrescription(prevState => ({
+      ...prevState,
+      total_days: e.target.value === '' ? '' : parseInt(e.target.value)
     }))
   }
 
@@ -525,6 +541,8 @@ export default function StickyHeadTable(params: { id: string,PId:string,
     clearErrors: AddPrescriptionItemClearErrors,
     trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
   const [timesError, setTimesError] = React.useState<string>('');
+  const [totalDaysError, setTotalDaysError] = React.useState<string>('');
+  const [frequencyPerDayError, setFrequencyPerDayError] = React.useState<string>('');
   const [bendError, setBendError] = React.useState<string>('');
   const [stretchError, setStretchError] = React.useState<string>('');
   const [error, setError] = React.useState(false);
@@ -550,13 +568,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       }
     ],
   })
-  const handleAddPrescriptionDuration = (event: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target;
-    setWillAddPrescription((prevInputValues) => ({
-      ...prevInputValues,
-      [id]: parseInt(value),
-    }))
-  };
+
   const handleAddPrescriptionModeChange = (event: SelectChangeEvent) => {
     console.log(event.target)
     console.log(ModeToNumMapping[parseInt(event.target.value)])
@@ -586,10 +598,44 @@ export default function StickyHeadTable(params: { id: string,PId:string,
       u: Number(willAddPrescription.u),
       v: Number(willAddPrescription.v),
       duration:Number(willEditPrescription.duration),
-      frequency_per_day: willEditPrescription.frequency_per_day,
-      total_days: willEditPrescription.total_days,
+      frequency_per_day: Number(willEditPrescription.frequency_per_day),
+      total_days: Number(willEditPrescription.total_days),
     }))
     setOpenAdd(false);
+  };
+  const handleAddPrescriptionDuration = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    setWillAddPrescription((prevInputValues) => ({
+      ...prevInputValues,
+      [id]: parseInt(value),
+    }))
+  };
+
+  const handleAddPrescriptionFrequencyPerDay = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    console.log(id, value);
+    if (value !== '' && value < '1') {
+      setFrequencyPerDayError('输入的数字不能小于1');
+    } else {
+      setFrequencyPerDayError('');
+      setWillAddPrescription((prevInputValues) => ({
+        ...prevInputValues,
+        [id]: parseInt(value),
+      }))
+    }
+  };
+  const handleAddPrescriptionTotalDays = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    console.log(id, value);
+    if (value !== '' && value < '1') {
+      setTotalDaysError('输入的数字不能小于1');
+    } else {
+      setTotalDaysError('');
+      setWillAddPrescription((prevInputValues) => ({
+        ...prevInputValues,
+        [id]: parseInt(value),
+      }))
+    }
   };
   const handleAddPrescriptionTimes = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -1170,29 +1216,29 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                 </Select>
               </FormControl>
               <TextField
-                {...register('zz', {
+                {...register('total_days', {
                   required: '不能为空',
-                  validate: value => (!isNaN(value) && value >= 3) || '值须大于等于3'
+                  validate: value => (!isNaN(value) && value >= 1) || '值须大于等于1'
                 })}
                 sx={{ m: 1, minWidth: 160 }}
-                value={willEditPrescription.zz}
-                id="outlined-zz" label="共需训练天数"
-                onChange={handleZZChange}
-                error={!!errors.zz}
-                helperText={errors.zz?.message}
+                value={willEditPrescription.total_days}
+                id="outlined-total_days" label="共需训练天数"
+                onChange={handleTotalDaysChange}
+                error={!!errors.total_days}
+                helperText={errors.total_days?.message}
                 inputProps={{ type: 'number' }}
                 variant="outlined" size="small"/>
               <TextField
-                {...register('zz', {
+                {...register('frequency_per_day', {
                   required: '不能为空',
-                  validate: value => (!isNaN(value) && value >= 3) || '值须大于等于3'
+                  validate: value => (!isNaN(value) && value >= 1) || '值须大于等于1'
                 })}
                 sx={{ m: 1, minWidth: 160 }}
-                value={willEditPrescription.zz}
-                id="outlined-zz" label="每天训练次数"
-                onChange={handleZZChange}
-                error={!!errors.zz}
-                helperText={errors.zz?.message}
+                value={willEditPrescription.frequency_per_day}
+                id="outlined-frequency_per_day" label="每天训练次数"
+                onChange={handleFrequencyPerDayChange}
+                error={!!errors.frequency_per_day}
+                helperText={errors.frequency_per_day?.message}
                 inputProps={{ type: 'number' }}
                 variant="outlined" size="small"/>
               </Box>
@@ -1289,30 +1335,48 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                   <MenuItem value={6}>右踝</MenuItem>
                 </Select>
               </FormControl>
-              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+              {/*<FormControl sx={{ m: 1, minWidth: 240 }} size="small">*/}
+              {/*  <TextField*/}
+              {/*    {...AddPrescriptionItemRegister<AddPrescriptionItem>('duration', {*/}
+              {/*      required: '不能为空',*/}
+              {/*      validate: value => {*/}
+              {/*        if (typeof value === 'undefined') {*/}
+              {/*          return false;*/}
+              {/*        }*/}
+              {/*        if (typeof value === 'string') {*/}
+              {/*          const numberValue = parseFloat(value);*/}
+              {/*          return (!isNaN(numberValue) && numberValue >= 1) || '值须大于等于1';*/}
+              {/*        }*/}
+              {/*        return (!isNaN(value) && value >= 3) || '值须大于等于3';*/}
+              {/*      }*/}
+              {/*    })}*/}
+              {/*    value={willAddPrescription.duration}*/}
+              {/*    onChange={handleAddPrescriptionDuration}*/}
+              {/*    error={!!AddPrescriptionItemErrors.duration}*/}
+              {/*    helperText={AddPrescriptionItemErrors.duration?.message}*/}
+              {/*    inputProps={{ type: 'number', min: 1 }}*/}
+              {/*    sx={{ m: 1, minWidth: 160 }}*/}
+              {/*    id="duration"*/}
+              {/*    label="疗程" variant="outlined" size="small"/>*/}
+              {/*</FormControl>*/}
                 <TextField
-                  {...AddPrescriptionItemRegister<AddPrescriptionItem>('duration', {
-                    required: '不能为空',
-                    validate: value => {
-                      if (typeof value === 'undefined') {
-                        return false;
-                      }
-                      if (typeof value === 'string') {
-                        const numberValue = parseFloat(value);
-                        return (!isNaN(numberValue) && numberValue >= 1) || '值须大于等于1';
-                      }
-                      return (!isNaN(value) && value >= 3) || '值须大于等于3';
-                    }
-                  })}
-                  value={willAddPrescription.duration}
-                  onChange={handleAddPrescriptionDuration}
-                  error={!!AddPrescriptionItemErrors.duration}
-                  helperText={AddPrescriptionItemErrors.duration?.message}
-                  inputProps={{ type: 'number', min: 1 }}
+                  value={willAddPrescription.total_days}
+                  onChange={handleAddPrescriptionTotalDays}
+                  error={totalDaysError != ''}
+                  helperText={totalDaysError}
+                  inputProps={{ type: 'number' }}
                   sx={{ m: 1, minWidth: 160 }}
-                  id="duration"
-                  label="疗程" variant="outlined" size="small"/>
-              </FormControl>
+                  id="total_days"
+                  label="共需训练天数" variant="outlined" size="small"/>
+                <TextField
+                  value={willAddPrescription.frequency_per_day}
+                  onChange={handleAddPrescriptionFrequencyPerDay}
+                  error={frequencyPerDayError != ''}
+                  helperText={frequencyPerDayError}
+                  inputProps={{ type: 'number'}}
+                  sx={{ m: 1, minWidth: 160 }}
+                  id="frequency_per_day"
+                  label="每天训练次数" variant="outlined" size="small"/>
             </Box>
             <Box>
               <TextField

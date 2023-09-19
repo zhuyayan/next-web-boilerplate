@@ -27,6 +27,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import {NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useCallback } from 'react';
+import {addAssessment, editPatient, deletePatient} from "@/redux/features/rehab/rehab-slice";
 
 export default function FuglMeyerAssessment( params: { PId: string} ) {
   const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
@@ -78,9 +79,17 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
     setSelectedAssessment(event.target.value as string);
   };
 
+  // const handleAddPatient = () => {
+  //   thunkDispatch(addAssessment({
+  //
+  //   }))
+
+  // };
+
+
   // 处理提交选择的函数
   const handleSubmit = () => {
-    // 在这里处理提交选择的逻辑，例如导航到相关页面
+    // 在这里处理提交选择的逻辑，例如导航到相关页面 addAssessment
     console.log('用户选择的评定量表:', selectedAssessment);
   };
 
@@ -260,10 +269,6 @@ export default function FuglMeyerAssessment( params: { PId: string} ) {
   const [showEvaluate5, setShowEvaluate5] = useState(true);
   const [showEvaluate6, setShowEvaluate6] = useState(true);
   const [showEvaluate7, setShowEvaluate7] = useState(true);
-  const [showEvaluate8, setShowEvaluate8] = useState(true);
-  const [showEvaluate9, setShowEvaluate9] = useState(true);
-  const [showEvaluate10, setShowEvaluate10] = useState(true);
-
 
   return (
     <Container>
