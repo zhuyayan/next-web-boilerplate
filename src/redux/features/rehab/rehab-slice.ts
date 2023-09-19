@@ -30,6 +30,7 @@ export interface MedicalStaff {
 
 export interface PatientStatus {
   pid: number;
+  task_id: number;
   onset_time : string;
   medication : string;
   spasm_status : string;
@@ -125,16 +126,6 @@ export interface Evaluation {
   tolerance: string
 }
 
-export interface Status {
-  avg_heart_rate: number;
-  max_heart_rate: number;
-  medication: string;
-  min_heart_rate: number;
-  onset_time: string;
-  pid: number;
-  spasm_status: string
-}
-
 export interface AddPrescriptionItem {
   part: string;
   mode: string;
@@ -153,15 +144,6 @@ export interface PrescriptionRecord {
   pid: string;
   state: string;
   updated_at: string;
-}
-
-export interface StatusFormProps {
-  onsetTime: string;
-  medication: string;
-  spasmStatus: string;
-  minHeartRate: string;
-  maxHeartRate: string;
-  avgHeartRate: string;
 }
 
 export interface EvaluateFormProps {
@@ -220,7 +202,6 @@ interface RehabState {
   activePatient: Patient[]
   rehabPatient: Patient
   prescription: Prescription[]
-  status:Status[]
   evluation:Evaluation[]
   prescriptionRecord: PrescriptionRecord[]
   onlineEquipment: EquipmentOnline[]
@@ -237,7 +218,6 @@ const initialState: RehabState = {
   activePatient: [],
   rehabPatient: patient,
   prescription: prescriptions,
-  status: status,
   evluation: evluation,
   prescriptionRecord: prescriptionRecord,
   onlineEquipment: onlineEquipment,
@@ -455,6 +435,7 @@ function convertAPIStaffToMedicalStaff(apiStaff: any): MedicalStaff {
 function convertAPIStatusToStatus(apiStatus: any): PatientStatus {
   return {
     pid:apiStatus.pid,
+    task_id:apiStatus.task_id,
     onset_time : apiStatus.onset_time,
     medication : apiStatus.medication,
     spasm_status : apiStatus.spasm_status,
@@ -605,6 +586,7 @@ export const deletePatient = createAsyncThunk<{id: number}, {id: number}, {}>('d
   return {id: id}
 });
 
+//删除处方
 export const deletePrescription = createAsyncThunk<{id: number}, {id: number}, {}>('deletePrescription', async ({id}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.delete(`prescription/${id}`);
   console.log("delete prescription async thunk: ", response.data)
@@ -641,12 +623,7 @@ export const deleteStaff = createAsyncThunk<{ id: number }, { id: number }, {}>(
   return {id: id}
 });
 
-// 添加指标
-export const addStatus = createAsyncThunk<PatientStatus, {pid: number, onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number }, {}>('addStatus', async ({pid, onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{pid, onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
-  console.log("add status async thunk: ", response.data.data.status[0])
-  return convertAPIStatusToStatus(response.data.data.status[0])
-});
+
 
 // 添加评价
 export const addEvaluation = createAsyncThunk<RehabEvaluation, {
@@ -689,12 +666,28 @@ export const fetchEvaluationById = createAsyncThunk<Evaluation[], { task_id: num
   return p
 });
 
-export const fetchStatusById = createAsyncThunk<Status[], { pid:number,task_id: number}, {}>('fetchStatusById', async ({pid,task_id}):Promise<any> => {
+// 添加指标
+export const addStatus = createAsyncThunk<PatientStatus, {pid: number, task_id: number, onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number },
+    {}>('addStatus', async ({pid, task_id,onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{pid, task_id, onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate })
+  console.log("add status async thunk: ", response.data.data.status[0])
+  return convertAPIStatusToStatus(response.data.data.status[0])
+});
+// 查找指标
+export const fetchStatusById = createAsyncThunk<PatientStatus, { pid:number,task_id: number},
+    {}>('fetchStatusById', async ({pid,task_id}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('train/status', {params:{pid,task_id}});
   console.log("fetch Status by id async thunk: ", response.data.data)
   let p = response.data.data.map(convertAPIStatusToStatus)
-  console.log('Status', p)
+  console.log('PatientStatus', p)
   return p
+});
+// 更新指标
+export const editStatus = createAsyncThunk<PatientStatus, {pid: number, task_id: number, onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number},
+    {}>('editstatus', async ({pid, task_id,onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('train/status', { pid, task_id, onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate});
+  console.log("edit status: ", response.data)
+  return convertAPIStatusToStatus(response.data.data.status[0])
 });
 
 export const fetchPrescriptionById = createAsyncThunk<Prescription[], { id: number}, {}>('fetchPrescriptionById', async ({ id}):Promise<any> => {
@@ -927,9 +920,9 @@ const RehabSlice = createSlice({
           console.log("fetch Evaluation by id", action.payload)
           state.evluation = action.payload
         })
-        .addCase(fetchStatusById.fulfilled, (state, action) => {
+        .addCase(fetchStatusById.fulfilled,(state, action) => {
           console.log("fetch Status by id", action.payload)
-          state.status = action.payload
+          state.patientStatus = action.payload
         })
         .addCase(fetchPrescriptionByPId.fulfilled, (state, action) => {
           console.log("fetch prescription by pid", action.payload)

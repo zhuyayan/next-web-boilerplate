@@ -11,7 +11,7 @@ import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Ic
 import {
   addStatus,
   exportTaskPressureData, PatientStatus, Prescription,
-  PrescriptionRecord, StatusFormProps,
+  PrescriptionRecord,
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
@@ -49,7 +49,7 @@ import dayjs, {Dayjs} from "dayjs";
 //   }
 // }))
 
-const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProps[], pid: string}) => {
+const PrescriptionTable = (params: {record: Prescription[],status:PatientStatus[], pid: string,task_id:string}) => {
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   function handleExport(row: PrescriptionRecord) {
     appThunkDispatch(exportTaskPressureData({pId: Number(params.pid), tId: row.id}))
@@ -67,6 +67,7 @@ const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProp
 
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
+    task_id:0,
     onset_time : "",
     medication : "",
     spasm_status : "",
@@ -97,8 +98,6 @@ const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProp
     targetElement?.scrollIntoView({ behavior: 'smooth'});
   };
 
-
-
   const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
     let processedValue: string | number = value;
@@ -115,6 +114,7 @@ const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProp
   const handleSaveAddStatus = () => {
     appThunkDispatch(addStatus({
       pid: parseInt(params.pid),
+      task_id:parseInt(params.task_id),
       onset_time: willAddStatus.onset_time,
       medication: willAddStatus.medication,
       spasm_status: willAddStatus.spasm_status,
@@ -170,7 +170,7 @@ const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProp
                       <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus}>填写指标</Button>
                     </TableCell>
                     <TableCell align="center">
-                      <a href={`/rehab/assessment/${historyRow.id}`} passHref target="_blank" rel="noopener noreferrer">
+                      <a href={`/rehab/assessment/${historyRow.id}`} target="_blank" rel="noopener noreferrer">
                         <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
                       </a>
                     </TableCell>
@@ -202,7 +202,7 @@ const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProp
   >
     <DialogTitle>{"病人各项指标"}</DialogTitle>
     <DialogContent>
-      {params.status.length > 0 ? (
+      {Number(params.status.length) > 0 ? (
         <DialogContentText id="Status">
           <Table sx={{ minWidth: 500 }} aria-label="a dense table">
             <TableHead>
@@ -218,17 +218,17 @@ const PrescriptionTable = (params: {record: Prescription[],status:StatusFormProp
             <TableBody>
               {params.status.map(row => (
                 <TableRow
-                  key={row.onsetTime}
+                  key={row.task_id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.onsetTime}
+                    {row.onset_time}
                   </TableCell>
                   {/*<TableCell align="right">{row.medication}</TableCell>*/}
-                  <TableCell align="right">{row.spasmStatus}</TableCell>
-                  <TableCell align="right">{row.minHeartRate}</TableCell>
-                  <TableCell align="right">{row.maxHeartRate}</TableCell>
-                  <TableCell align="right">{row.avgHeartRate}</TableCell>
+                  <TableCell align="right">{row.spasm_status}</TableCell>
+                  <TableCell align="right">{row.min_heart_rate}</TableCell>
+                  <TableCell align="right">{row.max_heart_rate}</TableCell>
+                  <TableCell align="right">{row.avg_heart_rate}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -238,13 +238,14 @@ const MCTFixedWidthChip = styled(Chip)<{color?: string}>`
   }
 `;
 
-export default function StickyHeadTable(params: { id: string,PId:string,
+export default function StickyHeadTable(params: { id: string,PId:string,task_id:string,
   prescription:Prescription[],
+  status:PatientStatus[],
   onlineEquipment: EquipmentOnline[]}) {
   const appDispatch = useAppDispatch()
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
-  const status = useAppSelector((state: RootState) => state.rehab.status)
+  const status = useAppSelector((state: RootState) => state.rehab.patientStatus)
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -460,6 +461,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
 
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
+    task_id:0,
     onset_time : "",
     medication : "",
     spasm_status : "",
@@ -484,6 +486,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
   const handleSaveAddStatus = () => {
     appThunkDispatch(addStatus({
       pid: parseInt(params.id),
+      task_id:0,
       onset_time: willAddStatus.onset_time,
       medication: willAddStatus.medication,
       spasm_status: willAddStatus.spasm_status,
@@ -685,6 +688,15 @@ export default function StickyHeadTable(params: { id: string,PId:string,
 
   const [selectedTab, setSelectedTab] = React.useState(0); // 初始选中的 tab
 
+  function getUniqueTrainingDays(records: PrescriptionRecord[]): number {
+    const uniqueDays = new Set(records.map(record => {
+      const date = new Date(record.created_at);
+      return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;  // Format: YYYY-MM-DD
+    }));
+    return uniqueDays.size;
+  }
+
+
   return (<>
     <Grid container alignItems="center" justifyContent="space-between" sx={{ height: 50 }}>
       <Grid item style={{display: 'flex', alignItems: 'center'}} >
@@ -743,11 +755,12 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                   <Typography align='right'>进度：
                     {
                       (() => {
-                        let label = row.prescription_record?.length + ' / ' + row.duration;
+                        let totalDuration = Number(row.frequency_per_day) * Number(row.total_days);
+                        let label = row.prescription_record?.length + ' / ' + totalDuration;
                         let color = 'success';
-                        if (row.prescription_record?.length == row.duration) {
+                        if (row.prescription_record?.length == totalDuration) {
                           color = 'success';
-                        } else if (row.prescription_record?.length && row.duration && row.prescription_record.length < row.duration) {
+                        } else if (row.prescription_record?.length && totalDuration && row.prescription_record.length < totalDuration) {
                           color = 'primary';
                         }
                         return <MCTFixedWidthChip label={label} color={color} />;
@@ -787,7 +800,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                   <Grid item xs={8} md={8}>
                     <Card key={row.id} sx={{ minWidth: 500,backgroundColor: '#74b2f1' ,display: 'flex', justifyContent: 'space-between'}}>
                         <Typography sx={{ fontSize: 16 ,fontWeight: 'bold',padding:2}} color="text.secondary" gutterBottom>
-                          一天 {row.frequency_per_day} 次，一次 {row.zz} 分钟，共需做 {row.total_days} 天，已做 3 天
+                          一天 {row.frequency_per_day} 次，一次 {row.zz} 分钟，共需做 {row.total_days} 天，已做 {getUniqueTrainingDays(row.prescription_record || []) }天
                         </Typography>
                     </Card>
                   </Grid>
@@ -808,7 +821,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,
                   <Grid item xs={12} md={12}>
                     <Card sx={{ height: 265 ,padding: '5px'}}>
                       <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                      <PrescriptionTable record={prescription} pid={params.id} status={status}/>
+                      <PrescriptionTable record={prescription} pid={params.id} status={status} task_id={params.task_id}/>
                     {/*  prescription_record*/}
                     </Card>
                   </Grid>

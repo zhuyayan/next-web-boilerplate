@@ -33,7 +33,6 @@ import {
   fetchPrescriptionByPId,
   Prescription as PrescriptionEntity,
   EvaluateFormProps,
-  TargetFormProps,
   AddPrescriptionItem,
   PatientStatus,
   addStatus,
@@ -97,11 +96,11 @@ const StyledBoxContainer = styled(Box)`
   }
 `;
 
-export default function MUITable({ params }: { params: { id: string } }) {
+export default function MUITable({ params }: { params: { id: string ,task_id:string, pid:string} }) {
   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
   const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
-  const status = useAppSelector((state: RootState) => state.rehab.status)
+  const status = useAppSelector((state: RootState) => state.rehab.patientStatus)
   const patientDuration = useAppSelector((state:RootState) => state.rehab.patientDuration)
   const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
@@ -162,6 +161,8 @@ export default function MUITable({ params }: { params: { id: string } }) {
     u: 3,
     v: 3,
     duration: 1,
+    frequency_per_day:1,
+    total_days:1,
     prescription_record: [
       {
         id: 123,
@@ -247,7 +248,10 @@ export default function MUITable({ params }: { params: { id: string } }) {
       y: NumToModeMapping[willAddPrescription.mode],
       zz: Number(willAddPrescription.zz),
       u: Number(willAddPrescription.u),
-      v: Number(willAddPrescription.v)
+      v: Number(willAddPrescription.v),
+      duration:Number(willAddPrescription.duration),
+      frequency_per_day:Number(willAddPrescription.frequency_per_day),
+      total_days:Number(willAddPrescription.total_days)
     }))
     setOpen(false);
   };
@@ -255,12 +259,14 @@ export default function MUITable({ params }: { params: { id: string } }) {
   useEffect(() => {
     // thunkDispatch(fetchPrescriptionById({id: parseInt(params.id)}))
     thunkDispatch(fetchPrescriptionByPId({pid: parseInt(params.id)}))
-    thunkDispatch(fetchEvaluationById({task_id: parseInt(params.id)}))
-    // thunkDispatch(fetchStatusById({pid,task_id: parseInt(params.id)}))
+    thunkDispatch(fetchEvaluationById({task_id: parseInt(params.task_id)}))
+    thunkDispatch(fetchStatusById({task_id: parseInt(params.task_id),pid:parseInt(params.pid)}))
     thunkDispatch(fetchPatientById({id: parseInt(params.id)}))
     thunkDispatch(fetchPrescriptionRecordById({id: parseInt(params.id)}))
     thunkDispatch(fetchPatientStatisticsById({id: parseInt(params.id)}))
     console.log("patient id: ", params.id)
+    console.log("patient pid: ", params.pid)
+    console.log("patient task_id: ", params.task_id)
   },[params.id, thunkDispatch])
 
   useEffect(() => {
@@ -289,6 +295,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
 
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
+    task_id:0,
     onset_time : "",
     medication : "",
     spasm_status : "",
@@ -313,6 +320,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
   const handleSaveAddStatus = () => {
     thunkDispatch(addStatus({
       pid: parseInt(params.id),
+      task_id:parseInt(params.task_id),
       onset_time: willAddStatus.onset_time,
       medication: willAddStatus.medication,
       spasm_status: willAddStatus.spasm_status,
@@ -499,7 +507,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
                   <CardHeader style={{display:'inline-block'}} title='康复仪训练报告' titleTypographyProps={{ variant: 'h5' }} />
                 </div>
                 <Divider />
-                <Prescription PId={params.id} prescription={prescription} status={status} onlineEquipment={onlineData || []}/>
+                <Prescription id={params.id} PId={params.pid} prescription={prescription} status={status} onlineEquipment={onlineData || []}/>
               </Card>
             </Grid>
             <br/>
@@ -509,7 +517,7 @@ export default function MUITable({ params }: { params: { id: string } }) {
               <Card sx={{ padding: '10px'}}>
                 <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
                 <CardContent>
-                  <quEcharts />
+
                 </CardContent>
               </Card>
             </Grid>
