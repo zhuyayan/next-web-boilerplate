@@ -49,7 +49,7 @@ import dayjs, {Dayjs} from "dayjs";
 //   }
 // }))
 
-const PrescriptionTable = (params: {record: Prescription[],status:PatientStatus[], pid: string,task_id:string}) => {
+const PrescriptionTable = (params: {record: PrescriptionRecord[],status:PatientStatus[], pid: string,task_id:string}) => {
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   function handleExport(row: PrescriptionRecord) {
     appThunkDispatch(exportTaskPressureData({pId: Number(params.pid), tId: row.id}))
@@ -142,19 +142,19 @@ const PrescriptionTable = (params: {record: Prescription[],status:PatientStatus[
             </TableHead>
             <TableBody>
               {params.record.map(row => (
-                row.prescription_record?.map((historyRow: PrescriptionRecord) => (
-                  <TableRow key={historyRow.id}>
+                // row.prescription_record?.map((historyRow: PrescriptionRecord) => (
+                  <TableRow key={row.id}>
                     <TableCell>
                       <Button
                         style={{
                           backgroundColor:
                             // historyRow.created_at === historyRow.updated_at ? '#f32148' : '#06c426' ,
-                            historyRow.state === 'N_END' || historyRow.state === 'H_END' ? '#06c426' : '#f32148',
+                            row.state === 'N_END' || row.state === 'H_END' ? '#06c426' : '#f32148',
                           color: '#ffffff',
                           float: 'right',
                         }}
                       >
-                        {historyRow.state === 'N_END' || historyRow.state === 'H_END' ? '完成' : '进行中'}
+                        {row.state === 'N_END' || row.state === 'H_END' ? '完成' : '进行中'}
                         {/*BEGIN：正常启动
                         N_END ：正常结束
                         H_END ：手动结束
@@ -163,14 +163,14 @@ const PrescriptionTable = (params: {record: Prescription[],status:PatientStatus[
                         {/*{historyRow.created_at === historyRow.updated_at ? '进行中' : '完成'}*/}
                       </Button>
                     </TableCell>
-                    <TableCell>{historyRow.created_at}</TableCell>
+                    <TableCell>{row.created_at}</TableCell>
                     {/*<TableCell>{historyRow.updated_at}</TableCell>*/}
-                    <TableCell>{historyRow.created_at === historyRow.updated_at ? ' ' : historyRow.updated_at}</TableCell>
+                    <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
                     <TableCell>
                       <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus}>填写指标</Button>
                     </TableCell>
                     <TableCell align="center">
-                      <a href={`/rehab/assessment/${historyRow.id}`} target="_blank" rel="noopener noreferrer">
+                      <a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">
                         <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
                       </a>
                     </TableCell>
@@ -188,7 +188,7 @@ const PrescriptionTable = (params: {record: Prescription[],status:PatientStatus[
                     {/*  </Tooltip>*/}
                     {/*</TableCell>*/}
                   </TableRow>
-                ))
+                // ))
               ))}
             </TableBody>
           </Table>

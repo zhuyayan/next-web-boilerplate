@@ -513,25 +513,25 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
             <br/>
 
             {/*直方图*/}
-            <Grid item xs={12} md={12}>
-              <Card sx={{ padding: '10px'}}>
-                <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
-                <CardContent>
+            {/*<Grid item xs={12} md={12}>*/}
+            {/*  <Card sx={{ padding: '10px'}}>*/}
+            {/*    <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />*/}
+            {/*    <CardContent>*/}
 
-                </CardContent>
-              </Card>
-            </Grid>
-            <br/>
+            {/*    </CardContent>*/}
+            {/*  </Card>*/}
+            {/*</Grid>*/}
+            {/*<br/>*/}
 
             {/*压力数据折线图*/}
-            <Grid item xs={6} md={5.5}>
-              <Card sx={{ height: 365 ,padding: '10px'}}>
-                <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
-                {
-                  trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
-                }
-              </Card>
-            </Grid>
+            {/*<Grid item xs={6} md={5.5}>*/}
+            {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
+            {/*    <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />*/}
+            {/*    {*/}
+            {/*      trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>*/}
+            {/*    }*/}
+            {/*  </Card>*/}
+            {/*</Grid>*/}
 
             {/*康复记录*/}
             {/*<Grid item xs={6} md={6.5}>*/}

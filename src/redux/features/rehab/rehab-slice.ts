@@ -571,18 +571,18 @@ export const addAssessment = createAsyncThunk<Assessments, {
 
 function convertApiAssessmentToAssessmentModel(apiAssessment: any): Assessments {
   return {
-    id: number;
-    body: {
-      id: number;
-      name: string;
-    };
-    part: {
-      id: number;
-      name: string;
-    };
-    examination: string;
-    levels: AssessmentLevel[];
-    selectedAssessment: SelectedAssessment
+    // id: number;
+    // body: {
+    //   id: number;
+    //   name: string;
+    // };
+    // part: {
+    //   id: number;
+    //   name: string;
+    // };
+    // examination: string;
+    // levels: AssessmentLevel[];
+    // selectedAssessment: SelectedAssessment
   }
 }
 //获取量表信息

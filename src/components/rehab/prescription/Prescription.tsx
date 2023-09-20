@@ -821,7 +821,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,task_id:
                   <Grid item xs={12} md={12}>
                     <Card sx={{ height: 265 ,padding: '5px'}}>
                       <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                      <PrescriptionTable record={prescription} pid={params.id} status={status} task_id={params.task_id}/>
+                      <PrescriptionTable record={row.prescription_record? row.prescription_record : []} pid={params.id} status={status} task_id={params.task_id}/>
                     {/*  prescription_record*/}
                     </Card>
                   </Grid>
