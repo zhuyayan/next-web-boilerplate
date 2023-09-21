@@ -15,7 +15,7 @@ import {
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {string} from "postcss-selector-parser";
 import {saveAs} from "file-saver";
-import {Assessment} from "@mui/icons-material";
+import {Assessment, getAssessment} from "@/redux/features/rehab/rehab-assessment-slice";
 
 export interface MedicalStaff {
   id: number;
@@ -58,41 +58,6 @@ export interface Patient {
   physicianId:number;
   i18d:string;
 }
-
-export interface AssessmentLevel {
-  id: number;
-  level_label: number;
-  description: string;
-}
-
-export interface Assessments {
-  id: number;
-  body: {
-    id: number;
-    name: string;
-  };
-  part: {
-    id: number;
-    name: string;
-  };
-  examination: string;
-  levels: AssessmentLevel[];
-  selectedAssessment: SelectedAssessment
-}
-
-export interface SelectedAssessment {
-  id: number;
-  selected_assessment_id: number;
-  selected_assessment_level: number;
-}
-
-// export interface AssessmentResponse {
-//   part: string;
-//   exam_id: number;
-//   examination: string;
-//   levels: Array;
-//   selected_assessment: SelectedAssessment;
-// }
 
 export interface Prescription {
   id: number;
@@ -158,7 +123,7 @@ let patients: Patient[] = []
 let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
 let evluation:Evaluation[]=[]
-let assessmentResponse: Assessments[]=[]
+let assessmentResponse: Assessment[]=[]
 let onlineEquipment: EquipmentOnline[] = []
 let equipmentAll: equipmentAll[] = []
 let sysInfo: systemInformation = {
@@ -204,7 +169,7 @@ interface RehabState {
   systemInformation: systemInformation
   patientDuration: PatientDuration
   selectedMenu: string
-  assessmentData: Assessments[]
+  // assessmentData: Assessment[]
 }
 
 const initialState: RehabState = {
@@ -221,7 +186,7 @@ const initialState: RehabState = {
   systemInformation: sysInfo,
   patientDuration: patientDuration,
   selectedMenu: '',
-  assessmentData: assessmentResponse
+  // assessmentData: assessmentResponse
 }
 
 export type Channel = 'redux' | 'general'
@@ -545,55 +510,6 @@ export const addPatient = createAsyncThunk<Patient, { name: string, age: number,
   console.log("add patient async thunk: ", response.data.data.patients[0])
   return convertAPIPatientToPatient(response.data.data.patients[0])
 });
-
-export const addAssessment = createAsyncThunk<Assessments, {
-  body: {
-    id: number;
-    name: string;
-  };
-  part: {
-    id: number;
-    name: string;
-  };
-  examination: string;
-  levels: AssessmentLevel[];
-}, {}>('addAssessment', async ({ body, part, examination, levels }, thunkAPI): Promise<Assessment> => {
-  const response: AxiosResponse<any, any> = await MCTAxiosInstance.post('assessment', {
-    body,
-    part,
-    examination,
-    levels,
-  });
-  const addedAssessment: Assessments = response.data; // 这里假设API返回了新添加的评估数据
-  console.log("add assessment async thunk: ", addedAssessment);
-  return addedAssessment;
-});
-
-function convertApiAssessmentToAssessmentModel(apiAssessment: any): Assessments {
-  return {
-    id: number;
-    body: {
-      id: number;
-      name: string;
-    };
-    part: {
-      id: number;
-      name: string;
-    };
-    examination: string;
-    levels: AssessmentLevel[];
-    selectedAssessment: SelectedAssessment
-  }
-}
-//获取量表信息
-export const getAssessment = createAsyncThunk<Assessments[], {task_id: number}, {}>(
-    'getAssessment',
-    async ({task_id}):Promise<any> => {
-      const response:AxiosResponse<any, any> = await MCTAxiosInstance.get(`assessment/${task_id}`)
-      console.log("get assessment async thunk: ", response.data.data)
-      return response.data.data.map(convertApiAssessmentToAssessmentModel)
-    });
-
 
 // 修改病人
 export const editPatient = createAsyncThunk<Patient, { id: number, name: string, age: number, sex: string, medical_history: string, media_stroke_type:number, media_stroke_level:number, staff_id: number, i_18_d: string }, {}>('editPatient', async ({id, name, age, sex, medical_history, staff_id,i_18_d}, thunkAPI):Promise<any> => {
@@ -991,9 +907,10 @@ const RehabSlice = createSlice({
         .addCase(getEquipmentAll.fulfilled, (state, action) => {
           state.equipmentAll = action.payload
         })
-        .addCase(getAssessment.fulfilled, (state, action) => {
-          state.assessmentData = [action.payload];
-        })
+        // .addCase(getAssessment.fulfilled, (state, action) => {
+        //   console.log("getAssessment.fulfilled", action.payload)
+        //   state.assessmentData = action.payload;
+        // })
         .addMatcher(rehabApi.endpoints?.getOnlineEquipments.matchFulfilled, (state, action) => {
           console.log("addMatcher rehabApi getOnlineEquipments fulfilled -> ", action.payload, action.type)
         })

@@ -1,13 +1,8 @@
 "use client";
 import {Container, IconButton} from "@mui/material";
 import { Title } from '@/components/rehab/styles';
-import { Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
-import styled from 'styled-components';
+import { Button, FormControl, Typography } from '@mui/material';
 import React, {useEffect, useState} from 'react';
-import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
-import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
-import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
-import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Grid from '@mui/material/Grid';
@@ -17,18 +12,20 @@ import { Card } from '@mui/material';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import Tooltip from "@mui/material/Tooltip";
 import {
-  addEvaluation, Assessment, AssessmentResponse, EvaluateFormProps, getAssessment, SelectedAssessment
+  addEvaluation, EvaluateFormProps
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
-import {string} from "postcss-selector-parser";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import DialogContentText from "@mui/material/DialogContentText";
-import {NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useCallback } from 'react';
-import {addAssessment, editPatient, deletePatient} from "@/redux/features/rehab/rehab-slice";
 import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
+import {
+  Assessment,
+  AssessmentLevel,
+  getAssessment, postAssessment,
+  setFuglMeyerScores
+} from "@/redux/features/rehab/rehab-assessment-slice";
 
 export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
   const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
@@ -36,8 +33,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   const [components, setComponents] = useState<JSX.Element[]>([]);
   const [inputValue, setInputValue] = useState('');
   const appDispatch = useAppDispatch()
-  const assessmentResponseData = useAppSelector((state: RootState) => state.rehab.assessmentData);
-
+  const assessmentResponseData = useAppSelector((state: RootState) => state.assessment.assessmentData);
+  const fuglMeyerScores = useAppSelector((state: RootState) => state.assessment.fuglMeyerScores)
   useEffect(()=>{
     console.log("params->TaskID", params.id)
     thunkDispatch(getAssessment({task_id: parseInt(params.id)}))
@@ -87,31 +84,12 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     setSelectedAssessment(event.target.value as string);
   };
 
-  // const handleAddPatient = () => {
-  //   thunkDispatch(addAssessment({
-  //
-  //   }))
-
-  // };
-
-
   // 处理提交选择的函数
   const handleSubmit = () => {
     // 在这里处理提交选择的逻辑，例如导航到相关页面 addAssessment
     console.log('用户选择的评定量表:', selectedAssessment);
+    thunkDispatch(postAssessment({task_id: parseInt(params.id), selectedRecord: fuglMeyerScores}))
   };
-
-
-  const [alignment1, setAlignment1] = React.useState<string>('000');
-  const [alignment2, setAlignment2] = React.useState<string>('000');
-  const [alignment3, setAlignment3] = React.useState<string>('000');
-  const [alignment4, setAlignment4] = React.useState<string>('000');
-  const [alignment5, setAlignment5] = React.useState<string>('000');
-  const [alignment6, setAlignment6] = React.useState<string>('000');
-  const [alignment7, setAlignment7] = React.useState<string>('000');
-  const [alignment8, setAlignment8] = React.useState<string>('000');
-  const [alignment9, setAlignment9] = React.useState<string>('000');
-  const [alignment10, setAlignment10] = React.useState<string>('000');
 
   // 医生评价表单
   const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
@@ -145,74 +123,6 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
       tolerance: evaluateFormData.tolerance,
     }))
     // setOpenAddStatus(false)
-  };
-
-  const handleAlignment1 = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string,
-  ) => {
-    setAlignment1(newAlignment);
-  };
-
-  const handleAlignment2 = (
-      event: React.MouseEvent<HTMLElement>,
-      newAlignment: string,
-  ) => {
-    setAlignment2(newAlignment);
-  };
-
-  const handleAlignment3 = (
-      event: React.MouseEvent<HTMLElement>,
-      newAlignment: string,
-  ) => {
-    setAlignment3(newAlignment);
-  };
-
-  const handleAlignment4 = (
-      event: React.MouseEvent<HTMLElement>,
-      newAlignment: string,
-  ) => {
-    setAlignment4(newAlignment);
-  };
-
-  const handleAlignment5 = (
-      event: React.MouseEvent<HTMLElement>,
-      newAlignment: string,
-  ) => {
-    setAlignment5(newAlignment);
-  };
-
-  const handleAlignment6 = (
-      event: React.MouseEvent<HTMLElement>,
-      newAlignment: string,
-  ) => {
-    setAlignment6(newAlignment);
-  };
-
-  const handleAlignment7 = (
-      event: React.MouseEvent<HTMLElement>,
-      newAlignment: string,
-  ) => {
-    setAlignment7(newAlignment);
-  };
-
-  const handleAlignment8 = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string,
-  ) => {
-    setAlignment8(newAlignment);
-  };
-  const handleAlignment9 = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string,
-  ) => {
-    setAlignment9(newAlignment);
-  };
-  const handleAlignment10 = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string,
-  ) => {
-    setAlignment10(newAlignment);
   };
 
   const selectedStyle = {
@@ -278,6 +188,10 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   const [showEvaluate6, setShowEvaluate6] = useState(true);
   const [showEvaluate7, setShowEvaluate7] = useState(true);
 
+  function handleFuglMeyerAssessmentChange(id: number, newValue: string | undefined | null) {
+    thunkDispatch(setFuglMeyerScores({id, newValue}));
+  }
+
   return (
     <Container>
       <Title>Fugl-Meyer评定量表（手部）</Title>
@@ -323,40 +237,47 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                 <div key={assessment.id}>
                   <Grid item xs={12} alignItems="center">
                     <Typography variant="h6">
-                      &gt; {assessment.examination}
+                      {assessment.examination}
                     </Typography>
+                  </Grid>
+                  <Grid item xs={12} alignItems="center">
+                    <ToggleButtonGroup
+                        value={fuglMeyerScores[assessment.id]}
+                        exclusive
+                        onChange={(event, newValue) => handleFuglMeyerAssessmentChange(assessment.id, newValue)}
+                        aria-label={`test-${assessment.id}`}
+                    >
+                      {
+                        assessment.levels.map((l: AssessmentLevel)=> {
+                          let selected
+                          if (fuglMeyerScores[assessment.id] != null && fuglMeyerScores[assessment.id] != undefined) {
+                            selected = Number(fuglMeyerScores[assessment.id].selected_assessment_level_id) === l.id
+                            console.log(fuglMeyerScores[assessment.id])
+                          }
+                          return (
+                            <ToggleButton key={l.id} value={l.id} style={selected ? selectedStyle : notSelectedStyle} aria-label={`level-${l.id}`}>
+                              {l.level_label}分: {l.description}
+                            </ToggleButton>
+                          )
+                        })
+                      }
+                    </ToggleButtonGroup>
                   </Grid>
                 </div>
             ))}
           </Grid>
+          <Grid item xs={12} alignItems="center">
+            {/*{*/}
+            {/*  if(assessmentResponseData.selectedAssessment){*/}
+
+            {/*  }*/}
+            {/*}*/}
+            <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleSubmit}>
+              保存
+            </Button>
+          </Grid>
         </Card>
 
-
-        {/*<Grid item xs={12} alignItems="center">*/}
-        {/*  <ToggleButtonGroup*/}
-        {/*      value={alignment1}*/}
-        {/*      exclusive*/}
-        {/*      onChange={handleAlignment1}*/}
-        {/*      aria-label="test1"*/}
-        {/*  >*/}
-        {/*    <ToggleButton value="010" style={alignment1 === "010" ? selectedStyle : notSelectedStyle} aria-label="test1 0">*/}
-        {/*      0分: 不能屈曲*/}
-        {/*    </ToggleButton>*/}
-        {/*    <ToggleButton value="011" style={alignment1 === "011" ? selectedStyle : notSelectedStyle} aria-label="test1 1">*/}
-        {/*      1分: 能屈曲但不充分*/}
-        {/*    </ToggleButton>*/}
-        {/*    <ToggleButton value="012" style={alignment1 === "012" ? selectedStyle : notSelectedStyle} aria-label="test1 2">*/}
-        {/*      2分: (与健侧比较)能完全主动屈曲*/}
-        {/*    </ToggleButton>*/}
-        {/*  </ToggleButtonGroup>*/}
-        {/*</Grid>*/}
-
-
-        {/*  <Grid item xs={12} alignItems="center">*/}
-        {/*    <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleSubmit}>*/}
-        {/*      提交*/}
-        {/*    </Button>*/}
-        {/*  </Grid>*/}
         <Grid container spacing={0}>
           <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
             <Title>训练后状态：</Title>
