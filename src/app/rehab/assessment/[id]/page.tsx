@@ -26,6 +26,8 @@ import {
   getAssessment, postAssessment,
   setFuglMeyerScores
 } from "@/redux/features/rehab/rehab-assessment-slice";
+import {getSuggestion, postSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
+import {CommonEvaluation, getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
 
 export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
   const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
@@ -34,10 +36,16 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   const [inputValue, setInputValue] = useState('');
   const appDispatch = useAppDispatch()
   const assessmentResponseData = useAppSelector((state: RootState) => state.assessment.assessmentData);
-  const fuglMeyerScores = useAppSelector((state: RootState) => state.assessment.fuglMeyerScores)
+  const suggestionResponseData = useAppSelector((state: RootState) => state.suggestion.suggestionData);
+  const [suggestionText, setSuggestionText] = useState('')
+  const evaluationResponseData = useAppSelector((state: RootState) => state.evaluation.evaluationData);
+  const [isModified, setIsModified] = useState(false);
+  const fuglMeyerScores = useAppSelector((state: RootState) => state.assessment.fuglMeyerScores);
   useEffect(()=>{
     console.log("params->TaskID", params.id)
     thunkDispatch(getAssessment({task_id: parseInt(params.id)}))
+    thunkDispatch(getSuggestion({task_id: parseInt(params.id)}))
+    thunkDispatch(getEvaluation({task_id: parseInt(params.id)}))
   },[params.id,thunkDispatch])
 
   const handleAddComponent = useCallback(() => {
@@ -163,8 +171,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   };
 
   //保存医生建议
-  const handleSaveAdvice = () => {
-
+  const handleSaveSuggestion = () => {
+    thunkDispatch(postSuggestion({task_id: parseInt(params.id), suggestion_id: suggestionResponseData?.suggestion_id || 1, suggestion_text: suggestionText}))
   };
 
   //是否显示
@@ -191,6 +199,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   function handleFuglMeyerAssessmentChange(id: number, newValue: string | undefined | null) {
     thunkDispatch(setFuglMeyerScores({id, newValue}));
   }
+
+  const initialSuggestionValue = isModified ? '' : suggestionResponseData?.suggestion;
 
   return (
     <Container>
@@ -323,7 +333,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                     <Grid item xs={8}>
                       <TextField
                         name="tolerance"
-                        value={evaluateFormData.tolerance}
+                        value = {evaluationResponseData?.tolerance}
+                        // value={evaluateFormData.tolerance}
                         onChange={handleEvaluationFormDataFormChange}
                         size="small"
                         fullWidth
@@ -341,7 +352,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                     <Grid item xs={8}>
                       <TextField
                         name="motionReview"
-                        value={evaluateFormData.motionReview}
+                        value = {evaluationResponseData?.motion_review}
+                        // value={evaluateFormData.motionReview}
                         onChange={handleEvaluationFormDataFormChange}
                         size="small"
                         fullWidth
@@ -359,7 +371,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                     <Grid item xs={8}>
                       <TextField
                         name="spasmReview"
-                        value={evaluateFormData.spasmReview}
+                        value = {evaluationResponseData?.spasm_review}
+                        // value={evaluateFormData.spasmReview}
                         onChange={handleEvaluationFormDataFormChange}
                         size="small"
                         fullWidth
@@ -377,7 +390,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                     <Grid item xs={8}>
                       <TextField
                         name="muscleTone"
-                        value={evaluateFormData.muscleTone}
+                        value = {evaluationResponseData?.muscle_tone}
+                        // value={evaluateFormData.muscleTone}
                         onChange={handleEvaluationFormDataFormChange}
                         size="small"
                         fullWidth
@@ -395,7 +409,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                     <Grid item xs={8}>
                       <TextField
                         name="acuteState"
-                        value={evaluateFormData.acuteState}
+                        value = {evaluationResponseData?.acute_state}
+                        // value={evaluateFormData.acuteState}
                         onChange={handleEvaluationFormDataFormChange}
                         size="small"
                         fullWidth
@@ -413,7 +428,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                     <Grid item xs={8}>
                       <TextField
                         name="neuroJudgment"
-                        value={evaluateFormData.neuroJudgment}
+                        value = {evaluationResponseData?.neuro_judgment}
+                        // value={evaluateFormData.neuroJudgment}
                         onChange={handleEvaluationFormDataFormChange}
                         size="small"
                         fullWidth
@@ -431,7 +447,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                     <Grid item xs={8}>
                       {showEvaluate7 && <TextField
                           name="motionInjury"
-                          value={evaluateFormData.motionInjury}
+                          value = {evaluationResponseData?.motion_injury}
+                          // value={evaluateFormData.motionInjury}
                           onChange={handleEvaluationFormDataFormChange}
                           size="small"
                           fullWidth
@@ -441,7 +458,31 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                 </Box>
               </Grid>}
 
-              {components.map((component, index) => component)}
+              {evaluationResponseData?.common_evaluation.map((commonEvaluation: CommonEvaluation) => (
+                  <div key={commonEvaluation.id}>
+                    <Grid item xs={12}>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={4}>
+                             <label htmlFor="input9">{commonEvaluation.evaluation_item}</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <TextField
+                                name="motionInjury"
+                                value = {commonEvaluation.evaluation_value}
+                                // value={evaluateFormData.motionInjury}
+                                onChange={handleEvaluationFormDataFormChange}
+                                size="small"
+                                fullWidth
+                            />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  </div>
+              ))}
+
+              {/*{components.map((component, index) => component)}*/}
 
               <Grid item xs={12}>
                 <Box sx={{padding: '8px' }}>
@@ -462,11 +503,16 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
         <Title>医生建议：</Title>
         <Card style={{ marginTop: '0px' }} sx={{ padding: '20px' }}>
           <TextField
-              name="advice"
+              name="suggestion"
               multiline
               rows={4}
               fullWidth
               placeholder="请按照本次训练情况在此输入医生建议"
+              value = {suggestionText || initialSuggestionValue}
+              onChange={(event) => {
+                setSuggestionText(event.target.value)
+                setIsModified(true);
+              }}
           />
           <Grid container spacing={0}>
             <Grid item xs={6} style={{display: 'flex', alignItems: 'center'}}>
@@ -476,7 +522,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
             </Grid>
             <Grid item xs={6} alignItems="center">
               <Box sx={{padding: '8px' }}>
-                <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveAdvice}>保存建议</Button>
+                <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveSuggestion}>保存建议</Button>
               </Box>
             </Grid>
           </Grid>
