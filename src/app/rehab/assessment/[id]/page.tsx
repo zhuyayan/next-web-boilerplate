@@ -1,5 +1,15 @@
 "use client";
-import {Container, IconButton} from "@mui/material";
+import {
+  Container,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from "@mui/material";
 import { Title } from '@/components/rehab/styles';
 import { Button, FormControl, Typography } from '@mui/material';
 import React, {useEffect, useState} from 'react';
@@ -26,6 +36,9 @@ import {
   getAssessment, postAssessment,
   setFuglMeyerScores
 } from "@/redux/features/rehab/rehab-assessment-slice";
+import styled from "styled-components";
+
+
 
 export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
   const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
@@ -192,6 +205,71 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     thunkDispatch(setFuglMeyerScores({id, newValue}));
   }
 
+
+  const StyledTableCell = styled(TableCell)`
+    background-color: #f0f0f0;
+    border-left: 1px solid #ccc;
+  `;
+
+  const TableWrapper = styled.div`
+  border: 1px solid #ccc; /* 设置边框样式，可以根据需要进行调整 */
+  margin: 16px;
+`;
+
+  const [degrees, setDegrees] = useState({
+    leftThumbMP: '',
+    rightThumbMP: '',
+    leftThumbIP: '',
+    rightThumbIP: '',
+    leftRadialAbduction: '',
+    rightRadialAbduction: '',
+    leftThumbOpposition: '',
+    rightThumbOpposition:'',
+  });
+
+  const handleInputDegreesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setDegrees((prevDegrees) => ({
+      ...prevDegrees,
+      [name]: value,
+    }));
+  };
+
+  //保存评估
+  const handleSaveDegrees = () => {
+
+  };
+
+  const initialDegrees = {
+    leftHand: {
+      finger1: { MCP: '', PIP: '', DIP: '' },
+      finger2: { MCP: '', PIP: '', DIP: '' },
+      finger3: { MCP: '', PIP: '', DIP: '' },
+    },
+    rightHand: {
+      finger1: { MCP: '', PIP: '', DIP: '' },
+      finger2: { MCP: '', PIP: '', DIP: '' },
+      finger3: { MCP: '', PIP: '', DIP: '' },
+    },
+  };
+
+  const [degree, setDegree] = useState(initialDegrees);
+
+  const handleInputDegreeChange = (event) => {
+    const { name, value } = event.target;
+    const [hand, finger, joint] = name.split('-');
+    setDegrees((prevDegrees) => ({
+      ...prevDegrees,
+      [hand]: {
+        ...prevDegrees[hand],
+        [finger]: {
+          ...prevDegrees[hand][finger],
+          [joint]: value,
+        },
+      },
+    }));
+  };
+
   return (
     <Container>
       <Title>Fugl-Meyer评定量表（手部）</Title>
@@ -310,6 +388,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
             </Tooltip>
           </Grid>
         </Grid>
+
         <Card style={{ marginTop: '0px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
           <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
           <form>
@@ -457,6 +536,195 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
               </Grid>
             </Grid>
           </form>
+        </Card>
+
+        <Card style={{paddingBottom:'20px',padding:'8px' }}>
+          {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
+          <Title>手关节活动度评估</Title>
+          <Typography variant='body2' style={{ color: 'red' }}>拇指对指：通过使用刻度尺测量拇指指腹至小指指腹的距离来评估。</Typography>
+          <TableWrapper>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>部位</StyledTableCell>
+                  <StyledTableCell>MP 屈曲（0°-50°）</StyledTableCell>
+                  <StyledTableCell>IP 屈曲（0°-80°~90°）</StyledTableCell>
+                  <StyledTableCell>桡侧外展（0°-50°）</StyledTableCell>
+                  <StyledTableCell>拇指对指</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <StyledTableCell>左拇指</StyledTableCell>
+                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                    <TextField
+                      name="leftThumbMP"
+                      value={degrees.leftThumbMP}
+                      onChange={handleInputDegreesChange}
+                      type="number"
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                    <TextField
+                      name="leftThumbIP"
+                      value={degrees.leftThumbIP}
+                      onChange={handleInputDegreesChange}
+                      type="number"
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                    <TextField
+                      name="leftRadialAbduction"
+                      value={degrees.leftRadialAbduction}
+                      onChange={handleInputDegreesChange}
+                      type="number"
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={9}>
+                      <TextField
+                        name="leftThumbOpposition"
+                        value={degrees.leftThumbOpposition}
+                        onChange={handleInputDegreesChange}
+                        type="number"
+                        size="small"
+                      />
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography variant='body2' style={{ color: 'red' }}>CM</Typography>
+                      </Grid>
+                    </Grid>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <StyledTableCell>右拇指</StyledTableCell>
+                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                    <TextField
+                      name="rightThumbMP"
+                      value={degrees.rightThumbMP}
+                      onChange={handleInputDegreesChange}
+                      type="number"
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                    <TextField
+                      name="rightThumbIP"
+                      value={degrees.rightThumbIP}
+                      onChange={handleInputDegreesChange}
+                      type="number"
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                    <TextField
+                      name="rightRadialAbduction"
+                      value={degrees.rightRadialAbduction}
+                      onChange={handleInputDegreesChange}
+                      type="number"
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                    <TextField
+                      name="rightThumbOpposition"
+                      value={degrees.rightThumbOpposition}
+                      onChange={handleInputDegreesChange}
+                      type="number"
+                      size="small"
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+          </TableWrapper>
+
+          <TableWrapper>
+            <TableContainer>
+              <Table aria-label="hand degrees table">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell align="center" colSpan={3}>左手</StyledTableCell>
+                    <StyledTableCell align="center" colSpan={3}>右手</StyledTableCell>
+                  </TableRow>
+                  <TableRow>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell>MCP（0°-90°）</StyledTableCell>
+                    <StyledTableCell>PIP（0°-110°）</StyledTableCell>
+                    <StyledTableCell>DIP（0°-80°）</StyledTableCell>
+                    <StyledTableCell>MCP（0°-90°）</StyledTableCell>
+                    <StyledTableCell>PIP（0°-110°）</StyledTableCell>
+                    <StyledTableCell>DIP（0°-80°）</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {['食指', '中指', '无名指'].map((finger, index) => (
+                    <TableRow key={index}>
+                      <StyledTableCell>{finger}</StyledTableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`leftHand-finger${index + 1}-MCP`}
+                          value={degree.leftHand[`finger${index + 1}`].MCP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`leftHand-finger${index + 1}-PIP`}
+                          value={degree.leftHand[`finger${index + 1}`].PIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`leftHand-finger${index + 1}-DIP`}
+                          value={degree.leftHand[`finger${index + 1}`].DIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`rightHand-finger${index + 1}-MCP`}
+                          value={degree.rightHand[`finger${index + 1}`].MCP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`rightHand-finger${index + 1}-PIP`}
+                          value={degree.rightHand[`finger${index + 1}`].PIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`rightHand-finger${index + 1}-DIP`}
+                          value={degree.rightHand[`finger${index + 1}`].DIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </TableWrapper>
+          <Box sx={{padding: '8px',marginBottom:'16px' }}>
+            <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
+          </Box>
         </Card>
 
         <Title>医生建议：</Title>

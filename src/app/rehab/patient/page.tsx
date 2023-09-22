@@ -614,10 +614,10 @@ export default function PatientList() {
                     >
                       <MenuItem value={10}>1 期</MenuItem>
                       <MenuItem value={21}>2 期</MenuItem>
-                      <MenuItem value={21}>3 期</MenuItem>
-                      <MenuItem value={21}>4 期</MenuItem>
-                      <MenuItem value={21}>5 期</MenuItem>
-                      <MenuItem value={21}>6 期</MenuItem>
+                      <MenuItem value={22}>3 期</MenuItem>
+                      <MenuItem value={23}>4 期</MenuItem>
+                      <MenuItem value={24}>5 期</MenuItem>
+                      <MenuItem value={25}>6 期</MenuItem>
 
                     </Select>
                   </FormControl>
