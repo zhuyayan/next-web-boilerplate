@@ -54,8 +54,8 @@ import {
   NumToModeMapping,
   PatientNumClassifyToClassifyLabelMapping, PatientNumStrokeLevelToStrokeLevelLabelMapping
 } from "@/utils/mct-utils";
-import {IconButton} from "@mui/material";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
+import {IconButton, TableContainer} from "@mui/material";
+
 import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
@@ -75,6 +75,11 @@ import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
 import Test from "@/components/rehab/prescription/Test";
 import PrescriptionTest from "@/components/rehab/prescription/PrescriptionTest";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import Table from "@mui/material/Table";
 
 const nextSunday = dayjs().endOf('week').startOf('day');
 
@@ -505,6 +510,37 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
               </Grid>
             </Grid>
 
+            <Grid item xs={12} md={12}>
+              <Card>
+                <CardHeader style={{display:'inline-block'}} title='量表记录' titleTypographyProps={{ variant: 'h6' }}></CardHeader>
+                <Divider />
+                <TableContainer sx={{ maxHeight: 280 }}>
+                  <Table stickyHeader aria-label="sticky table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell align="center">量表填写时间</TableCell>
+                        <TableCell>量表及评价</TableCell>
+                        <TableCell align="center">操作</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                          <TableCell align="center">
+                            <Typography variant="body2" color="text.secondary">
+                              2023-08-30 10:20:47
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
+                          </TableCell>
+                          <TableCell align="center">
+                          </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Card>
+            </Grid>
 
             {/*处方*/}
             <Grid item xs={12} md={12}>

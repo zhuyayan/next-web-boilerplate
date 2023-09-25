@@ -597,15 +597,15 @@ export default function StickyHeadTable(params: {
     console.log(NumToBodyPartMapping[willAddPrescription.part])
     console.log(NumToModeMapping[willAddPrescription.mode])
     thunkDispatch(addPrescription({
-      pid: parseInt(params.PId),
+      pid: parseInt(params.id),
       x: NumToBodyPartMapping[willAddPrescription.part],
       y: NumToModeMapping[willAddPrescription.mode],
       zz: Number(willAddPrescription.zz),
       u: Number(willAddPrescription.u),
       v: Number(willAddPrescription.v),
-      duration:Number(willEditPrescription.duration),
-      frequency_per_day: Number(willEditPrescription.frequency_per_day),
-      total_days: Number(willEditPrescription.total_days),
+      duration:Number(willAddPrescription.duration),
+      frequency_per_day: Number(willAddPrescription.frequency_per_day),
+      total_days: Number(willAddPrescription.total_days),
     }))
     setOpenAdd(false);
   };

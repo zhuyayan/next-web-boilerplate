@@ -3,6 +3,8 @@ import appBarReducer from './features/layout-slice'
 import loginReducer from './features/login-slice'
 import rehabReducer, {rehabApi} from './features/rehab/rehab-slice'
 import assessmentReducer from "@/redux/features/rehab/rehab-assessment-slice";
+import suggestionReducer from "@/redux/features/rehab/rehab-suggestion-slice";
+import evaluationReducer from "@/redux/features/rehab/rehab-evaluation-slice";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import {setupListeners} from "@reduxjs/toolkit/query";
 
@@ -12,6 +14,8 @@ const store = configureStore({
     login: loginReducer,
     rehab: rehabReducer,
     assessment: assessmentReducer,
+    suggestion: suggestionReducer,
+    evaluation: evaluationReducer,
     [rehabApi.reducerPath]: rehabApi.reducer,
   },
   middleware:(getDefaultMiddleware) => {
