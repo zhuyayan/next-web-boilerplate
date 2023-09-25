@@ -38,7 +38,7 @@ import {
   genderValueToLabel,
   getDefaultGenderLabel,
   getDefaultGenderValue,
-  GetDefaultPatient
+  GetDefaultPatient, PatientNumClassifyToClassifyLabelMapping, PatientNumStrokeLevelToStrokeLevelLabelMapping
 } from "@/utils/mct-utils";
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
@@ -50,6 +50,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialog';
 import { Title } from '@/components/rehab/styles';
 import Link from "next/link";
+import {string} from "postcss-selector-parser";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -85,8 +86,8 @@ export default function PatientList() {
     gender: getDefaultGenderValue(),
     genderLabel: getDefaultGenderLabel(),
     medicalHistory: '',
-    mediaStrokeType:0,
-    mediaStrokeLevel:0,
+    mediaStrokeType: 0,
+    mediaStrokeLevel: 0,
     physician: '',
     physicianId: 0,
     i18d: '',
@@ -114,14 +115,15 @@ export default function PatientList() {
   }, [thunkDispatch]);
 
   const handleAddPatient = () => {
+    console.log("handleAddPatient", willAddPatient.mediaStrokeType, willAddPatient.mediaStrokeLevel)
     // 使用 id 页面需要调整
     thunkDispatch(addPatient({
       name: willAddPatient.name,
       age: willAddPatient.age,
       sex: willAddPatient.genderLabel,
       medical_history: willAddPatient.medicalHistory,
-      media_stroke_type:willAddPatient.mediaStrokeType,
-      media_stroke_level:willAddPatient.mediaStrokeLevel,
+      stroke_type: willAddPatient.mediaStrokeType,
+      stroke_level: willAddPatient.mediaStrokeLevel,
       staff_id: willAddPatient.physicianId,
       i_18_d: willAddPatient.i18d
     }))
@@ -171,8 +173,8 @@ export default function PatientList() {
       age: willEditPatient.age,
       sex: willEditPatient.genderLabel,
       medical_history: willEditPatient.medicalHistory,
-      media_stroke_type:willEditPatient.mediaStrokeType,
-      media_stroke_level:willEditPatient.mediaStrokeLevel,
+      stroke_type: willEditPatient.mediaStrokeType,
+      stroke_level: willEditPatient.mediaStrokeLevel,
       staff_id: willEditPatient.physicianId,
       i_18_d: willEditPatient.i18d,
     }))
@@ -221,7 +223,7 @@ export default function PatientList() {
 
   const [gender, setGender] = React.useState('');
   const [physician, setPhysician] = React.useState('');
-  const [mediaStrokeLevel, setMediaStrokeLevel] = React.useState('');
+  // const [mediaStrokeLevel, setMediaStrokeLevel] = React.useState('');
 
   const handleChange = (event: SelectChangeEvent) => {
     const {value} = event.target;
@@ -232,7 +234,6 @@ export default function PatientList() {
       ["gender"]: value,
       ["genderLabel"]: genderValueToLabel(String(value)),
     }));
-    setGender(event.target.value);
   };
 
   const handleChangePhysician = (event: SelectChangeEvent) => {
@@ -253,9 +254,8 @@ export default function PatientList() {
     console.log("event.target.value", event.target.value)
     setWillEditPatient((prevInputValues) => ({
       ...prevInputValues,
-      ["mediaStrokeType"]: value,
+      ["mediaStrokeType"]: Number(value),
     }));
-    setMediaStrokeLevel(event.target.value);
   };
 
   const handleChangeMediaStrokeLevel = (event: SelectChangeEvent) => {
@@ -264,9 +264,9 @@ export default function PatientList() {
     console.log("event.target.value", event.target.value)
     setWillEditPatient((prevInputValues) => ({
       ...prevInputValues,
-      ["mediaStrokeLevel"]: value,
+      ["mediaStrokeLevel"]: Number(value),
     }));
-    setMediaStrokeLevel(event.target.value);
+    // setMediaStrokeLevel(event.target.value);
   };
 
   //分页
@@ -284,6 +284,7 @@ export default function PatientList() {
 
   const handleAddPatientGenderChange = (event: SelectChangeEvent) => {
     const {value} = event.target;
+    console.log("handleAddPatientGenderChange", value)
     setWillAddPatient((prevInputValues) => ({
       ...prevInputValues,
       ["gender"]: value,
@@ -296,8 +297,7 @@ export default function PatientList() {
     const {value} = event.target;
     setWillAddPatient((prevInputValues) => ({
       ...prevInputValues,
-      ["gender"]: value,
-      ["genderLabel"]: genderValueToLabel(String(value)),
+      ["mediaStrokeType"]: Number(value),
     }));
   };
 
@@ -305,7 +305,7 @@ export default function PatientList() {
     const {value} = event.target;
     setWillAddPatient((prevInputValues) => ({
       ...prevInputValues,
-      ["gender"]: value,
+      ["mediaStrokeLevel"]: Number(value),
     }));
   };
 
@@ -452,8 +452,8 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.age}</TableCell>
                           <TableCell align='center'>{patient.genderLabel}</TableCell>
                           <TableCell align='center'>{patient.medicalHistory}</TableCell>
-                          <TableCell align='center'>{patient.mediaStrokeType}</TableCell>
-                          <TableCell align='center'>{patient.mediaStrokeLevel}</TableCell>
+                          <TableCell align='center'>{PatientNumClassifyToClassifyLabelMapping[String(patient.mediaStrokeType)]}</TableCell>
+                          <TableCell align='center'>{PatientNumStrokeLevelToStrokeLevelLabelMapping[String(patient.mediaStrokeLevel)]}</TableCell>
                           <TableCell align='center'>{patient.physician}</TableCell>
                           <TableCell align='center'>{patient.i18d}</TableCell>
                           <TableCell align='center'>
@@ -557,7 +557,6 @@ export default function PatientList() {
                     <Select
                         labelId="gender"
                         id="gender"
-                        // value={willEditPatient.gender.toString()}
                         value={String(willEditPatient.gender)}
                         label="性别"
                         onChange={handleChange}
@@ -596,7 +595,7 @@ export default function PatientList() {
                       labelId="Classify"
                       id="Classify"
                       label="分类"
-                      value={willEditPatient.mediaStrokeType}
+                      value={String(willEditPatient.mediaStrokeType)}
                       onChange={handleChangeClassify}
                     >
                       <MenuItem value={10}>缺血性脑卒中</MenuItem>
@@ -609,16 +608,15 @@ export default function PatientList() {
                       labelId="mediaStrokeLevel"
                       id="mediaStrokeLevel"
                       label="分期"
-                      value={willEditPatient.mediaStrokeLevel}
+                      value={String(willEditPatient.mediaStrokeLevel)}
                       onChange={handleChangeMediaStrokeLevel}
                     >
                       <MenuItem value={10}>1 期</MenuItem>
-                      <MenuItem value={21}>2 期</MenuItem>
-                      <MenuItem value={21}>3 期</MenuItem>
-                      <MenuItem value={21}>4 期</MenuItem>
-                      <MenuItem value={21}>5 期</MenuItem>
-                      <MenuItem value={21}>6 期</MenuItem>
-
+                      <MenuItem value={11}>2 期</MenuItem>
+                      <MenuItem value={12}>3 期</MenuItem>
+                      <MenuItem value={13}>4 期</MenuItem>
+                      <MenuItem value={14}>5 期</MenuItem>
+                      <MenuItem value={15}>6 期</MenuItem>
                     </Select>
                   </FormControl>
                 </StyledDiv>
@@ -659,6 +657,7 @@ export default function PatientList() {
                         labelId="gender"
                         id="gender"
                         label="性别"
+                        value={willAddPatient.gender}
                         onChange={handleAddPatientGenderChange}
                     >
                       <MenuItem value={10}>男</MenuItem>
@@ -677,10 +676,11 @@ export default function PatientList() {
                     <Select
                         labelId="physician"
                         id="physician"
-                        value={String(willAddPatient.physicianId)}
                         label="主治医生"
+                        value={String(willAddPatient.physicianId)}
                         onChange={handleAddPatientPhysicianChange}
                     >
+                      <MenuItem value={0} key={0}></MenuItem>
                       {medicalStaffList.map((medicalStaff) =>
                           <MenuItem value={medicalStaff.id} key={medicalStaff.id}>{medicalStaff.fullName}</MenuItem>
                       )}
@@ -694,8 +694,10 @@ export default function PatientList() {
                       labelId="gender"
                       id="gender"
                       label="分类"
+                      value={String(willAddPatient.mediaStrokeType)}
                       onChange={handleAddPatientClassifyChange}
                     >
+                      <MenuItem value={0}></MenuItem>
                       <MenuItem value={10}>缺血性脑卒中</MenuItem>
                       <MenuItem value={21}>出血性脑卒中</MenuItem>
                     </Select>
@@ -706,15 +708,16 @@ export default function PatientList() {
                       labelId="mediaStrokeLevel"
                       id="mediaStrokeLevel"
                       label="分期"
+                      value={String(willAddPatient.mediaStrokeLevel)}
                       onChange={handleAddMediaStrokeLevelChange}
                     >
+                      <MenuItem value={0}></MenuItem>
                       <MenuItem value={10}>1 期</MenuItem>
-                      <MenuItem value={21}>2 期</MenuItem>
-                      <MenuItem value={21}>3 期</MenuItem>
-                      <MenuItem value={21}>4 期</MenuItem>
-                      <MenuItem value={21}>5 期</MenuItem>
-                      <MenuItem value={21}>6 期</MenuItem>
-
+                      <MenuItem value={11}>2 期</MenuItem>
+                      <MenuItem value={12}>3 期</MenuItem>
+                      <MenuItem value={13}>4 期</MenuItem>
+                      <MenuItem value={14}>5 期</MenuItem>
+                      <MenuItem value={15}>6 期</MenuItem>
                     </Select>
                   </FormControl>
                 </StyledDiv>

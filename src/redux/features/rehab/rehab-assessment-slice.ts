@@ -70,6 +70,11 @@ function convertApiAssessmentToAssessmentModel(apiAssessmentResp: ApiAssessmentR
       }
     })
     let slvl: SelectedAssessment | undefined = undefined
+    selectedAssessmentsObj[a.id] = {
+      id: 0,
+      selected_assessment_id: 0,
+      selected_assessment_level_id: 0,
+    }
     if (apiAssessmentResp.selected_assessment != undefined){
       apiAssessmentResp.selected_assessment.map((s)=>{
         // TODO dispatch调用store的
@@ -129,12 +134,16 @@ async ({task_id,selectedRecord}):Promise<any> => {
     task_id: 0,
     selected_assessment: []
   }
-  let sa : Array<{assessment_id: number, assessment_level: number}> = []
+  let sa : Array<{assessment_id: number, assessment_level: number, id: number}> = []
 
   for (let key in selectedRecord) {
     if (selectedRecord.hasOwnProperty(key)) {
       console.log(key, selectedRecord[key]);
-      sa.push({assessment_id: Number(key), assessment_level: Number(selectedRecord[key])})
+      sa.push({
+        id: selectedRecord[key].id,
+        assessment_id: Number(key),
+        assessment_level: selectedRecord[key].selected_assessment_level_id,
+      })
     }
   }
   postAss.task_id = task_id

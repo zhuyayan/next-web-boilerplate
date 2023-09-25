@@ -198,3 +198,19 @@ export const getRandomDate = (start: string, end: string, format: DateFormat = '
   const randomDate = new Date(randomTime);
   return formatDate(randomDate, format);
 };
+
+export const PatientNumClassifyToClassifyLabelMapping: { [key: string]: string } = {
+  "0": "未设置",
+  "10": "缺血性脑卒中",
+  "21": "出血性脑卒中",
+};
+
+export const PatientNumStrokeLevelToStrokeLevelLabelMapping: { [key: string]: string } = {
+  "0": "未设置",
+  "10": "1 期",
+  "11": "2 期",
+  "12": "3 期",
+  "13": "4 期",
+  "14": "5 期",
+  "15": "6 期",
+};

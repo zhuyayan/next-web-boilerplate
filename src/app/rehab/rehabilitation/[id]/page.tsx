@@ -47,7 +47,13 @@ import {
   useGetOnlineEquipmentsQuery,
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
-import {BodyPartToNumMapping, ModeToNumMapping, NumToBodyPartMapping, NumToModeMapping} from "@/utils/mct-utils";
+import {
+  BodyPartToNumMapping,
+  ModeToNumMapping,
+  NumToBodyPartMapping,
+  NumToModeMapping,
+  PatientNumClassifyToClassifyLabelMapping, PatientNumStrokeLevelToStrokeLevelLabelMapping
+} from "@/utils/mct-utils";
 import {IconButton} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import TimerIcon from '@mui/icons-material/Timer';
@@ -370,12 +376,12 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                     <Grid container spacing={2}>
                       <Grid item xs={5}>
                         <Typography component="div">
-                          分类：{rehabPatient.mediaStrokeType}
+                          分类：{PatientNumClassifyToClassifyLabelMapping[String(rehabPatient.mediaStrokeType)]}
                         </Typography>
                       </Grid>
                       <Grid item xs={7}>
                         <Typography component="div">
-                          Brunnstrom分期：{rehabPatient.mediaStrokeLevel}
+                          Brunnstrom分期：{PatientNumStrokeLevelToStrokeLevelLabelMapping[String(rehabPatient.mediaStrokeLevel)]}
                         </Typography>
                       </Grid>
                       <Divider />
@@ -507,7 +513,13 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                   <CardHeader style={{display:'inline-block'}} title='康复仪训练报告' titleTypographyProps={{ variant: 'h5' }} />
                 </div>
                 <Divider />
-                <Prescription id={params.id} PId={params.pid} prescription={prescription} status={status} onlineEquipment={onlineData || []}/>
+                <Prescription
+                  id={params.id}
+                  PId={params.pid}
+                  task_id={params.task_id}
+                  prescription={prescription}
+                  status={status}
+                  onlineEquipment={onlineData || []}/>
               </Card>
             </Grid>
             <br/>

@@ -1,25 +1,21 @@
 // ** MUI Imports
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
-import { styled } from '@mui/material/styles'
 import TableHead from '@mui/material/TableHead'
 import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
-import TableRow, { TableRowProps } from '@mui/material/TableRow'
-import TableCell, { TableCellProps, tableCellClasses } from '@mui/material/TableCell'
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton} from "@mui/material";
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText} from "@mui/material";
 import {
   addStatus,
-  exportTaskPressureData, PatientStatus, Prescription,
+  exportTaskPressureData, PatientStatus,
   PrescriptionRecord,
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import Tooltip from "@mui/material/Tooltip";
 import React, {ChangeEvent} from "react";
-import DownloadIcon from "@mui/icons-material/Download";
-import {string} from "postcss-selector-parser";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Grid";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
@@ -49,7 +45,11 @@ import dayjs, {Dayjs} from "dayjs";
 //   }
 // }))
 
-const PrescriptionTable = (params: {record: PrescriptionRecord[],status:PatientStatus[], pid: string,task_id:string}) => {
+const PrescriptionTable = (params: {
+  record: PrescriptionRecord[],
+  status: PatientStatus,
+  pid: string,
+  task_id: string}) => {
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   function handleExport(row: PrescriptionRecord) {
     appThunkDispatch(exportTaskPressureData({pId: Number(params.pid), tId: row.id}))
@@ -202,175 +202,138 @@ const PrescriptionTable = (params: {record: PrescriptionRecord[],status:PatientS
   >
     <DialogTitle>{"病人各项指标"}</DialogTitle>
     <DialogContent>
-      {Number(params.status.length) > 0 ? (
-        <DialogContentText id="Status">
-          <Table sx={{ minWidth: 500 }} aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell>发病时间</TableCell>
-                {/*<TableCell align="right">用药</TableCell>*/}
-                <TableCell align="right">痉挛状态</TableCell>
-                <TableCell align="right">最小心率</TableCell>
-                <TableCell align="right">最大心率</TableCell>
-                <TableCell align="right">平均心率</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {params.status.map(row => (
-                <TableRow
-                  key={row.task_id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.onset_time}
-                  </TableCell>
-                  {/*<TableCell align="right">{row.medication}</TableCell>*/}
-                  <TableCell align="right">{row.spasm_status}</TableCell>
-                  <TableCell align="right">{row.min_heart_rate}</TableCell>
-                  <TableCell align="right">{row.max_heart_rate}</TableCell>
-                  <TableCell align="right">{row.avg_heart_rate}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </DialogContentText>
-      ) : (
-        <div>
-          {/*<TextField*/}
-          {/*  label="发病时间"*/}
-          {/*  value={willAddStatus.onset_time}*/}
-          {/*  onChange={handleAddStatus}*/}
-          {/*  fullWidth*/}
-          {/*/>*/}
-          {/* Add more input fields for other indicators */}
-          <Grid container spacing={0}>
-            <Grid item xs={6}>
-              <Box sx={{padding: '8px' }}>
-                <Grid container spacing={0} alignItems="center">
-                  <Grid item xs={4}>
-                    <label htmlFor="input9">发病时间:</label>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DateTimePicker
-                        value={onsetTime as any}
-                        onChange={(newValue) => {
-                          // newValue is the selected date and time object
-                          const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';
-                          setWillAddStatus((prevStatus) => ({
-                            ...prevStatus,
-                            onset_time: formattedDate,
-                          }));
-                        }}
-                        defaultValue={nextSunday as any}
-                        shouldDisableDate={isWeekend}
-                        views={['year', 'month', 'day', 'hours', 'minutes']}
-                      />
-                    </LocalizationProvider>
-                    {/*<TextField*/}
-                    {/*  id="onset_time"*/}
-                    {/*  value={willAddStatus.onset_time}*/}
-                    {/*  onChange={handleAddStatus}*/}
-                    {/*  size="small"*/}
-                    {/*  fullWidth*/}
-                    {/*/>*/}
-                  </Grid>
-                </Grid>
-              </Box>
+      {/*<TextField*/}
+      {/*  label="发病时间"*/}
+      {/*  value={willAddStatus.onset_time}*/}
+      {/*  onChange={handleAddStatus}*/}
+      {/*  fullWidth*/}
+      {/*/>*/}
+      {/* Add more input fields for other indicators */}
+      <Grid container spacing={0}>
+        <Grid item xs={6}>
+          <Box sx={{padding: '8px' }}>
+            <Grid container spacing={0} alignItems="center">
+              <Grid item xs={4}>
+                <label htmlFor="input9">发病时间:</label>
+              </Grid>
+              <Grid item xs={8}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    value={onsetTime as any}
+                    onChange={(newValue) => {
+                      // newValue is the selected date and time object
+                      const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';
+                      setWillAddStatus((prevStatus) => ({
+                        ...prevStatus,
+                        onset_time: formattedDate,
+                      }));
+                    }}
+                    defaultValue={nextSunday as any}
+                    shouldDisableDate={isWeekend}
+                    views={['year', 'month', 'day', 'hours', 'minutes']}
+                  />
+                </LocalizationProvider>
+                {/*<TextField*/}
+                {/*  id="onset_time"*/}
+                {/*  value={willAddStatus.onset_time}*/}
+                {/*  onChange={handleAddStatus}*/}
+                {/*  size="small"*/}
+                {/*  fullWidth*/}
+                {/*/>*/}
+              </Grid>
             </Grid>
-            {/*<Grid item xs={6}>*/}
-            {/*  <Box sx={{padding: '8px' }}>*/}
-            {/*    <Grid container spacing={0} alignItems="center">*/}
-            {/*      <Grid item xs={4}>*/}
-            {/*        <label htmlFor="input10">用药:</label>*/}
-            {/*      </Grid>*/}
-            {/*      <Grid item xs={8}>*/}
-            {/*        <TextField*/}
-            {/*          id="medication"*/}
-            {/*          value={willAddStatus.medication}*/}
-            {/*          onChange={handleAddStatus}*/}
-            {/*          size="small"*/}
-            {/*          fullWidth*/}
-            {/*        />*/}
-            {/*      </Grid>*/}
-            {/*    </Grid>*/}
-            {/*  </Box>*/}
-            {/*</Grid>*/}
-            <Grid item xs={6}>
-              <Box sx={{padding: '8px' }}>
-                <Grid container spacing={0} alignItems="center">
-                  <Grid item xs={4}>
-                    <label htmlFor="input11">痉挛状态:</label>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <TextField
-                      id="spasm_status"
-                      value={willAddStatus.spasm_status}
-                      onChange={handleAddStatus}
-                      size="small"
-                      fullWidth
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
+          </Box>
+        </Grid>
+        {/*<Grid item xs={6}>*/}
+        {/*  <Box sx={{padding: '8px' }}>*/}
+        {/*    <Grid container spacing={0} alignItems="center">*/}
+        {/*      <Grid item xs={4}>*/}
+        {/*        <label htmlFor="input10">用药:</label>*/}
+        {/*      </Grid>*/}
+        {/*      <Grid item xs={8}>*/}
+        {/*        <TextField*/}
+        {/*          id="medication"*/}
+        {/*          value={willAddStatus.medication}*/}
+        {/*          onChange={handleAddStatus}*/}
+        {/*          size="small"*/}
+        {/*          fullWidth*/}
+        {/*        />*/}
+        {/*      </Grid>*/}
+        {/*    </Grid>*/}
+        {/*  </Box>*/}
+        {/*</Grid>*/}
+        <Grid item xs={6}>
+          <Box sx={{padding: '8px' }}>
+            <Grid container spacing={0} alignItems="center">
+              <Grid item xs={4}>
+                <label htmlFor="input11">痉挛状态:</label>
+              </Grid>
+              <Grid item xs={8}>
+                <TextField
+                  id="spasm_status"
+                  value={willAddStatus.spasm_status}
+                  onChange={handleAddStatus}
+                  size="small"
+                  fullWidth
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <Box sx={{padding: '8px' }}>
-                <Grid container spacing={0} alignItems="center">
-                  <Grid item xs={4}>
-                    <label htmlFor="input9">最小心率:</label>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <TextField
-                      id="min_heart_rate"
-                      value={willAddStatus.min_heart_rate}
-                      onChange={handleAddStatus}
-                      size="small"
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
+          </Box>
+        </Grid>
+        <Grid item xs={6}>
+          <Box sx={{padding: '8px' }}>
+            <Grid container spacing={0} alignItems="center">
+              <Grid item xs={4}>
+                <label htmlFor="input9">最小心率:</label>
+              </Grid>
+              <Grid item xs={8}>
+                <TextField
+                  id="min_heart_rate"
+                  value={willAddStatus.min_heart_rate}
+                  onChange={handleAddStatus}
+                  size="small"
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <Box sx={{padding: '8px' }}>
-                <Grid container spacing={0} alignItems="center">
-                  <Grid item xs={4}>
-                    <label htmlFor="input9">最大心率:</label>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <TextField
-                      id="max_heart_rate"
-                      value={willAddStatus.max_heart_rate}
-                      onChange={handleAddStatus}
-                      size="small"
-                      fullWidth
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
+          </Box>
+        </Grid>
+        <Grid item xs={6}>
+          <Box sx={{padding: '8px' }}>
+            <Grid container spacing={0} alignItems="center">
+              <Grid item xs={4}>
+                <label htmlFor="input9">最大心率:</label>
+              </Grid>
+              <Grid item xs={8}>
+                <TextField
+                  id="max_heart_rate"
+                  value={willAddStatus.max_heart_rate}
+                  onChange={handleAddStatus}
+                  size="small"
+                  fullWidth
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <Box sx={{padding: '8px' }}>
-                <Grid container spacing={0} alignItems="center">
-                  <Grid item xs={4}>
-                    <label htmlFor="input9">平均心率:</label>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <TextField
-                      id="avg_heart_rate"
-                      value={willAddStatus.avg_heart_rate}
-                      onChange={handleAddStatus}
-                      size="small"
-                      fullWidth
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
+          </Box>
+        </Grid>
+        <Grid item xs={6}>
+          <Box sx={{padding: '8px' }}>
+            <Grid container spacing={0} alignItems="center">
+              <Grid item xs={4}>
+                <label htmlFor="input9">平均心率:</label>
+              </Grid>
+              <Grid item xs={8}>
+                <TextField
+                  id="avg_heart_rate"
+                  value={willAddStatus.avg_heart_rate}
+                  onChange={handleAddStatus}
+                  size="small"
+                  fullWidth
+                />
+              </Grid>
             </Grid>
-          </Grid>
-
-        </div>
-      )}
+          </Box>
+        </Grid>
+      </Grid>
     </DialogContent>
     <DialogActions>
       <Button onClick={handleSaveAddStatus}>保存指标</Button>

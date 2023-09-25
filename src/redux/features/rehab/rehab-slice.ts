@@ -118,7 +118,16 @@ export interface EvaluateFormProps {
 // export interface  systemInformation
 
 let staffs: MedicalStaff[] = []
-let status: PatientStatus[] = []
+let status: PatientStatus = {
+  pid: 0,
+  task_id: 0,
+  onset_time : '',
+  medication : '',
+  spasm_status : '',
+  min_heart_rate : 0,
+  max_heart_rate : 0,
+  avg_heart_rate : 0,
+}
 let patients: Patient[] = []
 let prescriptions: Prescription[] = []
 let prescriptionRecord: PrescriptionRecord[] = []
@@ -157,7 +166,7 @@ let patient: Patient = {
 
 interface RehabState {
   staff: MedicalStaff[]
-  patientStatus: PatientStatus[]
+  patientStatus: PatientStatus
   patient: Patient[]
   activePatient: Patient[]
   rehabPatient: Patient
@@ -378,7 +387,7 @@ function convertAPIPatientToPatient(p: any): Patient {
     gender: genderLabelToValue(p.sex),
     genderLabel: p.sex,
     medicalHistory: p.medical_history,
-    mediaStrokeType:p.media_stroke_level,
+    mediaStrokeType:p.media_stroke_type,
     mediaStrokeLevel:p.media_stroke_level,
     physician: p.staff.name,
     physicianId: p.staff.id,
@@ -504,16 +513,20 @@ export const fetchPatientById = createAsyncThunk<Patient, { id: number}, {}>('fe
 });
 
 // 添加病人
-export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, media_stroke_type:number, media_stroke_level:number,staff_id: number, i_18_d: string},
-  {}>('addPatient', async ({name, age, sex, medical_history, staff_id, i_18_d}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('patient',{name, age, sex, medical_history, staff_id, i_18_d})
+export const addPatient = createAsyncThunk<Patient, { name: string, age: number, sex: string, medical_history: string, stroke_type:number, stroke_level:number,staff_id: number, i_18_d: string},
+  {}>('addPatient', async ({name, age, sex, medical_history,  stroke_type, stroke_level, staff_id, i_18_d}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('patient',{name, age, sex, medical_history, stroke_type, stroke_level, staff_id, i_18_d})
   console.log("add patient async thunk: ", response.data.data.patients[0])
   return convertAPIPatientToPatient(response.data.data.patients[0])
 });
 
 // 修改病人
-export const editPatient = createAsyncThunk<Patient, { id: number, name: string, age: number, sex: string, medical_history: string, media_stroke_type:number, media_stroke_level:number, staff_id: number, i_18_d: string }, {}>('editPatient', async ({id, name, age, sex, medical_history, staff_id,i_18_d}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('patient',{id, name, age, sex, medical_history, staff_id, i_18_d})
+export const editPatient = createAsyncThunk<
+    Patient,
+    { id: number, name: string, age: number, sex: string, medical_history: string, stroke_type: number, stroke_level: number, staff_id: number, i_18_d: string }, {}>(
+    'editPatient',
+    async ({id, name, age, sex, medical_history, stroke_type, stroke_level, staff_id,i_18_d}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('patient',{id, name, age, sex, medical_history, stroke_type, stroke_level, staff_id, i_18_d})
   console.log("edit patient async thunk: ", response.data.data.patients[0])
   return convertAPIPatientToPatient(response.data.data.patients[0])
 });
@@ -831,7 +844,7 @@ const RehabSlice = createSlice({
           console.log("add_staff_action", action.payload)
         })
       .addCase(addStatus.fulfilled,(state, action) => {
-        state.patientStatus.unshift(action.payload)
+        state.patientStatus=action.payload
         console.log("add_status_action", action.payload)
       })
         .addCase(editStaff.fulfilled, (state, action) => {

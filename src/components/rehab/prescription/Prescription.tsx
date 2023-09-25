@@ -238,9 +238,12 @@ const MCTFixedWidthChip = styled(Chip)<{color?: string}>`
   }
 `;
 
-export default function StickyHeadTable(params: { id: string,PId:string,task_id:string,
-  prescription:Prescription[],
-  status:PatientStatus[],
+export default function StickyHeadTable(params: {
+  id: string,
+  PId: string,
+  task_id: string,
+  prescription: Prescription[],
+  status: PatientStatus,
   onlineEquipment: EquipmentOnline[]}) {
   const appDispatch = useAppDispatch()
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
@@ -653,6 +656,7 @@ export default function StickyHeadTable(params: { id: string,PId:string,task_id:
       }))
     }
   };
+
   const handleAddPrescriptionBend = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
     console.log(id, value);
@@ -1430,7 +1434,6 @@ export default function StickyHeadTable(params: { id: string,PId:string,task_id:
           >确定</Button>
         </DialogActions>
       </Dialog>
-
     </>
   );
 }
