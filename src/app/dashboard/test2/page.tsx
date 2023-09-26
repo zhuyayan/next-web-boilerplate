@@ -1,14 +1,26 @@
 'use client';
 import React, { useState } from 'react';
-import {TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography, Container} from '@mui/material';
+import {
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Typography,
+  Container,
+  TableContainer, Table, TableHead, TableRow, TableCell, TableBody
+} from '@mui/material';
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
+import {width} from "@mui/system";
 
 export default function Page() {
   const [fields, setFields] = useState([]);
   const [currentField, setCurrentField] = useState({
     label: '',
+    group:'分组1',
     type: 'text',
     options: [],
     optionLabel: '' // New state for the label of the new option
@@ -18,6 +30,7 @@ export default function Page() {
     setFields([...fields, currentField]);
     setCurrentField({
       label: '',
+      group:'分组1',
       type: 'text',
       options: [],
       optionLabel: ''
@@ -40,6 +53,21 @@ export default function Page() {
       <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Paper elevation={3} sx={{ padding: 3, width: '100%' }}>
           <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                size={"small"}
+                label="分组名称"
+                variant="outlined"
+                // value={currentField.group}
+                onChange={(e) => setCurrentField({ ...currentField, group: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'left'}}>
+                新建分组
+              </Button>
+            </Grid>
             <Grid item xs={12} md={2}>
               <TextField
                   fullWidth
@@ -56,13 +84,13 @@ export default function Page() {
                 <Select
                     label={"分组"}
                     size={"small"}
-                    value={currentField.type}
-                    onChange={(e) => setCurrentField({ ...currentField, type: e.target.value })}
+                    value={currentField.group}
+                    onChange={(e) => setCurrentField({ ...currentField, group: e.target.value })}
                 >
-                  <MenuItem value="text">分组1</MenuItem>
-                  <MenuItem value="number">分组2</MenuItem>
-                  <MenuItem value="select">分组3</MenuItem>
-                  <MenuItem value="radio">分组4</MenuItem>
+                  <MenuItem value="1">分组1</MenuItem>
+                  <MenuItem value="2">分组2</MenuItem>
+                  <MenuItem value="3">分组3</MenuItem>
+                  <MenuItem value="4">分组4</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -143,34 +171,34 @@ export default function Page() {
               />
             </Grid>
             <Grid item xs={12} md={2}>
-              <TextField
-                  fullWidth
-                  label="选项名称"
-                  size={"small"}
-                  variant="outlined"
-                  value={currentField.label}
-                  onChange={(e) => setCurrentField({ ...currentField, label: e.target.value })}
-              />
+              {/*<TextField*/}
+              {/*    fullWidth*/}
+              {/*    label="选项名称"*/}
+              {/*    size={"small"}*/}
+              {/*    variant="outlined"*/}
+              {/*    value={currentField.label}*/}
+              {/*    onChange={(e) => setCurrentField({ ...currentField, label: e.target.value })}*/}
+              {/*/>*/}
             </Grid>
             <Grid item xs={12} md={2}>
-              <TextField
-                  fullWidth
-                  label="选项名称"
-                  size={"small"}
-                  variant="outlined"
-                  value={currentField.label}
-                  onChange={(e) => setCurrentField({ ...currentField, label: e.target.value })}
-              />
+              {/*<TextField*/}
+              {/*    fullWidth*/}
+              {/*    label="选项名称"*/}
+              {/*    size={"small"}*/}
+              {/*    variant="outlined"*/}
+              {/*    value={currentField.label}*/}
+              {/*    onChange={(e) => setCurrentField({ ...currentField, label: e.target.value })}*/}
+              {/*/>*/}
             </Grid>
             <Grid item xs={12} md={2}>
-              <TextField
-                  fullWidth
-                  label="选项名称"
-                  size={"small"}
-                  variant="outlined"
-                  value={currentField.label}
-                  onChange={(e) => setCurrentField({ ...currentField, label: e.target.value })}
-              />
+              {/*<TextField*/}
+              {/*    fullWidth*/}
+              {/*    label="选项名称"*/}
+              {/*    size={"small"}*/}
+              {/*    variant="outlined"*/}
+              {/*    value={currentField.label}*/}
+              {/*    onChange={(e) => setCurrentField({ ...currentField, label: e.target.value })}*/}
+              {/*/>*/}
             </Grid>
             {(currentField.type === 'select' || currentField.type === 'radio') && (
                 <React.Fragment>
@@ -216,19 +244,38 @@ export default function Page() {
                 </Grid>
             ))}
             <Grid item xs={12}>
-              <Button variant="contained" color="primary" onClick={handleAddField}>Add Field</Button>
+              <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'left'}} variant="contained" color="primary" onClick={handleAddField}>Add Field</Button>
             </Grid>
           </Grid>
           <Box mt={4}>
             <Typography variant="h5" gutterBottom>Configured Fields:</Typography>
-            {fields.map((field, index) => (
-                <Box key={index} mt={2}>
-                  <Typography variant="h6" gutterBottom>
-                    {field.label} ({field.type})
-                  </Typography>
-                  {field.options.length ? <Typography>Options: {field.options.map(opt=>opt.label).join(', ')}</Typography> : null}
-                </Box>
-            ))}
+            <TableContainer>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell align="right">选项名称</TableCell>
+                    <TableCell align="right">选项类型</TableCell>
+                    <TableCell align="right">选项</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {fields.map((field, index) => (
+                    <TableRow
+                      key={index}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {field.label}
+                      </TableCell>
+                      <TableCell align="right">{field.label}</TableCell>
+                      <TableCell align="right">{field.type}</TableCell>
+                      <TableCell align="right">{field.options.length ? <Typography> {field.options.map(opt=>opt.label).join(', ')}</Typography> : null}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         </Paper>
       </Box>
