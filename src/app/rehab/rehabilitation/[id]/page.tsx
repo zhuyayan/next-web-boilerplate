@@ -107,6 +107,11 @@ const StyledBoxContainer = styled(Box)`
   }
 `;
 
+const TableWrapper = styled.div`
+  border: 1px solid #ccc; /* 设置边框样式，可以根据需要进行调整 */
+  margin: 16px;
+`;
+
 export default function MUITable({ params }: { params: { id: string ,task_id:string, pid:string} }) {
   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
   const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
@@ -512,33 +517,34 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
 
             <Grid item xs={12} md={12}>
               <Card>
-                <CardHeader style={{display:'inline-block'}} title='量表记录' titleTypographyProps={{ variant: 'h6' }}></CardHeader>
-                <Divider />
+                <CardHeader style={{display:'inline-block'}} title='量表记录' titleTypographyProps={{ variant: 'h5' }}></CardHeader>
+                <TableWrapper>
                 <TableContainer sx={{ maxHeight: 280 }}>
                   <Table stickyHeader aria-label="sticky table">
                     <TableHead>
                       <TableRow>
-                        <TableCell align="center">量表填写时间</TableCell>
-                        <TableCell>量表及评价</TableCell>
-                        <TableCell align="center">操作</TableCell>
+                        <TableCell style={{ borderLeft: '1px solid #ccc' }}>量表填写时间</TableCell>
+                        <TableCell style={{ borderLeft: '1px solid #ccc' }}>量表及评价</TableCell>
+                        <TableCell style={{ borderLeft: '1px solid #ccc' }}>操作</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       <TableRow>
-                          <TableCell align="center">
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
                             <Typography variant="body2" color="text.secondary">
                               2023-08-30 10:20:47
                             </Typography>
                           </TableCell>
-                          <TableCell align="center">
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
                             <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
                           </TableCell>
-                          <TableCell align="center">
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
                           </TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
                 </TableContainer>
+                </TableWrapper>
               </Card>
             </Grid>
 

@@ -452,9 +452,10 @@ export default function Page() {
                                   <TableHead>
                                     <TableRow>
                                       <TableCell align="center" style={{ width: '10%' }}>ID</TableCell>
-                                      <TableCell align="center" style={{ width: '40%' }}>选项名称</TableCell>
+                                      <TableCell align="center" style={{ width: '30%' }}>选项名称</TableCell>
                                       <TableCell align="center" style={{ width: '10%' }}>选项类型</TableCell>
                                       <TableCell align="center" style={{ width: '40%' }}>选项</TableCell>
+                                      <TableCell align="center" style={{ width: '10%' }}>拥有者</TableCell>
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
@@ -476,6 +477,7 @@ export default function Page() {
                                                     </Typography>
                                                 ) : null}
                                               </TableCell>
+                                              <TableCell align="center">{field.owner}</TableCell>
                                             </TableRow>
                                         )
                                     ))}

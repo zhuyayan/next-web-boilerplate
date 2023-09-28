@@ -39,6 +39,9 @@ import {
 import styled from "styled-components";
 import {getSuggestion, postSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
 import {CommonEvaluation, getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
+import InputLabel from "@mui/material/InputLabel";
+import Select, {SelectChangeEvent} from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 
 export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
@@ -129,6 +132,18 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
       [name]: value,
     }));
   };
+
+  const handleChangeMediaStrokeLevel = (event: SelectChangeEvent) => {
+    const {value} = event.target;
+    console.log("value: ", value)
+    console.log("event.target.value", event.target.value)
+    setEvaluateFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    // setMediaStrokeLevel(event.target.value);
+  };
+
 
   const handleSaveEvaluate = () => {
     thunkDispatch(addEvaluation({
@@ -311,6 +326,34 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                       </Box>
                     </Grid>
                 }
+                {showEvaluate2 && <Grid item xs={3}>
+                    <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                            <Grid item xs={4}>
+                                <label htmlFor="input10">Brunnstrom分期:</label>
+                            </Grid>
+                            <Grid item xs={8}>
+                                {/*<InputLabel id="mediaStrokeLevel">Brunnstrom分期</InputLabel>*/}
+                                <Select
+                                    labelId="mediaStrokeLevel"
+                                    id="mediaStrokeLevel"
+                                    label="分期"
+                                    // value={String(willEditPatient.mediaStrokeLevel)}
+                                    onChange={handleChangeMediaStrokeLevel}
+                                    size="small"
+                                    fullWidth
+                                >
+                                    <MenuItem value={10}>1 期</MenuItem>
+                                    <MenuItem value={11}>2 期</MenuItem>
+                                    <MenuItem value={12}>3 期</MenuItem>
+                                    <MenuItem value={13}>4 期</MenuItem>
+                                    <MenuItem value={14}>5 期</MenuItem>
+                                    <MenuItem value={15}>6 期</MenuItem>
+                                </Select>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Grid>}
                 {showEvaluate2 && <Grid item xs={3}>
                   <Box sx={{padding: '8px' }}>
                     <Grid container spacing={0} alignItems="center">
@@ -638,18 +681,17 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
               </Typography>
             </Grid>
           </Grid>
-
-          <Grid item xs={4} alignItems="center">
-            <Tooltip title="自定义评价内容">
-              <IconButton
-                  style={{float: 'right'}}
-                  aria-label="setEvaluate"
-                  onClick={handleEditEvaluate}
-              >
-                <EditCalendarIcon sx={{ fontSize: 36 }} color="secondary"/>
-              </IconButton>
-            </Tooltip>
-          </Grid>
+          {/*<Grid item xs={4} alignItems="center">*/}
+          {/*  <Tooltip title="自定义评价内容">*/}
+          {/*    <IconButton*/}
+          {/*        style={{float: 'right'}}*/}
+          {/*        aria-label="setEvaluate"*/}
+          {/*        onClick={handleEditEvaluate}*/}
+          {/*    >*/}
+          {/*      <EditCalendarIcon sx={{ fontSize: 36 }} color="secondary"/>*/}
+          {/*    </IconButton>*/}
+          {/*  </Tooltip>*/}
+          {/*</Grid>*/}
           <Card style={{ marginTop: '0px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
           <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
           <Grid container spacing={0}>
@@ -711,211 +753,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
       <Dialog open={openEvaluate} onClose={handleCloseEvaluate}>
         <DialogTitle>自定义量表</DialogTitle>
         <DialogContent>
-        <Card style={{paddingBottom:'20px',padding:'8px' }}>
-          {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
-          <Title>手关节活动度评估</Title>
-          <Typography variant='body2' style={{ color: 'red' }}>拇指对指：通过使用刻度尺测量拇指指腹至小指指腹的距离来评估。</Typography>
-          <TableWrapper>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>部位</StyledTableCell>
-                  <StyledTableCell>MP 屈曲（0°-50°）</StyledTableCell>
-                  <StyledTableCell>IP 屈曲（0°-80°~90°）</StyledTableCell>
-                  <StyledTableCell>桡侧外展（0°-50°）</StyledTableCell>
-                  <StyledTableCell>拇指对指</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow>
-                  <StyledTableCell>左拇指</StyledTableCell>
-                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                    <TextField
-                      name="leftThumbMP"
-                      value={degrees.leftThumbMP}
-                      onChange={handleInputDegreesChange}
-                      type="number"
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                    <TextField
-                      name="leftThumbIP"
-                      value={degrees.leftThumbIP}
-                      onChange={handleInputDegreesChange}
-                      type="number"
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                    <TextField
-                      name="leftRadialAbduction"
-                      value={degrees.leftRadialAbduction}
-                      onChange={handleInputDegreesChange}
-                      type="number"
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={9}>
-                      <TextField
-                        name="leftThumbOpposition"
-                        value={degrees.leftThumbOpposition}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                      </Grid>
-                      <Grid item xs={3}>
-                        <Typography variant='body2' style={{ color: 'red' }}>CM</Typography>
-                      </Grid>
-                    </Grid>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <StyledTableCell>右拇指</StyledTableCell>
-                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                    <TextField
-                      name="rightThumbMP"
-                      value={degrees.rightThumbMP}
-                      onChange={handleInputDegreesChange}
-                      type="number"
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                    <TextField
-                      name="rightThumbIP"
-                      value={degrees.rightThumbIP}
-                      onChange={handleInputDegreesChange}
-                      type="number"
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                    <TextField
-                      name="rightRadialAbduction"
-                      value={degrees.rightRadialAbduction}
-                      onChange={handleInputDegreesChange}
-                      type="number"
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                    <TextField
-                      name="rightThumbOpposition"
-                      value={degrees.rightThumbOpposition}
-                      onChange={handleInputDegreesChange}
-                      type="number"
-                      size="small"
-                    />
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-          </TableWrapper>
-
-          <TableWrapper>
-            <TableContainer>
-              <Table aria-label="hand degrees table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell></StyledTableCell>
-                    <StyledTableCell align="center" colSpan={3}>左手</StyledTableCell>
-                    <StyledTableCell align="center" colSpan={3}>右手</StyledTableCell>
-                  </TableRow>
-                  <TableRow>
-                    <StyledTableCell></StyledTableCell>
-                    <StyledTableCell>MCP（0°-90°）</StyledTableCell>
-                    <StyledTableCell>PIP（0°-110°）</StyledTableCell>
-                    <StyledTableCell>DIP（0°-80°）</StyledTableCell>
-                    <StyledTableCell>MCP（0°-90°）</StyledTableCell>
-                    <StyledTableCell>PIP（0°-110°）</StyledTableCell>
-                    <StyledTableCell>DIP（0°-80°）</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {['食指', '中指', '无名指'].map((finger, index) => (
-                    <TableRow key={index}>
-                      <StyledTableCell>{finger}</StyledTableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-MCP`}
-                          value={degree.leftHand[`finger${index + 1}`].MCP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-PIP`}
-                          value={degree.leftHand[`finger${index + 1}`].PIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-DIP`}
-                          value={degree.leftHand[`finger${index + 1}`].DIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-MCP`}
-                          value={degree.rightHand[`finger${index + 1}`].MCP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-PIP`}
-                          value={degree.rightHand[`finger${index + 1}`].PIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-DIP`}
-                          value={degree.rightHand[`finger${index + 1}`].DIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </TableWrapper>
-          <Box sx={{padding: '8px',marginBottom:'16px' }}>
-            <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
-          </Box>
-        </Card>
-
-        <Title>医生建议：</Title>
         <Card style={{ marginTop: '0px' }} sx={{ padding: '20px' }}>
-          <TextField
-              name="suggestion"
-              multiline
-              rows={4}
-              fullWidth
-              placeholder="请按照本次训练情况在此输入医生建议"
-              value = {suggestionText || initialSuggestionValue}
-              onChange={(event) => {
-                setSuggestionText(event.target.value)
-                setIsModified(true);
-              }}
-          />
           <Grid container spacing={0}>
-
             <Grid item xs={8} style={{display: 'flex', alignItems: 'center'}}>
               <Typography variant="body1">
                 &gt; 耐受状态
@@ -1016,7 +855,6 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                     </Button>
                   </Grid>
                 </Grid>
-                <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveSuggestion}>保存建议</Button>
               </Box>
             </Grid>
           </Grid>
