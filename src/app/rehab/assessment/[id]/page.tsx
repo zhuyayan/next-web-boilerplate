@@ -283,25 +283,25 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     <>
       <Container>
         <FormControl fullWidth>
-          <Grid container spacing={0}>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Title>训练后状态：</Title>
-            </Grid>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-            </Grid>
-            <Grid item xs={4} alignItems="center">
-              <Tooltip title="自定义评价内容">
-                <IconButton
+          <Card style={{ marginTop: '10px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
+            <Grid container spacing={0}>
+              <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
+                <Title>训练后状态：</Title>
+              </Grid>
+              <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
+              </Grid>
+              <Grid item xs={4} alignItems="center">
+                <Tooltip title="自定义评价内容">
+                  <IconButton
                     style={{float: 'right'}}
                     aria-label="setEvaluate"
                     onClick={handleEditEvaluate}
-                >
-                  <EditCalendarIcon sx={{ fontSize: 36 }} color="secondary"/>
-                </IconButton>
-              </Tooltip>
+                  >
+                    <EditCalendarIcon sx={{ fontSize: 36 }} color="secondary"/>
+                  </IconButton>
+                </Tooltip>
+              </Grid>
             </Grid>
-          </Grid>
-          <Card style={{ marginTop: '0px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
             <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
             <form>
               <Grid container spacing={0}>
@@ -671,16 +671,156 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
           </Box>
         </Card>
 
+        <Card style={{paddingBottom:'20px',padding:'8px' ,marginTop:'20px'}}>
+          <Title>肌力</Title>
+          <Typography variant='body2' style={{ color: 'red' }}>握力指数=握力（kg）/体重（kg）× 100%。正常握力指数≥50％</Typography>
+          <TableWrapper>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>部位</StyledTableCell>
+                    <StyledTableCell>左手</StyledTableCell>
+                    <StyledTableCell>右手</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <StyledTableCell>握力</StyledTableCell>
+                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                      <TextField
+                        name="leftThumbMP"
+                        value={degrees.leftThumbMP}
+                        onChange={handleInputDegreesChange}
+                        type="number"
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                      <TextField
+                        name="leftThumbIP"
+                        value={degrees.leftThumbIP}
+                        onChange={handleInputDegreesChange}
+                        type="number"
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </TableWrapper>
+          <Box sx={{padding: '8px',marginBottom:'16px' }}>
+            <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
+          </Box>
+        </Card>
+
+        <Card style={{paddingBottom:'20px',padding:'8px' ,marginTop:'20px'}}>
+          {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
+          <Title>捏力评估</Title>
+          <Typography variant='body2' style={{ color: 'red' }}>用拇指与其他手指相对捏压捏力计，反映拇对掌肌及屈曲肌的肌力，正常值约为握力的 30%。</Typography>
+          <TableWrapper>
+            <TableContainer>
+              <Table aria-label="hand degrees table">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell align="center" colSpan={4}>对指</StyledTableCell>
+                    <StyledTableCell align="center" colSpan={4}>测捏</StyledTableCell>
+                  </TableRow>
+                  <TableRow>
+                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell>拇指-食指</StyledTableCell>
+                    <StyledTableCell>拇指-中指</StyledTableCell>
+                    <StyledTableCell>拇指-环指</StyledTableCell>
+                    <StyledTableCell>拇指-小指</StyledTableCell>
+                    <StyledTableCell>拇指-食指</StyledTableCell>
+                    <StyledTableCell>拇指-中指</StyledTableCell>
+                    <StyledTableCell>拇指-环指</StyledTableCell>
+                    <StyledTableCell>拇指-小指</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {['左手', '右手'].map((finger, index) => (
+                    <TableRow key={index}>
+                      <StyledTableCell>{finger}</StyledTableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`leftHand-finger${index + 1}-MCP`}
+                          value={degree.leftHand[`finger${index + 1}`].MCP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`leftHand-finger${index + 1}-PIP`}
+                          value={degree.leftHand[`finger${index + 1}`].PIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`leftHand-finger${index + 1}-DIP`}
+                          value={degree.leftHand[`finger${index + 1}`].DIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`rightHand-finger${index + 1}-MCP`}
+                          value={degree.rightHand[`finger${index + 1}`].MCP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`rightHand-finger${index + 1}-PIP`}
+                          value={degree.rightHand[`finger${index + 1}`].PIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`rightHand-finger${index + 1}-DIP`}
+                          value={degree.rightHand[`finger${index + 1}`].DIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`rightHand-finger${index + 1}-DIP`}
+                          value={degree.rightHand[`finger${index + 1}`].DIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                        <TextField
+                          name={`rightHand-finger${index + 1}-DIP`}
+                          value={degree.rightHand[`finger${index + 1}`].DIP}
+                          onChange={handleInputDegreeChange}
+                          size="small"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </TableWrapper>
+          <Box sx={{padding: '8px',marginBottom:'16px' }}>
+            <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
+          </Box>
+        </Card>
+
 
         <FormControl fullWidth>
-          <Title>Fugl-Meyer评定量表（手部）</Title>
-          <Grid container spacing={0}>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography variant="h5">
-                请选择评定量表
-              </Typography>
-            </Grid>
-          </Grid>
           {/*<Grid item xs={4} alignItems="center">*/}
           {/*  <Tooltip title="自定义评价内容">*/}
           {/*    <IconButton*/}
@@ -692,7 +832,15 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
           {/*    </IconButton>*/}
           {/*  </Tooltip>*/}
           {/*</Grid>*/}
-          <Card style={{ marginTop: '0px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
+          <Card style={{ marginTop: '20px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
+            <Title>Fugl-Meyer评定量表（手部）</Title>
+            <Grid container spacing={0}>
+              <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
+                <Typography variant="h5">
+                  请选择评定量表
+                </Typography>
+              </Grid>
+            </Grid>
           <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
           <Grid container spacing={0}>
               {assessmentResponseData.map((assessment: Assessment) => (
@@ -736,8 +884,9 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
         </FormControl>
 
         <FormControl fullWidth>
-          <Title>医生建议：</Title>
-          <Card style={{ marginBottom: '20px' }} sx={{ padding: '20px' }}>
+
+          <Card style={{ marginBottom: '20px',marginTop:'20px' }} sx={{ padding: '20px' }}>
+            <Title>医生建议：</Title>
             <TextField
                 name="advice"
                 multiline
