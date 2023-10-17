@@ -1,4 +1,4 @@
-import {ActionReducerMapBuilder, createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {AxiosResponse} from "axios";
 import MCTAxiosInstance from "@/utils/mct-request";
 
@@ -25,12 +25,12 @@ export interface formFieldRole {
     role_name: string;
 }
 
-export const getFormFields = createAsyncThunk<formField>(
+export const getFormFields = createAsyncThunk<formField[]>(
     'getFormFields',
-    async (_, thunkAPI): Promise<formField> => {
+    async (_, thunkAPI) => {
         const response: AxiosResponse<any, any> = await MCTAxiosInstance.get('form-fields');
         console.log("get form-fields async thunk: ", response.data.data)
-        return response.data.data
+        return response.data.data as formField[];
     },
 );
 

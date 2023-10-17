@@ -1,7 +1,7 @@
 "use client";
 import {
   Container,
-  IconButton,
+  IconButton, Input,
   Paper,
   Table,
   TableBody,
@@ -42,7 +42,7 @@ import {CommonEvaluation, getEvaluation} from "@/redux/features/rehab/rehab-eval
 import InputLabel from "@mui/material/InputLabel";
 import Select, {SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import {formField, getFormFields} from "@/redux/features/rehab/rehab-formFields-slice";
+import {formField, getFormFields, option} from "@/redux/features/rehab/rehab-formFields-slice";
 
 
 export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
@@ -295,17 +295,445 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
 
   const groupedFields = groupByGroupName(formFieldsRespomseData);
 
-  return (
-    <>
-      <Container>
-        <FormControl fullWidth>
-          {groupedFields.map((group, index) => (
-              <>
-              <Card key ={index} style={{ marginTop: '10px', marginBottom: '20px' }} sx={{ padding: '10px' }}>
+  //根据不同group返回相应量表的样式
+  const renderGroupTable = (group: formField[]) => {
+    switch (group[0].group_name) {
+      case "User Information":
+        return (
+            <></>
+        );
+      case "Brunnstrom":
+        return (
+            <>
+              <Card style={{ marginTop: '10px', marginBottom: '20px' }} sx={{ padding: '10px' }}>
                 <Grid container spacing={0}>
                   <Grid item xs={12} style={{display: 'flex', alignItems: 'center'}}>
                     <Title>{group[0].group_name}</Title>
                   </Grid>
+
+                  {group.map((field, index) => (
+                      <Grid key={index} item xs={6}>
+                        <Box sx={{padding: '8px' }}>
+                          <Grid container spacing={0} alignItems="center">
+                            <Grid item xs={4}>
+                              <label>{field.label}</label>
+                            </Grid>
+                            <Grid item xs={8}>
+                              {renderFormField(field.type, field.name, field.options)}
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      </Grid>
+                  ))}
+                </Grid>
+              </Card>
+            </>
+        );
+      case "肌力评估":
+        return (
+            <>
+              <Card style={{paddingBottom:'20px',padding:'8px' ,marginTop:'20px'}}>
+                <Title>肌力评估</Title>
+                <Typography variant='body2' style={{ color: 'red' }}>握力指数=握力（kg）/体重（kg）× 100%。正常握力指数≥50％</Typography>
+                <TableWrapper>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell>部位</StyledTableCell>
+                          <StyledTableCell>左手</StyledTableCell>
+                          <StyledTableCell>右手</StyledTableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          <StyledTableCell>握力</StyledTableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="leftThumbMP"
+                                value={degrees.leftThumbMP}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="leftThumbIP"
+                                value={degrees.leftThumbIP}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </TableWrapper>
+                <Box sx={{padding: '8px',marginBottom:'16px' }}>
+                  <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
+                </Box>
+              </Card>
+            </>
+        );
+      case "手关节活动度评估":
+        return (
+            <>
+              <Card style={{paddingBottom:'20px',padding:'8px' }}>
+                {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
+                <Title>手关节活动度评估</Title>
+                <Typography variant='body2' style={{ color: 'red' }}>拇指对指：通过使用刻度尺测量拇指指腹至小指指腹的距离来评估。</Typography>
+                <TableWrapper>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell>部位</StyledTableCell>
+                          <StyledTableCell>MP 屈曲（0°-50°）</StyledTableCell>
+                          <StyledTableCell>IP 屈曲（0°-80°~90°）</StyledTableCell>
+                          <StyledTableCell>桡侧外展（0°-50°）</StyledTableCell>
+                          <StyledTableCell>拇指对指</StyledTableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          <StyledTableCell>左拇指</StyledTableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="leftThumbMP"
+                                value={degrees.leftThumbMP}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="leftThumbIP"
+                                value={degrees.leftThumbIP}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="leftRadialAbduction"
+                                value={degrees.leftRadialAbduction}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <Grid container spacing={2}>
+                              <Grid item xs={9}>
+                                <TextField
+                                    name="leftThumbOpposition"
+                                    value={degrees.leftThumbOpposition}
+                                    onChange={handleInputDegreesChange}
+                                    type="number"
+                                    size="small"
+                                />
+                              </Grid>
+                              <Grid item xs={3}>
+                                <Typography variant='body2' style={{ color: 'red' }}>CM</Typography>
+                              </Grid>
+                            </Grid>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <StyledTableCell>右拇指</StyledTableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="rightThumbMP"
+                                value={degrees.rightThumbMP}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="rightThumbIP"
+                                value={degrees.rightThumbIP}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="rightRadialAbduction"
+                                value={degrees.rightRadialAbduction}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                          <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                            <TextField
+                                name="rightThumbOpposition"
+                                value={degrees.rightThumbOpposition}
+                                onChange={handleInputDegreesChange}
+                                type="number"
+                                size="small"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </TableWrapper>
+
+                <TableWrapper>
+                  <TableContainer>
+                    <Table aria-label="hand degrees table">
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell align="center" colSpan={3}>左手</StyledTableCell>
+                          <StyledTableCell align="center" colSpan={3}>右手</StyledTableCell>
+                        </TableRow>
+                        <TableRow>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell>MCP（0°-90°）</StyledTableCell>
+                          <StyledTableCell>PIP（0°-110°）</StyledTableCell>
+                          <StyledTableCell>DIP（0°-80°）</StyledTableCell>
+                          <StyledTableCell>MCP（0°-90°）</StyledTableCell>
+                          <StyledTableCell>PIP（0°-110°）</StyledTableCell>
+                          <StyledTableCell>DIP（0°-80°）</StyledTableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {['食指', '中指', '无名指'].map((finger, index) => (
+                            <TableRow key={index}>
+                              <StyledTableCell>{finger}</StyledTableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`leftHand-finger${index + 1}-MCP`}
+                                    value={degree.leftHand[`finger${index + 1}`].MCP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`leftHand-finger${index + 1}-PIP`}
+                                    value={degree.leftHand[`finger${index + 1}`].PIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`leftHand-finger${index + 1}-DIP`}
+                                    value={degree.leftHand[`finger${index + 1}`].DIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`rightHand-finger${index + 1}-MCP`}
+                                    value={degree.rightHand[`finger${index + 1}`].MCP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`rightHand-finger${index + 1}-PIP`}
+                                    value={degree.rightHand[`finger${index + 1}`].PIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`rightHand-finger${index + 1}-DIP`}
+                                    value={degree.rightHand[`finger${index + 1}`].DIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                            </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </TableWrapper>
+                <Box sx={{padding: '8px',marginBottom:'16px' }}>
+                  <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
+                </Box>
+              </Card>
+            </>
+        );
+      case "捏力评估":
+        return (
+            <>
+              <Card style={{paddingBottom:'20px',padding:'8px' ,marginTop:'20px'}}>
+                {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
+                <Title>捏力评估</Title>
+                <Typography variant='body2' style={{ color: 'red' }}>用拇指与其他手指相对捏压捏力计，反映拇对掌肌及屈曲肌的肌力，正常值约为握力的 30%。</Typography>
+                <TableWrapper>
+                  <TableContainer>
+                    <Table aria-label="hand degrees table">
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell align="center" colSpan={4}>对指</StyledTableCell>
+                          <StyledTableCell align="center" colSpan={4}>测捏</StyledTableCell>
+                        </TableRow>
+                        <TableRow>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell>拇指-食指</StyledTableCell>
+                          <StyledTableCell>拇指-中指</StyledTableCell>
+                          <StyledTableCell>拇指-环指</StyledTableCell>
+                          <StyledTableCell>拇指-小指</StyledTableCell>
+                          <StyledTableCell>拇指-食指</StyledTableCell>
+                          <StyledTableCell>拇指-中指</StyledTableCell>
+                          <StyledTableCell>拇指-环指</StyledTableCell>
+                          <StyledTableCell>拇指-小指</StyledTableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {['左手', '右手'].map((finger, index) => (
+                            <TableRow key={index}>
+                              <StyledTableCell>{finger}</StyledTableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`leftHand-finger${index + 1}-MCP`}
+                                    value={degree.leftHand[`finger${index + 1}`].MCP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`leftHand-finger${index + 1}-PIP`}
+                                    value={degree.leftHand[`finger${index + 1}`].PIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`leftHand-finger${index + 1}-DIP`}
+                                    value={degree.leftHand[`finger${index + 1}`].DIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`rightHand-finger${index + 1}-MCP`}
+                                    value={degree.rightHand[`finger${index + 1}`].MCP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`rightHand-finger${index + 1}-PIP`}
+                                    value={degree.rightHand[`finger${index + 1}`].PIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`rightHand-finger${index + 1}-DIP`}
+                                    value={degree.rightHand[`finger${index + 1}`].DIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`rightHand-finger${index + 1}-DIP`}
+                                    value={degree.rightHand[`finger${index + 1}`].DIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                              <TableCell style={{ borderLeft: '1px solid #ccc' }}>
+                                <TextField
+                                    name={`rightHand-finger${index + 1}-DIP`}
+                                    value={degree.rightHand[`finger${index + 1}`].DIP}
+                                    onChange={handleInputDegreeChange}
+                                    size="small"
+                                />
+                              </TableCell>
+                            </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </TableWrapper>
+                <Box sx={{padding: '8px',marginBottom:'16px' }}>
+                  <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
+                </Box>
+              </Card>
+            </>
+        );
+      case "Fugl-Meyer":
+        return (
+            <>
+              <Card style={{ marginTop: '20px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
+                <Title>Fugl-Meyer评定量表（手部）</Title>
+                <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
+                <Grid container spacing={0}>
+                  {group.map((field, index) => (
+                      <>
+                        <Grid key={index} item xs={12} alignItems="center">
+                          <Typography variant="h6">
+                            （{index+1}）{field.label}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} alignItems="center">
+                          <ToggleButtonGroup
+                              // value={fuglMeyerScores[index]}
+                              exclusive
+                              // onChange={}
+                              // aria-label={`test-${index}`}
+                          >
+                            {
+                              field.options.map((l: option)=> {
+                                let selected
+                                if (fuglMeyerScores[index] != null && fuglMeyerScores[index] != undefined) {
+                                  selected = Number(fuglMeyerScores[index].selected_assessment_level_id) === l.option_id
+                                }
+                                return (
+                                    <ToggleButton key={l.option_id} value={l.option_id} style={selected ? selectedStyle : notSelectedStyle} aria-label={`level-${l.option_id}`}>
+                                      {l.label}
+                                    </ToggleButton>
+                                )
+                              })
+                            }
+                          </ToggleButtonGroup>
+                        </Grid>
+                      </>
+                  ))}
+                </Grid>
+                <Grid item xs={12} alignItems="center">
+                  <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleSubmit}>
+                    保存
+                  </Button>
+                </Grid>
+              </Card>
+            </>
+        );
+      default:
+        return (
+            <>
+              <Card style={{ marginTop: '10px', marginBottom: '20px' }} sx={{ padding: '10px' }}>
+                <Grid container spacing={0}>
+                  <Grid item xs={12} style={{display: 'flex', alignItems: 'center'}}>
+                    <Title>{group[0].group_name}</Title>
+                  </Grid>
+
                   {group.map((field, index) => (
                       <Grid key={index} item xs={3}>
                         <Box sx={{padding: '8px' }}>
@@ -314,57 +742,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                               <label>{field.label}</label>
                             </Grid>
                             <Grid item xs={8}>
-                              {field.type === 'text' ? (
-                                  <TextField
-                                      name={field.name}
-                                      value=""
-                                      size="small"
-                                      fullWidth
-                                  />
-                              ) : field.options !== null ? (
-                                  <Select
-                                      name={field.name}
-                                      value=""
-                                      fullWidth
-                                      variant="outlined"
-                                      size="small"
-                                  >
-                                    {field.options.map((option) => (
-                                        <MenuItem key={option.option_id} value={option.value}>
-                                          {option.label}
-                                        </MenuItem>
-                                    ))}
-                                  </Select>
-                              ) : field.type === 'date' || field.type === 'time' ? (
-                                  <TextField
-                                      name={field.name}
-                                      type="date"
-                                      size="small"
-                                      fullWidth
-                                      InputLabelProps={{
-                                        shrink: true,
-                                      }}
-                                  />
-                              ) : field.type === 'password' ? (
-                                  <TextField
-                                      name={field.name}
-                                      type="password"
-                                      size="small"
-                                      fullWidth
-                                  />
-                              ) : field.type === 'number' ? (
-                                  <TextField
-                                      name={field.name}
-                                      type="number"
-                                      size="small"
-                                      fullWidth
-                                  />
-                              ) : <TextField
-                                      name={field.name}
-                                      value=""
-                                      size="small"
-                                      fullWidth
-                                  />}
+                              {renderFormField(field.type, field.name, field.options)}
                             </Grid>
                           </Grid>
                         </Box>
@@ -372,636 +750,104 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                   ))}
                 </Grid>
               </Card>
+            </>
+        );
+    }
+  }
+
+  //根据type返回组件
+  const renderFormField = (fieldType, fieldName, options) => {
+    if (fieldType === 'text') {
+      return (
+          <TextField
+              name={fieldName}
+              value=""
+              size="small"
+              fullWidth
+          />
+      );
+    } else if (options !== null) {
+      return (
+          <Select
+              name={fieldName}
+              value=""
+              fullWidth
+              variant="outlined"
+              size="small"
+          >
+            {options.map((option) => (
+                <MenuItem key={option.option_id} value={option.value}>
+                  {option.label}
+                </MenuItem>
+            ))}
+          </Select>
+      );
+    } else if (fieldType === 'date' || fieldType === 'time') {
+      return (
+          <TextField
+              name={fieldName}
+              type="date"
+              size="small"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+          />
+      );
+    } else if (fieldType === 'password') {
+      return (
+          <TextField
+              name={fieldName}
+              type="password"
+              size="small"
+              fullWidth
+          />
+      );
+    } else if (fieldType === 'number') {
+      return (
+          <TextField
+              name={fieldName}
+              type="number"
+              size="small"
+              fullWidth
+          />
+      );
+    } else if (fieldType === 'file') {
+      return (
+          <Input
+              type="file"
+              name={fieldName}
+              inputProps={{ multiple: false }}
+              onChange={(event) => {
+                console.log(event.target.files[0]);
+              }}
+          />
+      );
+    } else {
+      return (
+          <TextField
+              name={fieldName}
+              value=""
+              size="small"
+              fullWidth
+          />
+      );
+    }
+  };
+
+  return (
+    <>
+      <Container>
+        <FormControl fullWidth>
+          {groupedFields.map((group, index) => (
+              <>
+                {renderGroupTable(group)}
               </>
           ))}
-
-          <Card style={{ marginTop: '10px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
-            <Grid container spacing={0}>
-              <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-                <Title>训练后状态：</Title>
-              </Grid>
-              <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              </Grid>
-              <Grid item xs={4} alignItems="center">
-                <Tooltip title="自定义评价内容">
-                  <IconButton
-                    style={{float: 'right'}}
-                    aria-label="setEvaluate"
-                    onClick={handleEditEvaluate}
-                  >
-                    <EditCalendarIcon sx={{ fontSize: 36 }} color="secondary"/>
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-            </Grid>
-            <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
-            <form>
-              <Grid container spacing={0}>
-                {
-                  showEvaluate1 &&
-                    <Grid item xs={3}>
-                      <Box sx={{padding: '8px' }}>
-                        <Grid container spacing={0} alignItems="center">
-                          <Grid item xs={4}>
-                            <label htmlFor="input9">耐受状态:</label>
-                          </Grid>
-                          <Grid item xs={8}>
-                          <TextField
-                              name="tolerance"
-                              value={evaluateFormData.tolerance}
-                              onChange={handleEvaluationFormDataFormChange}
-                              size="small"
-                              fullWidth
-                          />
-                          </Grid>
-                        </Grid>
-                      </Box>
-                    </Grid>
-                }
-                {showEvaluate2 && <Grid item xs={3}>
-                    <Box sx={{padding: '8px' }}>
-                        <Grid container spacing={0} alignItems="center">
-                            <Grid item xs={4}>
-                                <label htmlFor="input10">Brunnstrom分期:</label>
-                            </Grid>
-                            <Grid item xs={8}>
-                                {/*<InputLabel id="mediaStrokeLevel">Brunnstrom分期</InputLabel>*/}
-                                <Select
-                                    labelId="mediaStrokeLevel"
-                                    id="mediaStrokeLevel"
-                                    label="分期"
-                                    // value={String(willEditPatient.mediaStrokeLevel)}
-                                    onChange={handleChangeMediaStrokeLevel}
-                                    size="small"
-                                    fullWidth
-                                >
-                                    <MenuItem value={10}>1 期</MenuItem>
-                                    <MenuItem value={11}>2 期</MenuItem>
-                                    <MenuItem value={12}>3 期</MenuItem>
-                                    <MenuItem value={13}>4 期</MenuItem>
-                                    <MenuItem value={14}>5 期</MenuItem>
-                                    <MenuItem value={15}>6 期</MenuItem>
-                                </Select>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Grid>}
-                {showEvaluate2 && <Grid item xs={3}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input10">运动评价:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                            name="motionReview"
-                            value={evaluateFormData.motionReview}
-                            onChange={handleEvaluationFormDataFormChange}
-                            size="small"
-                            fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>}
-                {showEvaluate3 && <Grid item xs={3}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input11">痉挛评价:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                            name="spasmReview"
-                            value={evaluateFormData.spasmReview}
-                            onChange={handleEvaluationFormDataFormChange}
-                            size="small"
-                            fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>}
-                {showEvaluate4 && <Grid item xs={3}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input9">肌张力:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                            name="muscleTone"
-                            value={evaluateFormData.muscleTone}
-                            onChange={handleEvaluationFormDataFormChange}
-                            size="small"
-                            fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>}
-                {showEvaluate5 && <Grid item xs={3}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input9">急性期情况:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                            name="acuteState"
-                            value={evaluateFormData.acuteState}
-                            onChange={handleEvaluationFormDataFormChange}
-                            size="small"
-                            fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>}
-                {showEvaluate6 && <Grid item xs={3}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        <label htmlFor="input9">神经科判断:</label>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <TextField
-                            name="neuroJudgment"
-                            value={evaluateFormData.neuroJudgment}
-                            onChange={handleEvaluationFormDataFormChange}
-                            size="small"
-                            fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>}
-                {showEvaluate7 && <Grid item xs={3}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container spacing={0} alignItems="center">
-                      <Grid item xs={4}>
-                        {showEvaluate7 && <label htmlFor="input9">运动损伤度:</label>}
-                      </Grid>
-                      <Grid item xs={8}>
-                        {showEvaluate7 && <TextField
-                            name="motionInjury"
-                            value={evaluateFormData.motionInjury}
-                            onChange={handleEvaluationFormDataFormChange}
-                            size="small"
-                            fullWidth
-                        />}
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>}
-
-                {components.map((component, index) => component)}
-
-                {/*{evaluationResponseData?.common_evaluation.map((commonEvaluation: CommonEvaluation) => (*/}
-                {/*  <div key={commonEvaluation.id}>*/}
-                {/*    <Grid item xs={12}>*/}
-                {/*      <Box sx={{padding: '8px' }}>*/}
-                {/*        <Grid container spacing={0} alignItems="center">*/}
-                {/*          <Grid item xs={4}>*/}
-                {/*            <label htmlFor="input9">{commonEvaluation.evaluation_item}</label>*/}
-                {/*          </Grid>*/}
-                {/*          <Grid item xs={8}>*/}
-                {/*            <TextField*/}
-                {/*              name="motionInjury"*/}
-                {/*              value = {commonEvaluation.evaluation_value}*/}
-                {/*              // value={evaluateFormData.motionInjury}*/}
-                {/*              onChange={handleEvaluationFormDataFormChange}*/}
-                {/*              size="small"*/}
-                {/*              fullWidth*/}
-                {/*            />*/}
-                {/*          </Grid>*/}
-                {/*        </Grid>*/}
-                {/*      </Box>*/}
-                {/*    </Grid>*/}
-                {/*  </div>*/}
-                {/*))}*/}
-
-                <Grid item xs={12}>
-                  <Box sx={{padding: '8px' }}>
-                    <Grid container alignItems="center" justifyContent="space-between">
-                      <Grid item>
-                        <Typography variant='body2' style={{ color: 'red' }}>注：医生在该表格填写完成的评价信息只针对本次康复训练，评价将被保存在本次康复记录的表格中。</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Button variant="outlined" onClick={handleSaveEvaluate}>保存评价</Button>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-              </Grid>
-            </form>
-          </Card>
-        </FormControl>
-
-        <Card style={{paddingBottom:'20px',padding:'8px' }}>
-          {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
-          <Title>手关节活动度评估</Title>
-          <Typography variant='body2' style={{ color: 'red' }}>拇指对指：通过使用刻度尺测量拇指指腹至小指指腹的距离来评估。</Typography>
-          <TableWrapper>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>部位</StyledTableCell>
-                    <StyledTableCell>MP 屈曲（0°-50°）</StyledTableCell>
-                    <StyledTableCell>IP 屈曲（0°-80°~90°）</StyledTableCell>
-                    <StyledTableCell>桡侧外展（0°-50°）</StyledTableCell>
-                    <StyledTableCell>拇指对指</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <StyledTableCell>左拇指</StyledTableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="leftThumbMP"
-                        value={degrees.leftThumbMP}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="leftThumbIP"
-                        value={degrees.leftThumbIP}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="leftRadialAbduction"
-                        value={degrees.leftRadialAbduction}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={9}>
-                          <TextField
-                            name="leftThumbOpposition"
-                            value={degrees.leftThumbOpposition}
-                            onChange={handleInputDegreesChange}
-                            type="number"
-                            size="small"
-                          />
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Typography variant='body2' style={{ color: 'red' }}>CM</Typography>
-                        </Grid>
-                      </Grid>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <StyledTableCell>右拇指</StyledTableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="rightThumbMP"
-                        value={degrees.rightThumbMP}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="rightThumbIP"
-                        value={degrees.rightThumbIP}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="rightRadialAbduction"
-                        value={degrees.rightRadialAbduction}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="rightThumbOpposition"
-                        value={degrees.rightThumbOpposition}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </TableWrapper>
-
-          <TableWrapper>
-            <TableContainer>
-              <Table aria-label="hand degrees table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell></StyledTableCell>
-                    <StyledTableCell align="center" colSpan={3}>左手</StyledTableCell>
-                    <StyledTableCell align="center" colSpan={3}>右手</StyledTableCell>
-                  </TableRow>
-                  <TableRow>
-                    <StyledTableCell></StyledTableCell>
-                    <StyledTableCell>MCP（0°-90°）</StyledTableCell>
-                    <StyledTableCell>PIP（0°-110°）</StyledTableCell>
-                    <StyledTableCell>DIP（0°-80°）</StyledTableCell>
-                    <StyledTableCell>MCP（0°-90°）</StyledTableCell>
-                    <StyledTableCell>PIP（0°-110°）</StyledTableCell>
-                    <StyledTableCell>DIP（0°-80°）</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {['食指', '中指', '无名指'].map((finger, index) => (
-                    <TableRow key={index}>
-                      <StyledTableCell>{finger}</StyledTableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-MCP`}
-                          value={degree.leftHand[`finger${index + 1}`].MCP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-PIP`}
-                          value={degree.leftHand[`finger${index + 1}`].PIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-DIP`}
-                          value={degree.leftHand[`finger${index + 1}`].DIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-MCP`}
-                          value={degree.rightHand[`finger${index + 1}`].MCP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-PIP`}
-                          value={degree.rightHand[`finger${index + 1}`].PIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-DIP`}
-                          value={degree.rightHand[`finger${index + 1}`].DIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </TableWrapper>
-          <Box sx={{padding: '8px',marginBottom:'16px' }}>
-            <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
-          </Box>
-        </Card>
-
-        <Card style={{paddingBottom:'20px',padding:'8px' ,marginTop:'20px'}}>
-          <Title>肌力</Title>
-          <Typography variant='body2' style={{ color: 'red' }}>握力指数=握力（kg）/体重（kg）× 100%。正常握力指数≥50％</Typography>
-          <TableWrapper>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>部位</StyledTableCell>
-                    <StyledTableCell>左手</StyledTableCell>
-                    <StyledTableCell>右手</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <StyledTableCell>握力</StyledTableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="leftThumbMP"
-                        value={degrees.leftThumbMP}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                      <TextField
-                        name="leftThumbIP"
-                        value={degrees.leftThumbIP}
-                        onChange={handleInputDegreesChange}
-                        type="number"
-                        size="small"
-                      />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </TableWrapper>
-          <Box sx={{padding: '8px',marginBottom:'16px' }}>
-            <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
-          </Box>
-        </Card>
-
-        <Card style={{paddingBottom:'20px',padding:'8px' ,marginTop:'20px'}}>
-          {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
-          <Title>捏力评估</Title>
-          <Typography variant='body2' style={{ color: 'red' }}>用拇指与其他手指相对捏压捏力计，反映拇对掌肌及屈曲肌的肌力，正常值约为握力的 30%。</Typography>
-          <TableWrapper>
-            <TableContainer>
-              <Table aria-label="hand degrees table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell></StyledTableCell>
-                    <StyledTableCell align="center" colSpan={4}>对指</StyledTableCell>
-                    <StyledTableCell align="center" colSpan={4}>测捏</StyledTableCell>
-                  </TableRow>
-                  <TableRow>
-                    <StyledTableCell></StyledTableCell>
-                    <StyledTableCell>拇指-食指</StyledTableCell>
-                    <StyledTableCell>拇指-中指</StyledTableCell>
-                    <StyledTableCell>拇指-环指</StyledTableCell>
-                    <StyledTableCell>拇指-小指</StyledTableCell>
-                    <StyledTableCell>拇指-食指</StyledTableCell>
-                    <StyledTableCell>拇指-中指</StyledTableCell>
-                    <StyledTableCell>拇指-环指</StyledTableCell>
-                    <StyledTableCell>拇指-小指</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {['左手', '右手'].map((finger, index) => (
-                    <TableRow key={index}>
-                      <StyledTableCell>{finger}</StyledTableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-MCP`}
-                          value={degree.leftHand[`finger${index + 1}`].MCP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-PIP`}
-                          value={degree.leftHand[`finger${index + 1}`].PIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`leftHand-finger${index + 1}-DIP`}
-                          value={degree.leftHand[`finger${index + 1}`].DIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-MCP`}
-                          value={degree.rightHand[`finger${index + 1}`].MCP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-PIP`}
-                          value={degree.rightHand[`finger${index + 1}`].PIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-DIP`}
-                          value={degree.rightHand[`finger${index + 1}`].DIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-DIP`}
-                          value={degree.rightHand[`finger${index + 1}`].DIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                        <TextField
-                          name={`rightHand-finger${index + 1}-DIP`}
-                          value={degree.rightHand[`finger${index + 1}`].DIP}
-                          onChange={handleInputDegreeChange}
-                          size="small"
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </TableWrapper>
-          <Box sx={{padding: '8px',marginBottom:'16px' }}>
-            <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveDegrees}>保存评估</Button>
-          </Box>
-        </Card>
-
-
-        <FormControl fullWidth>
-          {/*<Grid item xs={4} alignItems="center">*/}
-          {/*  <Tooltip title="自定义评价内容">*/}
-          {/*    <IconButton*/}
-          {/*        style={{float: 'right'}}*/}
-          {/*        aria-label="setEvaluate"*/}
-          {/*        onClick={handleEditEvaluate}*/}
-          {/*    >*/}
-          {/*      <EditCalendarIcon sx={{ fontSize: 36 }} color="secondary"/>*/}
-          {/*    </IconButton>*/}
-          {/*  </Tooltip>*/}
-          {/*</Grid>*/}
-          <Card style={{ marginTop: '20px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
-            <Title>Fugl-Meyer评定量表（手部）</Title>
-            <Grid container spacing={0}>
-              <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-                <Typography variant="h5">
-                  请选择评定量表
-                </Typography>
-              </Grid>
-            </Grid>
-          <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
-          <Grid container spacing={0}>
-              {assessmentResponseData.map((assessment: Assessment) => (
-                  <div key={assessment.id}>
-                    <Grid item xs={12} alignItems="center">
-                      <Typography variant="h6">
-                        {assessment.examination}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} alignItems="center">
-                      <ToggleButtonGroup
-                          value={fuglMeyerScores[assessment.id]}
-                          exclusive
-                          onChange={(event, newValue) => handleFuglMeyerAssessmentChange(assessment.id, newValue)}
-                          aria-label={`test-${assessment.id}`}
-                      >
-                        {
-                          assessment.levels.map((l: AssessmentLevel)=> {
-                            let selected
-                            if (fuglMeyerScores[assessment.id] != null && fuglMeyerScores[assessment.id] != undefined) {
-                              selected = Number(fuglMeyerScores[assessment.id].selected_assessment_level_id) === l.id
-                            }
-                            return (
-                                <ToggleButton key={l.id} value={l.id} style={selected ? selectedStyle : notSelectedStyle} aria-label={`level-${l.id}`}>
-                                  {l.level_label}分: {l.description}
-                                </ToggleButton>
-                            )
-                          })
-                        }
-                      </ToggleButtonGroup>
-                    </Grid>
-                  </div>
-              ))}
-            </Grid>
-          <Grid item xs={12} alignItems="center">
-            <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleSubmit}>
-              保存
-            </Button>
-          </Grid>
-        </Card>
         </FormControl>
 
         <FormControl fullWidth>
-
-          <Card style={{ marginBottom: '20px',marginTop:'20px' }} sx={{ padding: '20px' }}>
+          <Card style={{ marginBottom: '30px', marginTop:'0px' }} sx={{ padding: '20px' }}>
             <Title>医生建议：</Title>
             <TextField
               name="suggestion"
@@ -1029,123 +875,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
           </Card>
         </FormControl>
       </Container>
-
-      <Dialog open={openEvaluate} onClose={handleCloseEvaluate}>
-        <DialogTitle>自定义量表</DialogTitle>
-        <DialogContent>
-        <Card style={{ marginTop: '0px' }} sx={{ padding: '20px' }}>
-          <Grid container spacing={0}>
-            <Grid item xs={8} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography variant="body1">
-                &gt; 耐受状态
-              </Typography>
-            </Grid>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Button color={showEvaluate1 ? "primary" : "error"} onClick={() => setShowEvaluate1(!showEvaluate1)}>
-                {showEvaluate1 ? "将会显示" : "不会显示"}
-              </Button>
-            </Grid>
-
-            <Grid item xs={8} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography variant="body1">
-                &gt; 运动评价
-              </Typography>
-            </Grid>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Button color={showEvaluate2 ? "primary" : "error"} onClick={() => setShowEvaluate2(!showEvaluate2)}>
-                {showEvaluate2 ? "将会显示" : "不会显示"}
-              </Button>
-            </Grid>
-
-            <Grid item xs={8} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography variant="body1">
-                &gt; 痉挛评价
-              </Typography>
-            </Grid>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Button color={showEvaluate3 ? "primary" : "error"} onClick={() => setShowEvaluate3(!showEvaluate3)}>
-                {showEvaluate3 ? "将会显示" : "不会显示"}
-              </Button>
-            </Grid>
-
-            <Grid item xs={8} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography variant="body1">
-                &gt; 肌张力
-              </Typography>
-            </Grid>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Button color={showEvaluate4 ? "primary" : "error"} onClick={() => setShowEvaluate4(!showEvaluate4)}>
-                {showEvaluate4 ? "将会显示" : "不会显示"}
-              </Button>
-            </Grid>
-
-            <Grid item xs={8} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography variant="body1">
-                &gt; 急性期情况
-              </Typography>
-            </Grid>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Button color={showEvaluate5 ? "primary" : "error"} onClick={() => setShowEvaluate5(!showEvaluate5)}>
-                {showEvaluate5 ? "将会显示" : "不会显示"}
-              </Button>
-            </Grid>
-
-            <Grid item xs={8} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography variant="body1">
-                &gt; 神经科判断
-              </Typography>
-            </Grid>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Button color={showEvaluate6 ? "primary" : "error"} onClick={() => setShowEvaluate6(!showEvaluate6)}>
-                {showEvaluate6 ? "将会显示" : "不会显示"}
-              </Button>
-            </Grid>
-
-            <Grid item xs={8} style={{display: 'flex', alignItems: 'center'}}>
-              <Typography variant="body1">
-                &gt; 运动损伤度
-              </Typography>
-            </Grid>
-            <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
-              <Button color={showEvaluate7 ? "primary" : "error"} onClick={() => setShowEvaluate7(!showEvaluate7)}>
-                {showEvaluate7 ? "将会显示" : "不会显示"}
-              </Button>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Box sx={{padding: '8px' }}>
-                <Grid container spacing={0} alignItems="center" justifyContent="space-between">
-                  <Grid item xs={2.5}>
-                    <label>输入新增项：</label>
-                  </Grid>
-                  <Grid item xs={5.5}>
-                    <TextField
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        size="small"
-                        fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={1}>
-
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Button onClick={handleAddComponent}>
-                      添加新增项
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Grid>
-          </Grid>
-          </Card>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseEvaluate}>完成</Button>
-        </DialogActions>
-      </Dialog>
     </>
-
   )
 }
 
