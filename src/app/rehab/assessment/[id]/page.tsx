@@ -95,12 +95,6 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     setInputValue(event.target.value);
   }, []);
 
-  // 评定量表选项
-  const assessmentOptions = [
-    { value: 'assessment1', label: '评定量表1' },
-    { value: 'assessment2', label: '评定量表2' },
-    // 添加更多评定量表选项
-  ];
 
   // 处理选择量表的函数
   const handleAssessmentChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -144,22 +138,6 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     // setMediaStrokeLevel(event.target.value);
   };
 
-
-  const handleSaveEvaluate = () => {
-    thunkDispatch(addEvaluation({
-      acute_state: evaluateFormData.acuteState,
-      motion_injury: evaluateFormData.motionInjury,
-      motion_review: evaluateFormData.motionReview,
-      muscle_tone: evaluateFormData.muscleTone,
-      neuro_judgment: evaluateFormData.neuroJudgment,
-      pid: parseInt(params.PId),
-      rehab_session_id: 0,
-      spasm_review: evaluateFormData.spasmReview,
-      tolerance: evaluateFormData.tolerance,
-    }))
-    // setOpenAddStatus(false)
-  };
-
   const selectedStyle = {
     height: '40px',
     margin: '0 16px 0 16px',
@@ -195,6 +173,21 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   };
   const handleCloseEvaluate = () => {
     setOpenEvaluate(false);
+  };
+
+  const handleSaveEvaluate = () => {
+    thunkDispatch(addEvaluation({
+      acute_state: evaluateFormData.acuteState,
+      motion_injury: evaluateFormData.motionInjury,
+      motion_review: evaluateFormData.motionReview,
+      muscle_tone: evaluateFormData.muscleTone,
+      neuro_judgment: evaluateFormData.neuroJudgment,
+      pid: parseInt(params.PId),
+      rehab_session_id: 0,
+      spasm_review: evaluateFormData.spasmReview,
+      tolerance: evaluateFormData.tolerance,
+    }))
+    // setOpenAddStatus(false)
   };
 
   //保存医生建议
@@ -464,6 +457,30 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                 </Grid>}
 
                 {components.map((component, index) => component)}
+
+                {/*{evaluationResponseData?.common_evaluation.map((commonEvaluation: CommonEvaluation) => (*/}
+                {/*  <div key={commonEvaluation.id}>*/}
+                {/*    <Grid item xs={12}>*/}
+                {/*      <Box sx={{padding: '8px' }}>*/}
+                {/*        <Grid container spacing={0} alignItems="center">*/}
+                {/*          <Grid item xs={4}>*/}
+                {/*            <label htmlFor="input9">{commonEvaluation.evaluation_item}</label>*/}
+                {/*          </Grid>*/}
+                {/*          <Grid item xs={8}>*/}
+                {/*            <TextField*/}
+                {/*              name="motionInjury"*/}
+                {/*              value = {commonEvaluation.evaluation_value}*/}
+                {/*              // value={evaluateFormData.motionInjury}*/}
+                {/*              onChange={handleEvaluationFormDataFormChange}*/}
+                {/*              size="small"*/}
+                {/*              fullWidth*/}
+                {/*            />*/}
+                {/*          </Grid>*/}
+                {/*        </Grid>*/}
+                {/*      </Box>*/}
+                {/*    </Grid>*/}
+                {/*  </div>*/}
+                {/*))}*/}
 
                 <Grid item xs={12}>
                   <Box sx={{padding: '8px' }}>
@@ -888,13 +905,28 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
           <Card style={{ marginBottom: '20px',marginTop:'20px' }} sx={{ padding: '20px' }}>
             <Title>医生建议：</Title>
             <TextField
-                name="advice"
-                multiline
-                rows={4}
-                fullWidth
-                placeholder="请按照本次训练情况在此输入医生建议"
+              name="suggestion"
+              multiline
+              rows={4}
+              fullWidth
+              placeholder="请按照本次训练情况在此输入医生建议"
+              value = {suggestionText || initialSuggestionValue}
+              onChange={(event) => {
+                setSuggestionText(event.target.value)
+                setIsModified(true);
+              }}
+
             />
             <Typography variant='body2' style={{ color: 'red' }}>注：填写完毕后请点击保存按钮进行手动保存。</Typography>
+            <Grid container spacing={0}>
+              <Grid item xs={6} style={{display: 'flex', alignItems: 'center'}}>
+              </Grid>
+              <Grid item xs={6} alignItems="center">
+                <Box sx={{padding: '8px' }}>
+                  <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveSuggestion}>保存建议</Button>
+                </Box>
+              </Grid>
+            </Grid>
           </Card>
         </FormControl>
       </Container>

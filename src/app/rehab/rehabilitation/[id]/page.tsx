@@ -536,7 +536,10 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                             </Typography>
                           </TableCell>
                           <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                            <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
+                            <a target="_blank" rel="noopener noreferrer">
+                              {/*<a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">*/}
+                              <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>填写量表</Button>
+                            </a>
                           </TableCell>
                           <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
                           </TableCell>
