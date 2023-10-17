@@ -42,6 +42,7 @@ import {CommonEvaluation, getEvaluation} from "@/redux/features/rehab/rehab-eval
 import InputLabel from "@mui/material/InputLabel";
 import Select, {SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import {formField, getFormFields} from "@/redux/features/rehab/rehab-formFields-slice";
 
 
 export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
@@ -51,6 +52,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   const [inputValue, setInputValue] = useState('');
   const appDispatch = useAppDispatch()
   const assessmentResponseData = useAppSelector((state: RootState) => state.assessment.assessmentData);
+  const formFieldsRespomseData = useAppSelector((state: RootState) => state.formField.formFieldsData);
   const suggestionResponseData = useAppSelector((state: RootState) => state.suggestion.suggestionData);
   const [suggestionText, setSuggestionText] = useState('')
   const evaluationResponseData = useAppSelector((state: RootState) => state.evaluation.evaluationData);
@@ -61,6 +63,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     thunkDispatch(getAssessment({task_id: parseInt(params.id)}))
     thunkDispatch(getSuggestion({task_id: parseInt(params.id)}))
     thunkDispatch(getEvaluation({task_id: parseInt(params.id)}))
+    thunkDispatch(getFormFields())
   },[params.id,thunkDispatch])
 
   const handleAddComponent = useCallback(() => {
@@ -272,10 +275,106 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   };
   const initialSuggestionValue = isModified ? '' : suggestionResponseData?.suggestion;
 
+  //根据组名把获取的formField分组
+  const groupByGroupName = (formFieldsResponseData: formField[]) => {
+    const groupedFields: formField[][] = [];
+
+    for (let i = 0; i < formFieldsResponseData.length; i++) {
+      const currentField = formFieldsResponseData[i];
+      const previousField = i > 0 ? formFieldsResponseData[i - 1] : null;
+
+      if (!previousField || currentField.group_name !== previousField.group_name) {
+        groupedFields.push([currentField]);
+      } else {
+        groupedFields[groupedFields.length - 1].push(currentField);
+      }
+    }
+
+    return groupedFields;
+  };
+
+  const groupedFields = groupByGroupName(formFieldsRespomseData);
+
   return (
     <>
       <Container>
         <FormControl fullWidth>
+          {groupedFields.map((group, index) => (
+              <>
+              <Card key ={index} style={{ marginTop: '10px', marginBottom: '20px' }} sx={{ padding: '10px' }}>
+                <Grid container spacing={0}>
+                  <Grid item xs={12} style={{display: 'flex', alignItems: 'center'}}>
+                    <Title>{group[0].group_name}</Title>
+                  </Grid>
+                  {group.map((field, index) => (
+                      <Grid key={index} item xs={3}>
+                        <Box sx={{padding: '8px' }}>
+                          <Grid container spacing={0} alignItems="center">
+                            <Grid item xs={4}>
+                              <label>{field.label}</label>
+                            </Grid>
+                            <Grid item xs={8}>
+                              {field.type === 'text' ? (
+                                  <TextField
+                                      name={field.name}
+                                      value=""
+                                      size="small"
+                                      fullWidth
+                                  />
+                              ) : field.options !== null ? (
+                                  <Select
+                                      name={field.name}
+                                      value=""
+                                      fullWidth
+                                      variant="outlined"
+                                      size="small"
+                                  >
+                                    {field.options.map((option) => (
+                                        <MenuItem key={option.option_id} value={option.value}>
+                                          {option.label}
+                                        </MenuItem>
+                                    ))}
+                                  </Select>
+                              ) : field.type === 'date' || field.type === 'time' ? (
+                                  <TextField
+                                      name={field.name}
+                                      type="date"
+                                      size="small"
+                                      fullWidth
+                                      InputLabelProps={{
+                                        shrink: true,
+                                      }}
+                                  />
+                              ) : field.type === 'password' ? (
+                                  <TextField
+                                      name={field.name}
+                                      type="password"
+                                      size="small"
+                                      fullWidth
+                                  />
+                              ) : field.type === 'number' ? (
+                                  <TextField
+                                      name={field.name}
+                                      type="number"
+                                      size="small"
+                                      fullWidth
+                                  />
+                              ) : <TextField
+                                      name={field.name}
+                                      value=""
+                                      size="small"
+                                      fullWidth
+                                  />}
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      </Grid>
+                  ))}
+                </Grid>
+              </Card>
+              </>
+          ))}
+
           <Card style={{ marginTop: '10px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
             <Grid container spacing={0}>
               <Grid item xs={4} style={{display: 'flex', alignItems: 'center'}}>
