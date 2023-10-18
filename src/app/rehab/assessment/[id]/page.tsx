@@ -382,7 +382,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
             <>
               <Card style={{paddingBottom:'20px',padding:'8px' }}>
                 {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
-                <Title>手关节活动度评估</Title>
+                <Title>{group[0].group_name}</Title>
                 <Typography variant='body2' style={{ color: 'red' }}>拇指对指：通过使用刻度尺测量拇指指腹至小指指腹的距离来评估。</Typography>
                 <TableWrapper>
                   <TableContainer>
@@ -575,7 +575,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
             <>
               <Card style={{paddingBottom:'20px',padding:'8px' ,marginTop:'20px'}}>
                 {/*定义其用一个函数进行保存处理，用户填写的数据放在一个store里面，填写数据点击保存使其先渲染在页面上*/}
-                <Title>捏力评估</Title>
+                <Title>{group[0].group_name}</Title>
                 <Typography variant='body2' style={{ color: 'red' }}>用拇指与其他手指相对捏压捏力计，反映拇对掌肌及屈曲肌的肌力，正常值约为握力的 30%。</Typography>
                 <TableWrapper>
                   <TableContainer>
@@ -682,7 +682,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
         return (
             <>
               <Card style={{ marginTop: '20px', marginBottom: '20px' }} sx={{ padding: '20px' }}>
-                <Title>Fugl-Meyer评定量表（手部）</Title>
+                <Title>{group[0].group_name}</Title>
                 <Typography variant='h6'>请医护根据此次训练情况对以下信息进行评价：</Typography>
                 <Grid container spacing={0}>
                   {group.map((field, index) => (
