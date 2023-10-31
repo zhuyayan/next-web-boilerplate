@@ -473,13 +473,20 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                             />
                           </TableCell>
                           <TableCell style={{ borderLeft: '1px solid #ccc' }}>
-                            <TextField
-                                name="rightThumbOpposition"
-                                value={degrees.rightThumbOpposition}
-                                onChange={handleInputDegreesChange}
-                                type="number"
-                                size="small"
-                            />
+                            <Grid container spacing={2}>
+                              <Grid item xs={9}>
+                                <TextField
+                                  name="rightThumbOpposition"
+                                  value={degrees.rightThumbOpposition}
+                                  onChange={handleInputDegreesChange}
+                                  type="number"
+                                  size="small"
+                                />
+                              </Grid>
+                              <Grid item xs={3}>
+                                <Typography variant='body2' style={{ color: 'red' }}>CM</Typography>
+                              </Grid>
+                            </Grid>
                           </TableCell>
                         </TableRow>
                       </TableBody>
