@@ -6,7 +6,9 @@ export interface formField {
     id: number;
     name: string;
     label: string;
+    help_text:string;
     type: string;
+    render_type: string;
     group_id: number;
     group_name: string;
     options: option[];

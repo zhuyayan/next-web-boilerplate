@@ -15,7 +15,7 @@ import {
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import React, {ChangeEvent} from "react";
+import React, {ChangeEvent, useState} from "react";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Grid";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
@@ -57,6 +57,9 @@ const PrescriptionTable = (params: {
 
   // 查看指标弹框
   const [openStatus, setOpenStatus] = React.useState(false);
+
+  const [taskid, setTaskid] = useState(0);
+
   const handleClickOpenStatus = () => {
     setOpenStatus(true);
   };
@@ -68,9 +71,6 @@ const PrescriptionTable = (params: {
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
     task_id:0,
-    onset_time : "",
-    medication : "",
-    spasm_status : "",
     min_heart_rate : 0,
     max_heart_rate : 0,
     avg_heart_rate : 0,
@@ -84,7 +84,7 @@ const PrescriptionTable = (params: {
   const handleCloseEvaluate = () => {
     setOpenEvaluate(false);
   };
-  const onsetTime = willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null;
+  // const onsetTime = willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null;
   const nextSunday = dayjs().endOf('week').startOf('day').toDate();
   const isWeekend = (date: Dayjs) => {
     const day = date.day();
@@ -114,10 +114,7 @@ const PrescriptionTable = (params: {
   const handleSaveAddStatus = () => {
     appThunkDispatch(addStatus({
       pid: parseInt(params.pid),
-      task_id:parseInt(params.task_id),
-      onset_time: willAddStatus.onset_time,
-      medication: willAddStatus.medication,
-      spasm_status: willAddStatus.spasm_status,
+      task_id: taskid,
       min_heart_rate: willAddStatus.min_heart_rate,
       max_heart_rate: willAddStatus.max_heart_rate,
       avg_heart_rate: willAddStatus.avg_heart_rate
@@ -167,7 +164,11 @@ const PrescriptionTable = (params: {
                     {/*<TableCell>{historyRow.updated_at}</TableCell>*/}
                     <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
                     <TableCell>
-                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus}>填写指标</Button>
+                      {willAddStatus.avg_heart_rate === 0 && willAddStatus.min_heart_rate === 0 && willAddStatus.max_heart_rate === 0? (
+                          <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={() => {handleClickOpenStatus(); setTaskid(row.id);}}>填写指标</Button>
+                      ) : (
+                          <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={() => {handleClickOpenStatus(); setTaskid(row.id);}}>查看指标</Button>
+                      )}
                     </TableCell>
                     <TableCell align="center">
                       <a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">
@@ -210,40 +211,40 @@ const PrescriptionTable = (params: {
       {/*/>*/}
       {/* Add more input fields for other indicators */}
       <Grid container spacing={0}>
-        <Grid item xs={6}>
-          <Box sx={{padding: '8px' }}>
-            <Grid container spacing={0} alignItems="center">
-              <Grid item xs={4}>
-                <label htmlFor="input9">发病时间:</label>
-              </Grid>
-              <Grid item xs={8}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    value={onsetTime as any}
-                    onChange={(newValue) => {
-                      // newValue is the selected date and time object
-                      const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';
-                      setWillAddStatus((prevStatus) => ({
-                        ...prevStatus,
-                        onset_time: formattedDate,
-                      }));
-                    }}
-                    defaultValue={nextSunday as any}
-                    shouldDisableDate={isWeekend}
-                    views={['year', 'month', 'day', 'hours', 'minutes']}
-                  />
-                </LocalizationProvider>
-                {/*<TextField*/}
-                {/*  id="onset_time"*/}
-                {/*  value={willAddStatus.onset_time}*/}
-                {/*  onChange={handleAddStatus}*/}
-                {/*  size="small"*/}
-                {/*  fullWidth*/}
-                {/*/>*/}
-              </Grid>
-            </Grid>
-          </Box>
-        </Grid>
+        {/*<Grid item xs={6}>*/}
+        {/*  <Box sx={{padding: '8px' }}>*/}
+        {/*    <Grid container spacing={0} alignItems="center">*/}
+        {/*      <Grid item xs={4}>*/}
+        {/*        <label htmlFor="input9">发病时间:</label>*/}
+        {/*      </Grid>*/}
+        {/*      <Grid item xs={8}>*/}
+        {/*        <LocalizationProvider dateAdapter={AdapterDayjs}>*/}
+        {/*          <DateTimePicker*/}
+        {/*            value={onsetTime as any}*/}
+        {/*            onChange={(newValue) => {*/}
+        {/*              // newValue is the selected date and time object*/}
+        {/*              const formattedDate = newValue?.format('YYYY-MM-DD HH:mm:ss') || '';*/}
+        {/*              setWillAddStatus((prevStatus) => ({*/}
+        {/*                ...prevStatus,*/}
+        {/*                onset_time: formattedDate,*/}
+        {/*              }));*/}
+        {/*            }}*/}
+        {/*            defaultValue={nextSunday as any}*/}
+        {/*            shouldDisableDate={isWeekend}*/}
+        {/*            views={['year', 'month', 'day', 'hours', 'minutes']}*/}
+        {/*          />*/}
+        {/*        </LocalizationProvider>*/}
+        {/*        <TextField*/}
+        {/*          id="onset_time"*/}
+        {/*          value={willAddStatus.onset_time}*/}
+        {/*          onChange={handleAddStatus}*/}
+        {/*          size="small"*/}
+        {/*          fullWidth*/}
+        {/*        />*/}
+        {/*      </Grid>*/}
+        {/*    </Grid>*/}
+        {/*  </Box>*/}
+        {/*</Grid>*/}
         {/*<Grid item xs={6}>*/}
         {/*  <Box sx={{padding: '8px' }}>*/}
         {/*    <Grid container spacing={0} alignItems="center">*/}
@@ -262,24 +263,24 @@ const PrescriptionTable = (params: {
         {/*    </Grid>*/}
         {/*  </Box>*/}
         {/*</Grid>*/}
-        <Grid item xs={6}>
-          <Box sx={{padding: '8px' }}>
-            <Grid container spacing={0} alignItems="center">
-              <Grid item xs={4}>
-                <label htmlFor="input11">痉挛状态:</label>
-              </Grid>
-              <Grid item xs={8}>
-                <TextField
-                  id="spasm_status"
-                  value={willAddStatus.spasm_status}
-                  onChange={handleAddStatus}
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
-          </Box>
-        </Grid>
+        {/*<Grid item xs={6}>*/}
+        {/*  <Box sx={{padding: '8px' }}>*/}
+        {/*    <Grid container spacing={0} alignItems="center">*/}
+        {/*      <Grid item xs={4}>*/}
+        {/*        <label htmlFor="input11">痉挛状态:</label>*/}
+        {/*      </Grid>*/}
+        {/*      <Grid item xs={8}>*/}
+        {/*        <TextField*/}
+        {/*          id="spasm_status"*/}
+        {/*          value={willAddStatus.spasm_status}*/}
+        {/*          onChange={handleAddStatus}*/}
+        {/*          size="small"*/}
+        {/*          fullWidth*/}
+        {/*        />*/}
+        {/*      </Grid>*/}
+        {/*    </Grid>*/}
+        {/*  </Box>*/}
+        {/*</Grid>*/}
         <Grid item xs={6}>
           <Box sx={{padding: '8px' }}>
             <Grid container spacing={0} alignItems="center">
