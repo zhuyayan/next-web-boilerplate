@@ -1206,6 +1206,8 @@ export default function StickyHeadTable(params: {
                     <MenuItem value={5}>助力计次模式</MenuItem>
                     <MenuItem value={6}>助力定时模式</MenuItem>
                     <MenuItem value={7}>手动计次模式</MenuItem>
+                    <MenuItem value={8}>被动评估模式</MenuItem>
+                    <MenuItem value={9}>主动评估模式</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
