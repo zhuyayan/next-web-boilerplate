@@ -626,9 +626,9 @@ export const fetchStatusById = createAsyncThunk<PatientStatus, { pid:number,task
   return p
 });
 // 更新指标
-export const editStatus = createAsyncThunk<PatientStatus, {pid: number, task_id: number, onset_time : string, medication : string, spasm_status : string , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number},
-    {}>('editstatus', async ({pid, task_id,onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('train/status', { pid, task_id, onset_time , medication , spasm_status , min_heart_rate , max_heart_rate , avg_heart_rate});
+export const editStatus = createAsyncThunk<PatientStatus, {pid: number, task_id: number, min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number},
+    {}>('editstatus', async ({pid, task_id, min_heart_rate , max_heart_rate , avg_heart_rate}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('train/status', { pid, task_id, min_heart_rate , max_heart_rate , avg_heart_rate});
   console.log("edit status: ", response.data)
   return convertAPIStatusToStatus(response.data.data.status[0])
 });

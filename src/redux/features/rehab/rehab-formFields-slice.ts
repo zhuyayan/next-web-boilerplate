@@ -2,6 +2,14 @@ import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {AxiosResponse} from "axios";
 import MCTAxiosInstance from "@/utils/mct-request";
 
+export interface AllData {
+    code: number;
+    data: {
+        form_fields: formField[];
+        submission: SubmissionData;
+    };
+    msg: string;
+}
 export interface formField {
     id: number;
     name: string;
@@ -27,24 +35,44 @@ export interface formFieldRole {
     role_name: string;
 }
 
-export const getFormFields = createAsyncThunk<formField[]>(
-    'getFormFields',
-    async (_, thunkAPI) => {
-        const response: AxiosResponse<any, any> = await MCTAxiosInstance.get('form-fields');
-        console.log("get form-fields async thunk: ", response.data.data)
-        return response.data.data as formField[];
+export interface SubmissionField {
+    form_field_name: string;
+    value: string;
+}
+
+export interface SubmissionData {
+    fields: SubmissionField[];
+    owner_id: number;
+}
+
+export const getFormFields = createAsyncThunk<AllData>('getFormFields', async (_, thunkAPI) => {
+    const response: AxiosResponse<AllData> = await MCTAxiosInstance.get('form-fields?result_owner_id=456');
+    console.log('get form-fields async thunk: ', response.data);
+    return response.data;
+});
+
+
+export const submitForm = createAsyncThunk(
+    'submitForm',
+    async (submissionData: SubmissionData, thunkAPI) => {
+        const response: AxiosResponse<any, any> = await MCTAxiosInstance.post('form-fields', {
+            form_sub_mission: submissionData,
+        });
+        console.log("submit form async thunk: ", response.data);
+        // 返回修改后的数据或其他响应
+        return response.data;
     },
 );
 
 interface RehabFormFieldsState {
     formFieldsData: formField[];
+    submissionData: SubmissionField[];
 }
 
 const initialState: RehabFormFieldsState = {
     formFieldsData: [],
+    submissionData: [],
 }
-
-// ...
 
 const formFieldsSlice = createSlice({
     name: 'formFields',
@@ -52,9 +80,12 @@ const formFieldsSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder.addCase(getFormFields.fulfilled, (state, action) => {
-            state.formFieldsData = action.payload;
+            state.formFieldsData = action.payload.data.form_fields;
+            state.submissionData = action.payload.data.submission.fields;
         });
     },
 });
+
+
 
 export default formFieldsSlice.reducer

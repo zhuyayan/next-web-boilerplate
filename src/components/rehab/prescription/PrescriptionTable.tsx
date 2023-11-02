@@ -85,12 +85,12 @@ const PrescriptionTable = (params: {
     setOpenEvaluate(false);
   };
   // const onsetTime = willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null;
-  const nextSunday = dayjs().endOf('week').startOf('day').toDate();
-  const isWeekend = (date: Dayjs) => {
-    const day = date.day();
-
-    return day === 0 || day === 6;
-  };
+  // const nextSunday = dayjs().endOf('week').startOf('day').toDate();
+  // const isWeekend = (date: Dayjs) => {
+  //   const day = date.day();
+  //
+  //   return day === 0 || day === 6;
+  // };
 
   //跳转
   const handleClickMove = () => {

@@ -42,7 +42,14 @@ import {CommonEvaluation, getEvaluation} from "@/redux/features/rehab/rehab-eval
 import InputLabel from "@mui/material/InputLabel";
 import Select, {SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import {formField, getFormFields, option} from "@/redux/features/rehab/rehab-formFields-slice";
+import {
+  formField,
+  getFormFields,
+  option,
+  submitForm,
+  SubmissionField,
+  SubmissionData,
+} from "@/redux/features/rehab/rehab-formFields-slice";
 
 
 export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
@@ -52,7 +59,8 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   const [inputValue, setInputValue] = useState('');
   const appDispatch = useAppDispatch()
   const assessmentResponseData = useAppSelector((state: RootState) => state.assessment.assessmentData);
-  const formFieldsRespomseData = useAppSelector((state: RootState) => state.formField.formFieldsData);
+  const formFieldsResponseData = useAppSelector((state: RootState) => state.formField.formFieldsData);
+  const submissionResponseData = useAppSelector((state: RootState) => state.formField.submissionData);
   const suggestionResponseData = useAppSelector((state: RootState) => state.suggestion.suggestionData);
   const [suggestionText, setSuggestionText] = useState('')
   const evaluationResponseData = useAppSelector((state: RootState) => state.evaluation.evaluationData);
@@ -66,80 +74,67 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     thunkDispatch(getFormFields())
   },[params.id,thunkDispatch])
 
-  const handleAddComponent = useCallback(() => {
-    if (inputValue.trim() !== '') {
-      const newComponent = (
-          <Grid item xs={3}>
-            <Box sx={{ padding: '8px' }}>
-              <Grid container spacing={0} alignItems="center">
-                <Grid item xs={4}>
-                  <label htmlFor={inputValue}>{inputValue}:</label>
-                </Grid>
-                <Grid item xs={8}>
-                  <TextField
-                      name={inputValue}
-                      value=""
-                      //需要有内容变化函数
-                      size="small"
-                      fullWidth
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
-      );
+  const [groupedFields, setGroupedFields] = useState<formField[][]>([]);
+  useEffect(()=>{
+    setGroupedFields(groupByGroupName(formFieldsResponseData));
+  },[formFieldsResponseData])
 
-      setComponents((prevComponents) => [...prevComponents, newComponent]);
-      setInputValue('');
-    }
-  }, [inputValue]);
-
-  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-  }, []);
+  const [submissionData, setSubmissionData] = useState<SubmissionField[]>([]);
+  useEffect(() => {
+    setSubmissionData(submissionResponseData);
+  },[submissionResponseData])
+  useEffect(() => {
+    const fields = submissionData.reduce((acc, field) => {
+      return {
+        ...acc,
+        [field.form_field_name]: field.value
+      };
+    }, {});
+    setTextFields(fields);
+  }, [submissionData]);
 
 
   // 处理选择量表的函数
-  const handleAssessmentChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedAssessment(event.target.value as string);
-  };
+  // const handleAssessmentChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  //   setSelectedAssessment(event.target.value as string);
+  // };
 
   // 处理提交选择的函数
-  const handleSubmit = () => {
-    // 在这里处理提交选择的逻辑，例如导航到相关页面 addAssessment
-    console.log('用户选择的评定量表:', selectedAssessment);
-    thunkDispatch(postAssessment({task_id: parseInt(params.id), selectedRecord: fuglMeyerScores}))
-  };
+  // const handleSubmit = () => {
+  //   // 在这里处理提交选择的逻辑，例如导航到相关页面 addAssessment
+  //   console.log('用户选择的评定量表:', selectedAssessment);
+  //   thunkDispatch(postAssessment({task_id: parseInt(params.id), selectedRecord: fuglMeyerScores}))
+  // };
 
   // 医生评价表单
-  const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
-    tolerance: '',
-    motionReview: '',
-    spasmReview: '',
-    muscleTone: '',
-    acuteState: '',
-    neuroJudgment: '',
-    motionInjury: '',
-  });
+  // const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
+  //   tolerance: '',
+  //   motionReview: '',
+  //   spasmReview: '',
+  //   muscleTone: '',
+  //   acuteState: '',
+  //   neuroJudgment: '',
+  //   motionInjury: '',
+  // });
 
-  const handleEvaluationFormDataFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setEvaluateFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  // const handleEvaluationFormDataFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   setEvaluateFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+  // };
 
-  const handleChangeMediaStrokeLevel = (event: SelectChangeEvent) => {
-    const {value} = event.target;
-    console.log("value: ", value)
-    console.log("event.target.value", event.target.value)
-    setEvaluateFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-    // setMediaStrokeLevel(event.target.value);
-  };
+  // const handleChangeMediaStrokeLevel = (event: SelectChangeEvent) => {
+  //   const {value} = event.target;
+  //   console.log("value: ", value)
+  //   console.log("event.target.value", event.target.value)
+  //   setEvaluateFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+  //   // setMediaStrokeLevel(event.target.value);
+  // };
 
   const selectedStyle = {
     height: '40px',
@@ -161,54 +156,46 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
 
   //自定义量表
 
-  const [openScale, setOpenScale] = useState(false);
-  const [openEvaluate, setOpenEvaluate] = useState(false);
-  const handleEditScale = () => {
-    setOpenScale(true);
-  };
-  const handleCloseScale = () => {
-    setOpenScale(false);
-  };
+  // const [openScale, setOpenScale] = useState(false);
+  // const [openEvaluate, setOpenEvaluate] = useState(false);
+  // const handleEditScale = () => {
+  //   setOpenScale(true);
+  // };
+  // const handleCloseScale = () => {
+  //   setOpenScale(false);
+  // };
+  //
+  // //自定义评价内容
+  // const handleEditEvaluate = () => {
+  //   setOpenEvaluate(true);
+  // };
+  // const handleCloseEvaluate = () => {
+  //   setOpenEvaluate(false);
+  // };
 
-  //自定义评价内容
-  const handleEditEvaluate = () => {
-    setOpenEvaluate(true);
-  };
-  const handleCloseEvaluate = () => {
-    setOpenEvaluate(false);
-  };
-
-  const handleSaveEvaluate = () => {
-    thunkDispatch(addEvaluation({
-      acute_state: evaluateFormData.acuteState,
-      motion_injury: evaluateFormData.motionInjury,
-      motion_review: evaluateFormData.motionReview,
-      muscle_tone: evaluateFormData.muscleTone,
-      neuro_judgment: evaluateFormData.neuroJudgment,
-      pid: parseInt(params.PId),
-      rehab_session_id: 0,
-      spasm_review: evaluateFormData.spasmReview,
-      tolerance: evaluateFormData.tolerance,
-    }))
-    // setOpenAddStatus(false)
-  };
+  // const handleSaveEvaluate = () => {
+  //   thunkDispatch(addEvaluation({
+  //     acute_state: evaluateFormData.acuteState,
+  //     motion_injury: evaluateFormData.motionInjury,
+  //     motion_review: evaluateFormData.motionReview,
+  //     muscle_tone: evaluateFormData.muscleTone,
+  //     neuro_judgment: evaluateFormData.neuroJudgment,
+  //     pid: parseInt(params.id),
+  //     rehab_session_id: 0,
+  //     spasm_review: evaluateFormData.spasmReview,
+  //     tolerance: evaluateFormData.tolerance,
+  //   }))
+  //   // setOpenAddStatus(false)
+  // };
 
   //保存医生建议
   const handleSaveSuggestion = () => {
     thunkDispatch(postSuggestion({task_id: parseInt(params.id), suggestion_id: suggestionResponseData?.suggestion_id || 1, suggestion_text: suggestionText}))
   };
 
-  const [showEvaluate1, setShowEvaluate1] = useState(true);
-  const [showEvaluate2, setShowEvaluate2] = useState(true);
-  const [showEvaluate3, setShowEvaluate3] = useState(true);
-  const [showEvaluate4, setShowEvaluate4] = useState(true);
-  const [showEvaluate5, setShowEvaluate5] = useState(true);
-  const [showEvaluate6, setShowEvaluate6] = useState(true);
-  const [showEvaluate7, setShowEvaluate7] = useState(true);
-
-  function handleFuglMeyerAssessmentChange(id: number, newValue: string | undefined | null) {
-    thunkDispatch(setFuglMeyerScores({id, newValue}));
-  }
+  // function handleFuglMeyerAssessmentChange(id: number, newValue: string | undefined | null) {
+  //   thunkDispatch(setFuglMeyerScores({id, newValue}));
+  // }
 
   const StyledTableCell = styled(TableCell)`
     background-color: #f0f0f0;
@@ -220,59 +207,103 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   margin: 16px;
 `;
 
-  const [degrees, setDegrees] = useState({
-    leftThumbMP: '',
-    rightThumbMP: '',
-    leftThumbIP: '',
-    rightThumbIP: '',
-    leftRadialAbduction: '',
-    rightRadialAbduction: '',
-    leftThumbOpposition: '',
-    rightThumbOpposition:'',
-  });
+  // const [degrees, setDegrees] = useState({
+  //   leftThumbMP: '',
+  //   rightThumbMP: '',
+  //   leftThumbIP: '',
+  //   rightThumbIP: '',
+  //   leftRadialAbduction: '',
+  //   rightRadialAbduction: '',
+  //   leftThumbOpposition: '',
+  //   rightThumbOpposition:'',
+  // });
 
-  const handleInputDegreesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setDegrees((prevDegrees) => ({
-      ...prevDegrees,
-      [name]: value,
+  // const handleInputDegreesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   setDegrees((prevDegrees) => ({
+  //     ...prevDegrees,
+  //     [name]: value,
+  //   }));
+  // };
+
+
+
+  const [textFields, setTextFields] = useState({}); // 状态中存储文本框的name和value
+  const handleInputTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setTextFields((prevTextFields) => ({
+      ...prevTextFields,
+      [name]: value, // 更新相应的name和value
     }));
   };
 
-  //保存评估
-  const handleSaveDegrees = () => {
-
-  };
-
-  const initialDegrees = {
-    leftHand: {
-      finger1: { MCP: '', PIP: '', DIP: '' },
-      finger2: { MCP: '', PIP: '', DIP: '' },
-      finger3: { MCP: '', PIP: '', DIP: '' },
-    },
-    rightHand: {
-      finger1: { MCP: '', PIP: '', DIP: '' },
-      finger2: { MCP: '', PIP: '', DIP: '' },
-      finger3: { MCP: '', PIP: '', DIP: '' },
-    },
-  };
-
-  const [degree, setDegree] = useState(initialDegrees);
-
-  const handleInputDegreeChange = (event) => {
-    const { name, value } = event.target;
-    const [hand, finger, joint] = name.split('-');
-    setDegrees((prevDegrees) => ({
-      ...prevDegrees,
-      [hand]: {
-        ...prevDegrees[hand],
-        [finger]: {
-          ...prevDegrees[hand][finger],
-          [joint]: value,
-        },
-      },
+  //量表选中状态
+  const [selectedValues, setSelectedValues] = useState<{ [key: string]: string }>({});
+  const handleToggleButtonChange = (fieldName: string, value: string) => {
+    setSelectedValues(prevState => ({
+      ...prevState,
+      [fieldName]: value
     }));
   };
+
+  const handleInputFuglChange = (name: string, value: string) => {
+    if (name && value) {
+      setTextFields((prevTextFields) => ({
+        ...prevTextFields,
+        [name]: value,
+      }));
+    }
+  };
+
+  // 将 textFields 转换为 SubmissionField 数组
+  const submissionFields: SubmissionField[] = Object.entries(textFields).map(([name, value]) => ({
+    form_field_name: name,
+    value: value as string, // 使用类型断言将未知类型的 value 转换为字符串类型
+  }));
+
+  //保存
+  const handleSubmitAll = () => {
+    // 构建 submissionData 对象
+    const submissionData: SubmissionData = {
+      fields: submissionFields,
+      owner_id: 456,
+    };
+
+    // 调用异步操作
+    thunkDispatch(submitForm(submissionData));
+  };
+
+
+
+  // const initialDegrees = {
+  //   leftHand: {
+  //     finger1: { MCP: '', PIP: '', DIP: '' },
+  //     finger2: { MCP: '', PIP: '', DIP: '' },
+  //     finger3: { MCP: '', PIP: '', DIP: '' },
+  //   },
+  //   rightHand: {
+  //     finger1: { MCP: '', PIP: '', DIP: '' },
+  //     finger2: { MCP: '', PIP: '', DIP: '' },
+  //     finger3: { MCP: '', PIP: '', DIP: '' },
+  //   },
+  // };
+
+  // const [degree, setDegree] = useState(initialDegrees);
+  //
+  // const handleInputDegreeChange = (event) => {
+  //   const { name, value } = event.target;
+  //   const [hand, finger, joint] = name.split('-');
+  //   setDegrees((prevDegrees) => ({
+  //     ...prevDegrees,
+  //     [hand]: {
+  //       ...prevDegrees[hand],
+  //       [finger]: {
+  //         ...prevDegrees[hand][finger],
+  //         [joint]: value,
+  //       },
+  //     },
+  //   }));
+  // };
   const initialSuggestionValue = isModified ? '' : suggestionResponseData?.suggestion;
 
   //根据组名把获取的formField分组
@@ -293,7 +324,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     return groupedFields;
   };
 
-  const groupedFields = groupByGroupName(formFieldsRespomseData);
+  //const groupedFields = groupByGroupName(formFieldsResponseData);
   const uniqueStringsLeft: Set<string> = new Set();
   const uniqueStringsRight: Set<string> = new Set();
   let uniqueArrayLeft: string[];
@@ -317,36 +348,42 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                       </Grid>
                       <Grid item xs={12} alignItems="center">
                         <ToggleButtonGroup
-                            // value={fuglMeyerScores[index]}
+                            value={selectedValues[field.name] || ''}
                             exclusive
-                            // onChange={}
-                            // aria-label={`test-${index}`}
+                            onChange={(event, value) => {
+                              handleToggleButtonChange(field.name, value);
+                              handleInputFuglChange(field.name, value);
+                            }}
                         >
-                          {
-                            field.options.map((l: option)=> {
-                              let selected
-                              if (fuglMeyerScores[index] != null && fuglMeyerScores[index] != undefined) {
-                                selected = Number(fuglMeyerScores[index].selected_assessment_level_id) === l.option_id
-                              }
-                              return (
-                                  <ToggleButton key={l.option_id} value={l.option_id} style={selected ? selectedStyle : notSelectedStyle} aria-label={`level-${l.option_id}`}>
-                                    {l.label}
-                                  </ToggleButton>
-                              )
-                            })
-                          }
+                          {field.options.map((l: option) => {
+                            const selected = (selectedValues[field.name] || textFields[field.name as keyof typeof textFields])  === l.value;
+                            return (
+                                <ToggleButton
+                                    key={l.option_id}
+                                    value={l.value}
+                                    style={selected ? selectedStyle : notSelectedStyle}
+                                >
+                                  {l.label}
+                                </ToggleButton>
+                            );
+                          })}
                         </ToggleButtonGroup>
                       </Grid>
                     </>
                 ))}
               </Grid>
               <Grid item xs={12} alignItems="center">
-                <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleSubmit}>
-                  保存
+                <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleSubmitAll}>
+                  保存所有数据
                 </Button>
               </Grid>
             </Card>
           </>
+      );
+    }
+    else if (group[0].group_name === 'User Information') {
+      return (
+          <></>
       );
     }
 
@@ -388,15 +425,16 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {uniqueArrayLeft.map((finger) => (
-                          <TableRow key={finger}>
+                      {uniqueArrayLeft.map((finger, index) => (
+                          <TableRow key={index}>
                             <StyledTableCell align="center">{finger}</StyledTableCell>
-                            {group.slice(0, num).map((item) => (
-                                <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center" key={item.id}>
+                            {group.slice(index * num, (index + 1) * num).map((item) => (
+                                <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center" key={item.name}>
                                   <TextField
-                                      name={item.id.toString()}
-                                      value=""
-                                      // onChange={handleInputDegreeChange}
+                                      name={item.name}
+                                      value={textFields[ item.name as keyof typeof textFields] || ''} // 设置文本框的值为状态中存储的值
+                                      //value={item.name}
+                                      onChange={handleInputTextChange} // 绑定onChange事件处理函数
                                       size="small"
                                   />
                                 </TableCell>
@@ -442,7 +480,7 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   }
 
   //根据type返回组件
-  const renderFormField = (fieldType, fieldName, options) => {
+  const renderFormField = (fieldType: string, fieldName: string, options: option[]) => {
     if (fieldType === 'text') {
       return (
           <TextField
@@ -456,64 +494,36 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
       return (
           <Select
               name={fieldName}
-              value=""
+              value={textFields[fieldName as keyof typeof textFields] || ""} // set default label to empty string if no value is present
               fullWidth
               variant="outlined"
               size="small"
+              onChange={(event) => {
+                const name = event.target.name;
+                const value = event.target.value;
+                handleInputFuglChange(name, value);
+              }}
           >
-            {options.map((option) => (
-                <MenuItem key={option.option_id} value={option.value}>
+            {options.map((option: option) => (
+                <MenuItem
+                    key={option.option_id}
+                    value={option.value}
+                    selected={option.value === textFields[fieldName as keyof typeof textFields]}
+                >
                   {option.label}
                 </MenuItem>
             ))}
           </Select>
-      );
-    } else if (fieldType === 'date' || fieldType === 'time') {
-      return (
-          <TextField
-              name={fieldName}
-              type="date"
-              size="small"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-          />
-      );
-    } else if (fieldType === 'password') {
-      return (
-          <TextField
-              name={fieldName}
-              type="password"
-              size="small"
-              fullWidth
-          />
-      );
-    } else if (fieldType === 'number') {
-      return (
-          <TextField
-              name={fieldName}
-              type="number"
-              size="small"
-              fullWidth
-          />
-      );
-    } else if (fieldType === 'file') {
-      return (
-          <Input
-              type="file"
-              name={fieldName}
-              inputProps={{ multiple: false }}
-              onChange={(event) => {
-                console.log(event.target.files[0]);
-              }}
-          />
+
+
       );
     } else {
       return (
           <TextField
               name={fieldName}
-              value=""
+              value={textFields[ fieldName as keyof typeof textFields] || ''} // 设置文本框的值为状态中存储的值
+              //value={fieldName}
+              onChange={handleInputTextChange} // 绑定onChange事件处理函数
               size="small"
               fullWidth
           />

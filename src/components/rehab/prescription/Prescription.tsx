@@ -465,9 +465,6 @@ export default function StickyHeadTable(params: {
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
     pid:0,
     task_id:0,
-    onset_time : "",
-    medication : "",
-    spasm_status : "",
     min_heart_rate : 0,
     max_heart_rate : 0,
     avg_heart_rate : 0,
@@ -490,9 +487,6 @@ export default function StickyHeadTable(params: {
     appThunkDispatch(addStatus({
       pid: parseInt(params.id),
       task_id:0,
-      onset_time: willAddStatus.onset_time,
-      medication: willAddStatus.medication,
-      spasm_status: willAddStatus.spasm_status,
       min_heart_rate: willAddStatus.min_heart_rate,
       max_heart_rate: willAddStatus.max_heart_rate,
       avg_heart_rate: willAddStatus.avg_heart_rate
@@ -688,7 +682,7 @@ export default function StickyHeadTable(params: {
       }))
     }
   };
-  const onsetTime = willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null;
+  // const onsetTime = willAddStatus.onset_time !== "" ? dayjs(willAddStatus.onset_time) : null;
 
   const [selectedTab, setSelectedTab] = React.useState(0); // 初始选中的 tab
 
