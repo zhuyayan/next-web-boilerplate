@@ -1,4 +1,6 @@
 import moment from 'moment';
+import {MenuItem} from "@mui/material";
+import * as React from "react";
 export function genderLabelToValue(label:string): string {
   if (label == "男") {
     return "10"
@@ -50,6 +52,8 @@ export const NumToModeMapping: { [key: string]: number } = {
   "助力计次模式": 5,
   "助力定时模式": 6,
   "手动计次模式": 7,
+  "被动评估模式": 8,
+  "主动评估模式": 9,
   "无效": 0,
 };
 
@@ -80,6 +84,8 @@ export const ModeToNumMapping: { [key: number]: string } = {
   5: "助力计次模式",
   6: "助力定时模式",
   7: "手动计次模式",
+  8: "被动评估模式",
+  9: "主动评估模式",
   0: "无效",
 };
 
