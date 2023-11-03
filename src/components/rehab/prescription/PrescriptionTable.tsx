@@ -9,12 +9,12 @@ import TableCell from '@mui/material/TableCell'
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText} from "@mui/material";
 import {
   addStatus,
-  exportTaskPressureData, PatientStatus,
+  exportTaskPressureData, PatientStatus, fetchStatusById,
   PrescriptionRecord,
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import React, {ChangeEvent, useState} from "react";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Grid";
@@ -23,6 +23,8 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
 import TextField from "@mui/material/TextField";
 import dayjs, {Dayjs} from "dayjs";
+import { useEffect } from 'react';
+import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
 
 
 // const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({
@@ -60,20 +62,32 @@ const PrescriptionTable = (params: {
 
   const [taskid, setTaskid] = useState(0);
 
-  const handleClickOpenStatus = () => {
+  const handleClickOpenStatus = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const taskId = event.currentTarget.dataset.taskId;
+    setTaskid(Number(taskId));
+    await thunkDispatch(fetchStatusById({ pid: parseInt(params.pid), task_id: Number(taskId) }));
     setOpenStatus(true);
   };
+
   const handleCloseStatus = () => {
     setOpenStatus(false);
   };
 
+  const thunkDispatch = useAppDispatch();
+  const statusData = useAppSelector(state => state.rehab.patientStatus);
+
+  useEffect(() => {
+    if (statusData) {
+      setWillAddStatus(statusData);
+    }
+  }, [statusData, taskid]);
 
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
-    pid:0,
-    task_id:0,
-    min_heart_rate : 0,
-    max_heart_rate : 0,
-    avg_heart_rate : 0,
+    pid: 0,
+    task_id: 0,
+    min_heart_rate: 0,
+    max_heart_rate: 0,
+    avg_heart_rate: 0,
   })
 
   // 查看评价弹框
@@ -165,9 +179,9 @@ const PrescriptionTable = (params: {
                     <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
                     <TableCell>
                       {willAddStatus.avg_heart_rate === 0 && willAddStatus.min_heart_rate === 0 && willAddStatus.max_heart_rate === 0? (
-                          <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={() => {handleClickOpenStatus(); setTaskid(row.id);}}>填写指标</Button>
+                          <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus} data-task-id={row.id}>填写指标</Button>
                       ) : (
-                          <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={() => {handleClickOpenStatus(); setTaskid(row.id);}}>查看指标</Button>
+                          <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus} data-task-id={row.id}>查看指标</Button>
                       )}
                     </TableCell>
                     <TableCell align="center">
@@ -290,7 +304,7 @@ const PrescriptionTable = (params: {
               <Grid item xs={8}>
                 <TextField
                   id="min_heart_rate"
-                  value={willAddStatus.min_heart_rate}
+                  value={willAddStatus.min_heart_rate !== 0 ? willAddStatus.min_heart_rate : statusData.min_heart_rate || ''}
                   onChange={handleAddStatus}
                   size="small"
                 />
@@ -307,7 +321,7 @@ const PrescriptionTable = (params: {
               <Grid item xs={8}>
                 <TextField
                   id="max_heart_rate"
-                  value={willAddStatus.max_heart_rate}
+                  value={willAddStatus.max_heart_rate !== 0 ? willAddStatus.max_heart_rate : statusData.max_heart_rate || ''}
                   onChange={handleAddStatus}
                   size="small"
                   fullWidth
@@ -325,7 +339,7 @@ const PrescriptionTable = (params: {
               <Grid item xs={8}>
                 <TextField
                   id="avg_heart_rate"
-                  value={willAddStatus.avg_heart_rate}
+                  value={willAddStatus.avg_heart_rate !== 0 ? willAddStatus.avg_heart_rate : statusData.avg_heart_rate || ''}
                   onChange={handleAddStatus}
                   size="small"
                   fullWidth

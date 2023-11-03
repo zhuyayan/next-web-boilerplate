@@ -51,6 +51,9 @@ import DeleteConfirmationDialog from '@/components/rehab/DeleteConfirmationDialo
 import { Title } from '@/components/rehab/styles';
 import Link from "next/link";
 import {string} from "postcss-selector-parser";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -436,8 +439,11 @@ export default function PatientList() {
                   <TableCell sx={{m: 1, minWidth: 80}} align='center'>年龄</TableCell>
                   <TableCell sx={{m: 1, minWidth: 80}} align='center'>性别</TableCell>
                   <TableCell sx={{m: 1, minWidth: 90}} align='center'>诊断</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 110}} align='center'>分类</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>病变部位</TableCell>
+                  {/*<TableCell sx={{m: 1, minWidth: 110}} align='center'>分类</TableCell>*/}
+                  <TableCell sx={{m: 1, minWidth: 110}} align='center'>发病日期</TableCell>
                   <TableCell sx={{m: 1, minWidth: 80}} align='center'>Brunnstrom分期</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>NIHSS评分</TableCell>
                   <TableCell sx={{m: 1, minWidth: 100}} align='center'>主治医生</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>身份证号</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>操作</TableCell>
@@ -452,8 +458,11 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.age}</TableCell>
                           <TableCell align='center'>{patient.genderLabel}</TableCell>
                           <TableCell align='center'>{patient.medicalHistory}</TableCell>
-                          <TableCell align='center'>{PatientNumClassifyToClassifyLabelMapping[String(patient.mediaStrokeType)]}</TableCell>
+                          <TableCell align='center'>部位占位</TableCell>
+                          {/*<TableCell align='center'>{PatientNumClassifyToClassifyLabelMapping[String(patient.mediaStrokeType)]}</TableCell>*/}
+                          <TableCell align='center'>日期占位</TableCell>
                           <TableCell align='center'>{PatientNumStrokeLevelToStrokeLevelLabelMapping[String(patient.mediaStrokeLevel)]}</TableCell>
+                          <TableCell align='center'>分数占位</TableCell>
                           <TableCell align='center'>{patient.physician}</TableCell>
                           <TableCell align='center'>{patient.i18d}</TableCell>
                           <TableCell align='center'>
@@ -589,18 +598,35 @@ export default function PatientList() {
                   </FormControl>
                 </StyledDiv>
                 <StyledDiv>
+                  <TextField
+                      sx={{ m: 1, minWidth: 120 }}
+                      id="bingbianbuwei"
+                      //value={willEditPatient.name}
+                      //onChange={handleEditPatientInput}
+                      label="病变部位" variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 80 }}
+                      id="BIHSS value"
+                      //value={willEditPatient.age}
+                      //onChange={handleEditPatientAgeInput}
+                      label="BIHSS评分" variant="outlined" size="small"/>
+                </StyledDiv>
+                <StyledDiv>
                   <FormControl sx={{m: 1, minWidth: 200}} size="small">
-                    <InputLabel id="Classify">分类</InputLabel>
-                    <Select
-                      labelId="Classify"
-                      id="Classify"
-                      label="分类"
-                      value={String(willEditPatient.mediaStrokeType)}
-                      onChange={handleChangeClassify}
-                    >
-                      <MenuItem value={10}>缺血性脑卒中</MenuItem>
-                      <MenuItem value={21}>出血性脑卒中</MenuItem>
-                    </Select>
+                  {/*  <InputLabel id="Classify">分类</InputLabel>*/}
+                  {/*  <Select*/}
+                  {/*    labelId="Classify"*/}
+                  {/*    id="Classify"*/}
+                  {/*    label="分类"*/}
+                  {/*    value={String(willEditPatient.mediaStrokeType)}*/}
+                  {/*    onChange={handleChangeClassify}*/}
+                  {/*  >*/}
+                  {/*    <MenuItem value={10}>缺血性脑卒中</MenuItem>*/}
+                  {/*    <MenuItem value={21}>出血性脑卒中</MenuItem>*/}
+                  {/*  </Select>*/}
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker label="发病日期"/>
+                    </LocalizationProvider>
                   </FormControl>
                   <FormControl sx={{m: 1, minWidth: 200}} size="small">
                     <InputLabel id="mediaStrokeLevel">Brunnstrom分期</InputLabel>
@@ -688,19 +714,36 @@ export default function PatientList() {
                   </FormControl>
                 </StyledDiv>
                 <StyledDiv>
+                  <TextField
+                      sx={{ m: 1, minWidth: 120 }}
+                      id="bingbianbuwei"
+                      //value={willEditPatient.name}
+                      //onChange={handleEditPatientInput}
+                      label="病变部位" variant="outlined" size="small"/>
+                  <TextField
+                      sx={{ m: 1, minWidth: 80 }}
+                      id="BIHSS value"
+                      //value={willEditPatient.age}
+                      //onChange={handleEditPatientAgeInput}
+                      label="BIHSS评分" variant="outlined" size="small"/>
+                </StyledDiv>
+                <StyledDiv>
                   <FormControl sx={{m: 1, minWidth: 200}} size="small">
-                    <InputLabel id="gender">分类</InputLabel>
-                    <Select
-                      labelId="gender"
-                      id="gender"
-                      label="分类"
-                      value={String(willAddPatient.mediaStrokeType)}
-                      onChange={handleAddPatientClassifyChange}
-                    >
-                      <MenuItem value={0}></MenuItem>
-                      <MenuItem value={10}>缺血性脑卒中</MenuItem>
-                      <MenuItem value={21}>出血性脑卒中</MenuItem>
-                    </Select>
+                  {/*  <InputLabel id="gender">分类</InputLabel>*/}
+                  {/*  <Select*/}
+                  {/*    labelId="gender"*/}
+                  {/*    id="gender"*/}
+                  {/*    label="分类"*/}
+                  {/*    value={String(willAddPatient.mediaStrokeType)}*/}
+                  {/*    onChange={handleAddPatientClassifyChange}*/}
+                  {/*  >*/}
+                  {/*    <MenuItem value={0}></MenuItem>*/}
+                  {/*    <MenuItem value={10}>缺血性脑卒中</MenuItem>*/}
+                  {/*    <MenuItem value={21}>出血性脑卒中</MenuItem>*/}
+                  {/*  </Select>*/}
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker label="发病日期"/>
+                    </LocalizationProvider>
                   </FormControl>
                   <FormControl sx={{m: 1, minWidth: 200}} size="small">
                     <InputLabel id="gender">Brunnstrom分期</InputLabel>

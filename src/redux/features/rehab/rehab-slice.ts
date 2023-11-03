@@ -399,7 +399,7 @@ function convertAPIStaffToMedicalStaff(apiStaff: any): MedicalStaff {
 }
 function convertAPIStatusToStatus(apiStatus: any): PatientStatus {
   return {
-    pid:apiStatus.pid,
+    pid:apiStatus.patient_id,
     task_id:apiStatus.task_id,
     min_heart_rate : apiStatus.min_heart_rate,
     max_heart_rate : apiStatus.max_heart_rate,
@@ -621,7 +621,8 @@ export const fetchStatusById = createAsyncThunk<PatientStatus, { pid:number,task
     {}>('fetchStatusById', async ({pid,task_id}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('train/status', {params:{pid,task_id}});
   console.log("fetch Status by id async thunk: ", response.data.data)
-  let p = response.data.data.map(convertAPIStatusToStatus)
+  //let p = response.data.data.map(convertAPIStatusToStatus)
+  let p = convertAPIStatusToStatus(response.data.data)
   console.log('PatientStatus', p)
   return p
 });
