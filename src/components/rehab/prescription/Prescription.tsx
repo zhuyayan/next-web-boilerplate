@@ -42,7 +42,7 @@ import {
   addEvaluation,
   EvaluateFormProps,
   addPrescription,
-  Prescription as PrescriptionEntity, AddPrescriptionItem
+  Prescription as PrescriptionEntity, AddPrescriptionItem, useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -84,7 +84,6 @@ import CardHeader from "@mui/material/CardHeader";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {Simulate} from "react-dom/test-utils";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
-import {color} from "echarts";
 import Divider from "@mui/material/Divider";
 
 
@@ -248,6 +247,7 @@ export default function StickyHeadTable(params: {
   status: PatientStatus,
   onlineEquipment: EquipmentOnline[]}) {
   const appDispatch = useAppDispatch()
+  const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
   const status = useAppSelector((state: RootState) => state.rehab.patientStatus)
@@ -923,6 +923,7 @@ export default function StickyHeadTable(params: {
                             </Card>
                           </Grid>
                         </Grid>
+                        {/*<EChartsTest/>*/}
                       </CardContent>
                     </Card>
                   </Grid>
