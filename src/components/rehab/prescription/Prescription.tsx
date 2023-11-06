@@ -84,6 +84,8 @@ import CardHeader from "@mui/material/CardHeader";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {Simulate} from "react-dom/test-utils";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
+import {color} from "echarts";
+import Divider from "@mui/material/Divider";
 
 
 interface TabPanelProps {
@@ -825,9 +827,102 @@ export default function StickyHeadTable(params: {
                   </Grid>
                   <Grid item xs={12} md={12}>
                     <Card id="target-element">
-                      <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
+                      <CardHeader title='肌力评估' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
                       <CardContent>
-                        <EChartsTest/>
+                        <Grid container spacing={2}>
+                          <Grid item xs={4} md={4}>
+                            <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                              <InputLabel id="demo-select-small-label">训练模式</InputLabel>
+                              <Select
+                                {...register('mode', {required: '训练模式是必需的'})}
+                                labelId="demo-select-small-label"
+                                id="demo-select-small"
+                                value={String(NumToModeMapping[willEditPrescription.mode])}
+                                label="Age1"
+                                name="mode"
+                                onChange={handleModeChange}>
+                                <MenuItem value={8}>被动评估模式</MenuItem>
+                                <MenuItem value={9}>主动评估模式</MenuItem>
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={4} md={4}>
+                            <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                              <InputLabel id="demo-select-small-label">训练部位</InputLabel>
+                              <Select
+                                {...register('part', { required: '训练部位是必需的' })}
+                                labelId="demo-select-small-label"
+                                id="demo-select-small"
+                                value={String(NumToBodyPartMapping[willEditPrescription.part])}
+                                label="Age2"
+                                onChange={handlePartChange}
+                                name="part">
+                                <MenuItem value={1}>左手</MenuItem>
+                                <MenuItem value={2}>右手</MenuItem>
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={4} md={4}>
+                            <Tooltip title="下发评估">
+                              <IconButton
+                                aria-label="edit"
+                                color="primary"
+                                onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
+                              >
+                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                  下发评估：
+                                </Typography>
+                                <SendAndArchiveIcon sx={{ fontSize: 30 }} />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={4}>
+                          <Grid item xs={6} md={6}>
+                            <Card sx={{padding:'8px'}}>
+                              <Typography sx={{ fontSize: 18}}>
+                                左手
+                              </Typography>
+                              <Divider sx={{padding:'5px'}}/>
+                              <Typography sx={{ fontSize: 18,padding:'5px'}}>
+                                最大肌力：
+                                <TextField
+                                id="min_heart_rate"
+                                size="small"
+                                />
+                              </Typography>
+                              <Typography sx={{ fontSize: 18,padding:'5px'}}>
+                                平均肌力：
+                                <TextField
+                                  id="min_heart_rate"
+                                  size="small"
+                                />
+                              </Typography>
+                            </Card>
+                          </Grid>
+                          <Grid item xs={6} md={6}>
+                            <Card sx={{padding:'8px'}}>
+                              <Typography sx={{ fontSize: 18}}>
+                                右手
+                              </Typography>
+                              <Divider sx={{padding:'5px'}}/>
+                              <Typography sx={{ fontSize: 18,padding:'5px'}}>
+                                最大肌力：
+                                <TextField
+                                  id="min_heart_rate"
+                                  size="small"
+                                />
+                              </Typography>
+                              <Typography sx={{ fontSize: 18,padding:'5px'}}>
+                                平均肌力：
+                                <TextField
+                                  id="min_heart_rate"
+                                  size="small"
+                                />
+                              </Typography>
+                            </Card>
+                          </Grid>
+                        </Grid>
                       </CardContent>
                     </Card>
                   </Grid>
