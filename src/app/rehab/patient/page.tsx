@@ -442,10 +442,9 @@ export default function PatientList() {
                   <TableCell sx={{m: 1, minWidth: 90}} align='center'>病变部位</TableCell>
                   {/*<TableCell sx={{m: 1, minWidth: 110}} align='center'>分类</TableCell>*/}
                   <TableCell sx={{m: 1, minWidth: 110}} align='center'>发病日期</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 80}} align='center'>Brunnstrom分期</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>NIHSS评分</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 100}} align='center'>主治医生</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 200}} align='center'>身份证号</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 110}} align='center'>NIHSS评分</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>主治医生</TableCell>
+                  <TableCell sx={{m: 1, minWidth: 190}} align='center'>身份证号</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>操作</TableCell>
                 </TableRow>
               </TableHead>
@@ -461,7 +460,6 @@ export default function PatientList() {
                           <TableCell align='center'>部位占位</TableCell>
                           {/*<TableCell align='center'>{PatientNumClassifyToClassifyLabelMapping[String(patient.mediaStrokeType)]}</TableCell>*/}
                           <TableCell align='center'>日期占位</TableCell>
-                          <TableCell align='center'>{PatientNumStrokeLevelToStrokeLevelLabelMapping[String(patient.mediaStrokeLevel)]}</TableCell>
                           <TableCell align='center'>分数占位</TableCell>
                           <TableCell align='center'>{patient.physician}</TableCell>
                           <TableCell align='center'>{patient.i18d}</TableCell>

@@ -80,6 +80,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import Table from "@mui/material/Table";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const nextSunday = dayjs().endOf('week').startOf('day');
 
@@ -375,21 +376,9 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
             <Grid container item xs={12} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
                 {/*病人card*/}
-                <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 150}} >
+                <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 160}} >
                   <CardContent>
                     <Grid container spacing={2}>
-                      <Grid item xs={5}>
-                        <Typography component="div">
-                          分类：{PatientNumClassifyToClassifyLabelMapping[String(rehabPatient.mediaStrokeType)]}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={7}>
-                        <Typography component="div">
-                          Brunnstrom分期：{PatientNumStrokeLevelToStrokeLevelLabelMapping[String(rehabPatient.mediaStrokeLevel)]}
-                        </Typography>
-                      </Grid>
-                      <Divider />
-                      <br />
                       <Grid item xs={5}>
                         <Typography component="div">
                           姓名：{rehabPatient.name}
@@ -421,7 +410,24 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                       </Grid>
                       <Grid item xs={3.5}>
                         <Typography component="div">
-                          主治医生：{rehabPatient.physician}
+                          发病日期：
+                          {/*主治医生：{rehabPatient.physician}*/}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Divider />
+                    <br />
+                    <Grid container spacing={2}>
+                      <Grid item xs={5}>
+                        <Typography component="div">
+                          病变部位：
+                          {/*分类：{PatientNumClassifyToClassifyLabelMapping[String(rehabPatient.mediaStrokeType)]}*/}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={7}>
+                        <Typography component="div">
+                          NIHSS评分：
+                          {/*Brunnstrom分期：{PatientNumStrokeLevelToStrokeLevelLabelMapping[String(rehabPatient.mediaStrokeLevel)]}*/}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -431,7 +437,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                 </Card>
               </Grid>
               <Grid item xs={6} md={2}>
-                <StatisticsCard>
+                <StatisticsCard style={{ height: '160px' }}>
                   <CardMedia
                     style={{
                       position: 'absolute',
@@ -446,21 +452,24 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                   {/*  /!*<AccessTimeFilledIcon style={{ color: '#69acee', fontSize: 50 }}/>*!/*/}
                   {/*</Typography>*/}
                   <CardContent style={{ textAlign: 'right' }}>
-                    <Typography variant="h3" color="primary" style={{display:'inline-block'}}>
-                      {trainMinus}<br />
+                    <Typography variant="h4" color="primary" style={{display:'inline-block'}}>
+                      {trainMinus}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      弯曲总时长
+                      弯曲总时长 / 分钟
                     </Typography>
-                    <Divider style={{padding:'5px'}}/>
-                    <Typography sx={{ fontSize: 6 }} color="text.secondary">
-                      时间 / 分钟
+                    <Divider />
+                    <Typography variant="h4" color="primary" style={{ textAlign: 'right' }}>
+                      666
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" style={{ textAlign: 'right' }}>
+                      弯曲总次数 / 次
                     </Typography>
                   </CardContent>
                 </StatisticsCard>
               </Grid>
               <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
-                <StatisticsCard>
+                <StatisticsCard style={{ height: '160px' }}>
                   <CardMedia
                     style={{
                       position: 'absolute',
@@ -475,21 +484,24 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                   {/*  <AssessmentIcon  sx={{ color: '#0a94a1', fontSize: 50 }}/>*/}
                   {/*</Typography>*/}
                   <CardContent sx={{ textAlign: 'right' }}>
-                    <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
+                    <Typography variant="h4" color="primary" style={{display:'inline-block'}}>
                       {record.length}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      伸展总时长
+                      伸展总时长 / 分钟
                     </Typography>
-                    <Divider sx={{padding:'5px'}}/>
-                    <Typography sx={{ fontSize: 6 }} color="text.secondary">
-                      时间 / 分钟
+                    <Divider />
+                    <Typography variant="h4" color="primary" style={{ textAlign: 'right' }}>
+                      666
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" style={{ textAlign: 'right' }}>
+                      伸展总次数 / 次
                     </Typography>
                   </CardContent>
                 </StatisticsCard>
               </Grid>
               <Grid item xs={6} md={2}>
-                <StatisticsCard>
+                <StatisticsCard style={{ height: '160px' }}>
                   <Typography sx={{ float:"left" }}>
                     <TimerIcon  sx={{ color: '#7442f6', fontSize: 50 }}/>
                   </Typography>
@@ -501,7 +513,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                       总训练天数
                     </Typography>
                     <Divider sx={{padding:'5px'}}/>
-                    <Typography sx={{ fontSize: 6 }} color="text.secondary">
+                    <Typography sx={{ fontSize: 10 }} color="text.secondary">
                       时间 / 天
                     </Typography>
                   </CardContent>
@@ -511,37 +523,88 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
 
             <Grid item xs={12} md={12}>
               <Card>
-                <CardHeader style={{display:'inline-block'}} title='量表记录' titleTypographyProps={{ variant: 'h5' }}></CardHeader>
-                <TableWrapper>
-                <TableContainer sx={{ maxHeight: 280 }}>
-                  <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ borderLeft: '1px solid #ccc' }}>量表填写时间</TableCell>
-                        <TableCell style={{ borderLeft: '1px solid #ccc' }}>量表及评价</TableCell>
-                        <TableCell style={{ borderLeft: '1px solid #ccc' }}>操作</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow>
-                          <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                            <Typography variant="body2" color="text.secondary">
-                              2023-08-30 10:20:47
-                            </Typography>
-                          </TableCell>
-                          <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                            <a target="_blank" rel="noopener noreferrer">
-                              {/*<a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">*/}
-                              <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
-                            </a>
-                          </TableCell>
-                          <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                          </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                </TableWrapper>
+                <CardHeader style={{display:'inline-block'}} title='评估记录' titleTypographyProps={{ variant: 'h5' }}></CardHeader>
+                <Tooltip title="新建评估">
+                  <IconButton
+                      style={{float: 'right'}}
+                      aria-label="add"
+                      // onClick={handleAddPatientOpen}
+                  >
+                    <AddCircleIcon sx={{ fontSize: 48 }} color="primary"/>
+                  </IconButton>
+                </Tooltip>
+                <Card>
+                  <TableWrapper>
+                    <TableContainer style={{ maxHeight: '195px' }}>
+                      <Table stickyHeader aria-label="sticky table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ borderLeft: '1px solid #ccc', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }} align="center">量表填写时间</TableCell>
+                            <TableCell style={{ borderLeft: '1px solid #ccc', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }} align="center">量表及评价</TableCell>
+                            <TableCell style={{ borderLeft: '1px solid #ccc', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }} align="center">评估完成率</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {/* 表格内容 */}
+                          <TableRow>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <Typography variant="body2" color="text.secondary">
+                                2023-08-30 10:20:47
+                              </Typography>
+                            </TableCell>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <a target="_blank" rel="noopener noreferrer">
+                                {/*<a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">*/}
+                                <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
+                              </a>
+                            </TableCell>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <Typography variant="body2" color="text.secondary">
+                                90 %
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <Typography variant="body2" color="text.secondary">
+                                2023-11-06 16:20:47
+                              </Typography>
+                            </TableCell>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <a target="_blank" rel="noopener noreferrer">
+                                {/*<a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">*/}
+                                <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
+                              </a>
+                            </TableCell>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <Typography variant="body2" color="text.secondary">
+                                80 %
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <Typography variant="body2" color="text.secondary">
+                                2023-08-30 10:20:47
+                              </Typography>
+                            </TableCell>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <a target="_blank" rel="noopener noreferrer">
+                                {/*<a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">*/}
+                                <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
+                              </a>
+                            </TableCell>
+                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
+                              <Typography variant="body2" color="text.secondary">
+                                90 %
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </TableWrapper>
+                </Card>
               </Card>
             </Grid>
 

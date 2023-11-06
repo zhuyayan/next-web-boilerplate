@@ -42,7 +42,7 @@ import {
   addEvaluation,
   EvaluateFormProps,
   addPrescription,
-  Prescription as PrescriptionEntity, AddPrescriptionItem
+  Prescription as PrescriptionEntity, AddPrescriptionItem, useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -84,6 +84,7 @@ import CardHeader from "@mui/material/CardHeader";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {Simulate} from "react-dom/test-utils";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
+import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
 
 
 interface TabPanelProps {
@@ -246,6 +247,7 @@ export default function StickyHeadTable(params: {
   status: PatientStatus,
   onlineEquipment: EquipmentOnline[]}) {
   const appDispatch = useAppDispatch()
+  const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
   const status = useAppSelector((state: RootState) => state.rehab.patientStatus)
@@ -825,9 +827,9 @@ export default function StickyHeadTable(params: {
                   </Grid>
                   <Grid item xs={12} md={12}>
                     <Card id="target-element">
-                      <CardHeader title='当次压力直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
+                      <CardHeader title='肌力评估' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />
                       <CardContent>
-                        <EChartsTest/>
+                        {/*<EChartsTest/>*/}
                       </CardContent>
                     </Card>
                   </Grid>

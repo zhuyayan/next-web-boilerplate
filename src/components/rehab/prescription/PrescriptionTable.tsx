@@ -178,11 +178,7 @@ const PrescriptionTable = (params: {
                     {/*<TableCell>{historyRow.updated_at}</TableCell>*/}
                     <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
                     <TableCell>
-                      {willAddStatus.avg_heart_rate === 0 && willAddStatus.min_heart_rate === 0 && willAddStatus.max_heart_rate === 0? (
-                          <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus} data-task-id={row.id}>填写指标</Button>
-                      ) : (
-                          <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus} data-task-id={row.id}>查看指标</Button>
-                      )}
+                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus} data-task-id={row.id}>查看指标</Button>
                     </TableCell>
                     <TableCell align="center">
                       <a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">
@@ -190,7 +186,7 @@ const PrescriptionTable = (params: {
                       </a>
                     </TableCell>
                     <TableCell align="center">
-                      <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={handleClickMove}>查看直方图</Button>
+                      <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={handleClickMove}>进行肌力评估</Button>
                     </TableCell>
                     {/*<TableCell align='center'>*/}
                     {/*  <Tooltip title="导出">*/}
