@@ -534,8 +534,8 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                 </Tooltip>
                 <Card>
                   <TableWrapper>
-                    <TableContainer style={{ maxHeight: '195px' }}>
-                      <Table stickyHeader aria-label="sticky table">
+                    <TableContainer sx={{ maxHeight: 140 }}>
+                      <Table stickyHeader aria-label="sticky table" size="small">
                         <TableHead>
                           <TableRow>
                             <TableCell style={{ borderLeft: '1px solid #ccc', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }} align="center">量表填写时间</TableCell>

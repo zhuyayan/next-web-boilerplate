@@ -350,6 +350,11 @@ export default function StickyHeadTable(params: {
   const handleSendCommand = () => {
     appThunkDispatch(sendPrescriptionToEquipment({prescription_id:selectedPrescription.id, e_id: clientId}))
     setOpen(false);
+    window.onload = function() {
+      window.addEventListener('refresh', function() {
+        location.reload(); //父页面仅仅是刷新页面，当然也可以自定义逻辑函数写在里面
+      })
+    }
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -798,9 +803,13 @@ export default function StickyHeadTable(params: {
                 {/*一天三次，一次十分钟，共需做5天，已做3天*/}
                 <Grid container spacing={2}>
                   <Grid item xs={8} md={8}>
-                    <Card key={row.id} sx={{ minWidth: 500,backgroundColor: '#74b2f1' ,display: 'flex', justifyContent: 'space-between'}}>
-                        <Typography sx={{ fontSize: 16 ,fontWeight: 'bold',padding:2}} color="text.secondary" gutterBottom>
-                          一天 {row.frequency_per_day} 次，一次 {row.zz} 分钟，共需做 {row.total_days} 天，已做 {getUniqueTrainingDays(row.prescription_record || []) }天
+                    <Card key={row.id}
+                          sx={{ minWidth: 500,backgroundColor: '#9acafc' ,display: 'flex', justifyContent: 'space-between', borderRadius:'20px', boxShadow:'5px 5px 5px #74b2f1' }}>
+                        <Typography sx={{ fontSize: 16 ,fontWeight: 'bold',padding:2, fontfamily:'serif'}} color="text.secondary" gutterBottom>
+                          一天 {row.frequency_per_day} 次，
+                          一次 {row.zz} 分钟，
+                          共需做 {row.total_days} 天，
+                          已做 {getUniqueTrainingDays(row.prescription_record || []) }天
                         </Typography>
                     </Card>
                   </Grid>
@@ -819,7 +828,7 @@ export default function StickyHeadTable(params: {
                     </Tooltip>
                   </Grid>
                   <Grid item xs={12} md={12}>
-                    <Card sx={{ height: 265 ,padding: '5px'}}>
+                    <Card sx={{ height: 220 ,padding: '5px'}}>
                       <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
                       <PrescriptionTable record={row.prescription_record? row.prescription_record : []} pid={params.id} status={status} task_id={params.task_id}/>
                     {/*  prescription_record*/}
@@ -1302,8 +1311,6 @@ export default function StickyHeadTable(params: {
                     <MenuItem value={5}>助力计次模式</MenuItem>
                     <MenuItem value={6}>助力定时模式</MenuItem>
                     <MenuItem value={7}>手动计次模式</MenuItem>
-                    <MenuItem value={8}>被动评估模式</MenuItem>
-                    <MenuItem value={9}>主动评估模式</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl sx={{ m: 1, minWidth: 240 }} size="small">

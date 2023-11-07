@@ -6,7 +6,16 @@ import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText} from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  FormControl,
+  IconButton, InputLabel, MenuItem, Select
+} from "@mui/material";
 import {
   addStatus,
   exportTaskPressureData, PatientStatus, fetchStatusById,
@@ -25,6 +34,12 @@ import TextField from "@mui/material/TextField";
 import dayjs, {Dayjs} from "dayjs";
 import { useEffect } from 'react';
 import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
+import {right} from "@popperjs/core";
+import Typography from "@mui/material/Typography";
+import SendAndArchiveIcon from "@mui/icons-material/SendAndArchive";
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import Tooltip from "@mui/material/Tooltip";
+import {SelectChangeEvent} from "@mui/material/Select";
 
 
 // const StyledTableCell = styled(TableCell)<TableCellProps>(({ theme }) => ({
@@ -59,6 +74,7 @@ const PrescriptionTable = (params: {
 
   // 查看指标弹框
   const [openStatus, setOpenStatus] = React.useState(false);
+  const [openBindDevice, setOpenBindDevice] = React.useState(false);
 
   const [taskid, setTaskid] = useState(0);
 
@@ -68,9 +84,18 @@ const PrescriptionTable = (params: {
     await thunkDispatch(fetchStatusById({ pid: parseInt(params.pid), task_id: Number(taskId) }));
     setOpenStatus(true);
   };
+  const handleBindDevice = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const taskId = event.currentTarget.dataset.taskId;
+    setTaskid(Number(taskId));
+    await thunkDispatch(fetchStatusById({ pid: parseInt(params.pid), task_id: Number(taskId) }));
+    setOpenBindDevice(true);
+  };
 
   const handleCloseStatus = () => {
     setOpenStatus(false);
+  };
+  const handleCloseBindDevice = () => {
+    setOpenBindDevice(false);
   };
 
   const thunkDispatch = useAppDispatch();
@@ -134,21 +159,27 @@ const PrescriptionTable = (params: {
       avg_heart_rate: willAddStatus.avg_heart_rate
     }));
     setOpenStatus(false);
-  }
+  };
+
+  const [heartrate, setHeartRate] = React.useState('');
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setHeartRate(event.target.value as string);
+  };
 
   return (
     <>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 280 }}>
-          <Table stickyHeader aria-label="sticky table">
+        <TableContainer sx={{ maxHeight: 140 }}>
+          <Table stickyHeader aria-label="sticky table" size="small">
             <TableHead>
               <TableRow>
                 <TableCell align="center">状态</TableCell>
                 <TableCell>康复开始时间</TableCell>
                 <TableCell>康复结束时间</TableCell>
                 <TableCell align="center">心率</TableCell>
-                <TableCell align="center">量表及评价</TableCell>
-                <TableCell align="center">操作</TableCell>
+                <TableCell align="center">评估</TableCell>
+                <TableCell align="center">肌力</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -160,12 +191,12 @@ const PrescriptionTable = (params: {
                         style={{
                           backgroundColor:
                             // historyRow.created_at === historyRow.updated_at ? '#f32148' : '#06c426' ,
-                            row.state === 'N_END' || row.state === 'H_END' ? '#06c426' : '#f32148',
+                            row.state === 'BEGIN' || row.state === 'BEGIN' ? '#f32148' : '#06c426',
                           color: '#ffffff',
                           float: 'right',
                         }}
                       >
-                        {row.state === 'N_END' || row.state === 'H_END' ? '完成' : '进行中'}
+                        {row.state === 'BEGIN' || row.state === 'BEGIN' ? '进行中' : '完成'}
                         {/*BEGIN：正常启动
                         N_END ：正常结束
                         H_END ：手动结束
@@ -178,7 +209,8 @@ const PrescriptionTable = (params: {
                     {/*<TableCell>{historyRow.updated_at}</TableCell>*/}
                     <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
                     <TableCell>
-                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus} data-task-id={row.id}>查看心率</Button>
+                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'left'}} onClick={handleClickOpenStatus} data-task-id={row.id}>手动录入</Button>
+                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleBindDevice}>绑定设备</Button>
                     </TableCell>
                     <TableCell align="center">
                       <a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">
@@ -211,7 +243,7 @@ const PrescriptionTable = (params: {
     onClose={handleCloseStatus}
     aria-describedby="Status"
   >
-    <DialogTitle>{"病人各项指标"}</DialogTitle>
+    <DialogTitle>{"病人心率数据"}</DialogTitle>
     <DialogContent>
       {/*<TextField*/}
       {/*  label="发病时间"*/}
@@ -347,10 +379,85 @@ const PrescriptionTable = (params: {
       </Grid>
     </DialogContent>
     <DialogActions>
-      <Button onClick={handleSaveAddStatus}>保存指标</Button>
+      <Button onClick={handleSaveAddStatus}>保存</Button>
       <Button onClick={handleCloseStatus}>关闭</Button>
     </DialogActions>
   </Dialog>
+      <Dialog
+          open={openBindDevice}
+          onClose={handleCloseBindDevice}
+          aria-describedby="BindDevice"
+      >
+        <DialogTitle>{"绑定心率设备"}</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={0}>
+            <Grid item xs={12}>
+              <Grid container spacing={0} alignItems="center">
+                <Grid item xs={4}>
+                  <label htmlFor="input9">选择心率手环:</label>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box>
+                    <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
+                      <InputLabel id="device">心率设备</InputLabel>
+                      <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={heartrate}
+                          label="HeartRate"
+                          onChange={handleChange}
+                      >
+                        <MenuItem value={10}>Ten</MenuItem>
+                        <MenuItem value={20}>Twenty</MenuItem>
+                        <MenuItem value={30}>Thirty</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Tooltip title="开始监测">
+                    <IconButton
+                        aria-label="edit"
+                        color="primary"
+                        // onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
+                    >
+                      <PlayCircleOutlineIcon sx={{ fontSize: 30 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={6}>
+              <Box sx={{padding: '8px' }}>
+                <Grid container spacing={0} alignItems="center">
+                  <Grid item xs={4}>
+                    <label htmlFor="input9">最大心率:</label>
+                  </Grid>
+                  <Grid item xs={8}>
+
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box sx={{padding: '8px' }}>
+                <Grid container spacing={0} alignItems="center">
+                  <Grid item xs={4}>
+                    <label htmlFor="input9">平均心率:</label>
+                  </Grid>
+                  <Grid item xs={8}>
+
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseBindDevice}>保存</Button>
+          <Button onClick={handleCloseBindDevice}>关闭</Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }
