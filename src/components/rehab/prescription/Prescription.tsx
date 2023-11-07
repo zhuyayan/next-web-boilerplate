@@ -832,7 +832,7 @@ export default function StickyHeadTable(params: {
                         <Grid container spacing={2}>
                           <Grid item xs={4} md={4}>
                             <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                              <InputLabel id="demo-select-small-label">训练模式</InputLabel>
+                              <InputLabel id="demo-select-small-label">评估模式</InputLabel>
                               <Select
                                 {...register('mode', {required: '训练模式是必需的'})}
                                 labelId="demo-select-small-label"
@@ -848,7 +848,7 @@ export default function StickyHeadTable(params: {
                           </Grid>
                           <Grid item xs={4} md={4}>
                             <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                              <InputLabel id="demo-select-small-label">训练部位</InputLabel>
+                              <InputLabel id="demo-select-small-label">评估部位</InputLabel>
                               <Select
                                 {...register('part', { required: '训练部位是必需的' })}
                                 labelId="demo-select-small-label"

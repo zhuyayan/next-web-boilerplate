@@ -146,7 +146,7 @@ const PrescriptionTable = (params: {
                 <TableCell align="center">状态</TableCell>
                 <TableCell>康复开始时间</TableCell>
                 <TableCell>康复结束时间</TableCell>
-                <TableCell align="center">指标</TableCell>
+                <TableCell align="center">心率</TableCell>
                 <TableCell align="center">量表及评价</TableCell>
                 <TableCell align="center">操作</TableCell>
               </TableRow>
@@ -178,7 +178,7 @@ const PrescriptionTable = (params: {
                     {/*<TableCell>{historyRow.updated_at}</TableCell>*/}
                     <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
                     <TableCell>
-                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus} data-task-id={row.id}>查看指标</Button>
+                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleClickOpenStatus} data-task-id={row.id}>查看心率</Button>
                     </TableCell>
                     <TableCell align="center">
                       <a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">

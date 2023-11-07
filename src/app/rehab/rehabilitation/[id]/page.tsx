@@ -347,9 +347,8 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
       <Container>
         <Box sx={{marginBottom:5}}>
           <Grid container spacing={8}>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={8} sm={10} lg={6} xl={4}>
               <div >
-
                 <Grid container alignItems="center">
                   <Grid item xs={6}>
                     <Title >康复管理</Title>
@@ -638,22 +637,22 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
             {/*<br/>*/}
 
             {/*压力数据折线图*/}
-            <Grid item xs={6} md={5.5}>
-              <Card sx={{ height: 365 ,padding: '10px'}}>
-                <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
-                {
-                  trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
-                }
-              </Card>
-            </Grid>
+            {/*<Grid item xs={6} md={5.5}>*/}
+            {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
+            {/*    <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />*/}
+            {/*    {*/}
+            {/*      trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>*/}
+            {/*    }*/}
+            {/*  </Card>*/}
+            {/*</Grid>*/}
 
             {/*康复记录*/}
-            <Grid item xs={6} md={6.5}>
-              <Card sx={{ height: 365 ,padding: '10px'}}>
-                <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                <PrescriptionTable record={record} pid={params.id}/>
-              </Card>
-            </Grid>
+            {/*<Grid item xs={6} md={6.5}>*/}
+            {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
+            {/*    <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />*/}
+            {/*    <PrescriptionTable record={record} pid={params.id}/>*/}
+            {/*  </Card>*/}
+            {/*</Grid>*/}
           </Grid>
           <br/>
         </Box>
