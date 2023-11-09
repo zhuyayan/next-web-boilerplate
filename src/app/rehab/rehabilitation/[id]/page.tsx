@@ -24,7 +24,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
@@ -81,6 +81,94 @@ import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import Table from "@mui/material/Table";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+//双击编辑组件
+type EditableTextProps = {
+  initialText: string;
+};
+
+const EditableText: React.FC<EditableTextProps> = ({ initialText }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [text, setText] = useState(initialText);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleBlur = () => {
+    setIsEditing(false);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+  };
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+    }
+  }, [isEditing]);
+
+  return (
+      <>
+        {isEditing ? (
+            <TextField
+                inputRef={inputRef}
+                autoFocus
+                value={text}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                size="small"
+            />
+        ) : (
+            <Typography onDoubleClick={handleDoubleClick}>{text}</Typography>
+        )}
+      </>
+  );
+};
+
+type EditableDateProps = {
+  initialDate: string;
+};
+
+const EditableDate: React.FC<EditableDateProps> = ({ initialDate }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(initialDate);
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleDateChange = (date: string | null) => {
+    setSelectedDate(date);
+  };
+
+  const handleBlur = () => {
+    setIsEditing(false);
+  };
+
+  return (
+      <div>
+        {isEditing ? (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                  onClose={handleBlur}
+              />
+            </LocalizationProvider>
+
+        ) : (
+            <Typography onDoubleClick={handleDoubleClick}>
+              {selectedDate ? selectedDate : "请双击选择日期"}
+            </Typography>
+        )}
+      </div>
+  );
+};
+
 
 const nextSunday = dayjs().endOf('week').startOf('day');
 
@@ -131,8 +219,6 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   const [trainDays, setTrainDays] = useState<number>(0)
 
   const { register: AddPrescriptionItemRegister, formState: { errors: AddPrescriptionItemErrors }, clearErrors: AddPrescriptionItemClearErrors, trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
-
-
 
   const [openAddStatus, setOpenAddStatus] = React.useState(false);
 
@@ -520,6 +606,70 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
               </Grid>
             </Grid>
 
+
+            <Grid item xs={12} md={12}>
+              <Card>
+                <CardHeader style={{display:'inline-block'}} title='病人详细信息' titleTypographyProps={{ variant: 'h5' }}></CardHeader>
+                <CardContent>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6} md={6}>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center" justify-items="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input9">病变部位:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <EditableText initialText="我是部位" />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                    <Grid  item xs={6} md={6}>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input9">发病日期:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            {/*<FormControl sx={{m: 1, minWidth: 50}} size="small">*/}
+                            {/*  <LocalizationProvider dateAdapter={AdapterDayjs}>*/}
+                            {/*    <DatePicker label="发病日期"/>*/}
+                            {/*  </LocalizationProvider>*/}
+                            {/*</FormControl>*/}
+                            <EditableDate initialDate={"2023-01-01"}/>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} md={6}>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center" justify-items="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input9">BIHSS评分:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <EditableText initialText="我是评分" />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                    <Grid  item xs={6} md={6}>
+                      <Box sx={{padding: '8px' }}>
+                        <Grid container spacing={0} alignItems="center" justify-items="center">
+                          <Grid item xs={4}>
+                            <label htmlFor="input9">诊断:</label>
+                          </Grid>
+                          <Grid item xs={8}>
+                            <EditableText initialText="我是诊断" />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+
             <Grid item xs={12} md={12}>
               <Card>
                 <CardHeader style={{display:'inline-block'}} title='评估记录' titleTypographyProps={{ variant: 'h5' }}></CardHeader>
@@ -540,7 +690,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                           <TableRow>
                             <TableCell style={{ borderLeft: '1px solid #ccc', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }} align="center">量表填写时间</TableCell>
                             <TableCell style={{ borderLeft: '1px solid #ccc', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }} align="center">量表及评价</TableCell>
-                            <TableCell style={{ borderLeft: '1px solid #ccc', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }} align="center">评估完成率</TableCell>
+                            {/*<TableCell style={{ borderLeft: '1px solid #ccc', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }} align="center">评估完成率</TableCell>*/}
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -557,11 +707,11 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                                 <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
                               </a>
                             </TableCell>
-                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <Typography variant="body2" color="text.secondary">
-                                90 %
-                              </Typography>
-                            </TableCell>
+                            {/*<TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">*/}
+                            {/*  <Typography variant="body2" color="text.secondary">*/}
+                            {/*    90 %*/}
+                            {/*  </Typography>*/}
+                            {/*</TableCell>*/}
                           </TableRow>
                           <TableRow>
                             <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
@@ -575,11 +725,11 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                                 <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
                               </a>
                             </TableCell>
-                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <Typography variant="body2" color="text.secondary">
-                                80 %
-                              </Typography>
-                            </TableCell>
+                            {/*<TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">*/}
+                            {/*  <Typography variant="body2" color="text.secondary">*/}
+                            {/*    80 %*/}
+                            {/*  </Typography>*/}
+                            {/*</TableCell>*/}
                           </TableRow>
                           <TableRow>
                             <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
@@ -593,11 +743,11 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                                 <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
                               </a>
                             </TableCell>
-                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <Typography variant="body2" color="text.secondary">
-                                90 %
-                              </Typography>
-                            </TableCell>
+                            {/*<TableCell style={{ borderLeft: a'1px solid #ccc' }} align="center">*/}
+                            {/*  <Typography variant="body2" color="text.secondary">*/}
+                            {/*    90 %*/}
+                            {/*  </Typography>*/}
+                            {/*</TableCell>*/}
                           </TableRow>
                         </TableBody>
                       </Table>
