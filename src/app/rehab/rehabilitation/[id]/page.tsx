@@ -12,17 +12,8 @@ import {quEcharts} from "@/components/rehab/echarts/quEcharts";
 import * as React from 'react';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import styled from "styled-components";
 
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {ChangeEvent, useEffect, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
@@ -67,20 +58,18 @@ import Link from "next/link";
 import {useForm} from "react-hook-form";
 
 import dayjs, { Dayjs } from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import {string} from "postcss-selector-parser";
-import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
-import Test from "@/components/rehab/prescription/Test";
-import PrescriptionTest from "@/components/rehab/prescription/PrescriptionTest";
-import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import Table from "@mui/material/Table";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+
+import Tab from '@mui/material/Tab'
+import TabList from '@mui/lab/TabList'
+import TabPanel from '@mui/lab/TabPanel'
+import TabContext from '@mui/lab/TabContext'
+import Avatar from "@mui/material/Avatar";
 
 const nextSunday = dayjs().endOf('week').startOf('day');
 
@@ -342,6 +331,17 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
     setOpenAddStatus(false)
   };
 
+  const [stretchValue, setStretchValue] = useState<string>('1')
+
+  const handleStretchChange = (event: SyntheticEvent, newValue: string) => {
+    setStretchValue(newValue)
+  }
+  const [bendValue, setBendValue] = useState<string>('1')
+
+  const handleBendChange = (event: SyntheticEvent, newValue: string) => {
+    setBendValue(newValue)
+  }
+
   return (
     <>
       <Container>
@@ -375,8 +375,17 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
             <Grid container item xs={12} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
                 {/*病人card*/}
+                {/*<Card  sx={{height: 160}}>*/}
+                {/*  <CardContent>*/}
+                {/*      <Box sx={{ mr: 2, mb: 1, display: 'flex', flexDirection: 'column' }}>*/}
+                {/*        <Typography variant='h6'>{rehabPatient.name}</Typography>*/}
+                {/*        <Typography variant='caption'>{rehabPatient.genderLabel}, {rehabPatient.age}, ID：{rehabPatient.i18d}</Typography>*/}
+                {/*      </Box>*/}
+                {/*  </CardContent>*/}
+                {/*</Card>*/}
                 <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 160}} >
                   <CardContent>
+                    <br />
                     <Grid container spacing={2}>
                       <Grid item xs={5}>
                         <Typography component="div">
@@ -394,6 +403,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                         </Typography>
                       </Grid>
                     </Grid>
+                    <br />
                     <Divider />
                     <br />
                     <Grid container spacing={2}>
@@ -402,101 +412,88 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                           ID：{rehabPatient.i18d}
                         </Typography>
                       </Grid>
-                      <Grid item xs={3.5}>
-                        <Typography component="div">
-                          诊断：{rehabPatient.medicalHistory}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={3.5}>
-                        <Typography component="div">
-                          发病日期：
-                          {/*主治医生：{rehabPatient.physician}*/}
-                        </Typography>
-                      </Grid>
                     </Grid>
-                    <Divider />
-                    <br />
-                    <Grid container spacing={2}>
-                      <Grid item xs={5}>
-                        <Typography component="div">
-                          病变部位：
-                          {/*分类：{PatientNumClassifyToClassifyLabelMapping[String(rehabPatient.mediaStrokeType)]}*/}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={7}>
-                        <Typography component="div">
-                          NIHSS评分：
-                          {/*Brunnstrom分期：{PatientNumStrokeLevelToStrokeLevelLabelMapping[String(rehabPatient.mediaStrokeLevel)]}*/}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Divider />
-                    <br />
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={6} md={2}>
                 <StatisticsCard style={{ height: '160px' }}>
-                  <CardMedia
-                    style={{
-                      position: 'absolute',
-                      width: 50, // 图片的宽度
-                      height: 50, // 图片的高度
-                    }}
-                    component="img"
-                    src="/images/fist.png"
-                    alt="Image"
-                  />
-                  {/*<Typography style={{ float:"left" }}>*/}
-                  {/*  /!*<AccessTimeFilledIcon style={{ color: '#69acee', fontSize: 50 }}/>*!/*/}
-                  {/*</Typography>*/}
-                  <CardContent style={{ textAlign: 'right' }}>
-                    <Typography variant="h4" color="primary" style={{display:'inline-block'}}>
-                      {trainMinus}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      弯曲总时长 / 分钟
-                    </Typography>
-                    <Divider />
-                    <Typography variant="h4" color="primary" style={{ textAlign: 'right' }}>
-                      666
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" style={{ textAlign: 'right' }}>
-                      弯曲总次数 / 次
-                    </Typography>
-                  </CardContent>
+                  <TabContext value={bendValue}>
+                    <TabList onChange={handleBendChange} aria-label='card navigation example'>
+                      <Tab value='1' label='时长' />
+                      <Tab value='2' label='次数' />
+                    </TabList>
+                    <CardMedia
+                      style={{
+                        position: 'absolute',
+                        width: 50, // 图片的宽度
+                        height: 50, // 图片的高度
+                      }}
+                      component="img"
+                      src="/images/fist.png"
+                      alt="Image"
+                    />
+                    <CardContent  sx={{ textAlign: 'right' }}>
+                      <TabPanel value='1' sx={{ p: 0 }}>
+                        <Typography variant="h4" color="primary" style={{display:'inline-block'}}>
+                          {trainMinus}
+                        </Typography>
+                        <Divider />
+                        <Typography variant="body2" color="text.secondary">
+                          弯曲总时长 / 分钟
+                        </Typography>
+                      </TabPanel>
+                      <TabPanel value='2' sx={{ p: 0 }}>
+                        <Typography variant="h4" color="primary" style={{ textAlign: 'right' }}>
+                          666
+                        </Typography>
+                        <Divider />
+                        <Typography variant="body2" color="text.secondary" style={{ textAlign: 'right' }}>
+                          弯曲总次数 / 次
+                        </Typography>
+                      </TabPanel>
+                    </CardContent>
+                  </TabContext>
                 </StatisticsCard>
               </Grid>
               <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
                 <StatisticsCard style={{ height: '160px' }}>
-                  <CardMedia
-                    style={{
-                      position: 'absolute',
-                      width: 50, // 图片的宽度
-                      height: 50, // 图片的高度
-                    }}
-                    component="img"
-                    src="/images/hand.png"
-                    alt="Image"
-                  />
-                  {/*<Typography sx={{ float:"left" }}>*/}
-                  {/*  <AssessmentIcon  sx={{ color: '#0a94a1', fontSize: 50 }}/>*/}
-                  {/*</Typography>*/}
-                  <CardContent sx={{ textAlign: 'right' }}>
-                    <Typography variant="h4" color="primary" style={{display:'inline-block'}}>
-                      {record.length}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      伸展总时长 / 分钟
-                    </Typography>
-                    <Divider />
-                    <Typography variant="h4" color="primary" style={{ textAlign: 'right' }}>
-                      666
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" style={{ textAlign: 'right' }}>
-                      伸展总次数 / 次
-                    </Typography>
-                  </CardContent>
+                  <TabContext value={stretchValue}>
+                    <TabList onChange={handleStretchChange} aria-label='card navigation example'>
+                      <Tab value='1' label='时长' />
+                      <Tab value='2' label='次数' />
+                    </TabList>
+                    <CardMedia
+                      style={{
+                        position: 'absolute',
+                        width: 50, // 图片的宽度
+                        height: 50, // 图片的高度
+                      }}
+                      component="img"
+                      src="/images/hand.png"
+                      alt="Image"
+                    />
+                    <CardContent  sx={{ textAlign: 'right' }}>
+                      <TabPanel value='1' sx={{ p: 0 }}>
+                        <Typography variant="h4" color="primary" style={{display:'inline-block'}}>
+                          {record.length}
+                        </Typography>
+                        <Divider />
+                        <Typography variant="body2" color="text.secondary">
+                          伸展总时长 / 分钟
+                        </Typography>
+                      </TabPanel>
+                      <TabPanel value='2' sx={{ p: 0 }}>
+                        <Typography variant="h4" color="primary" style={{ textAlign: 'right' }}>
+                          666
+                        </Typography>
+                        <Divider />
+                        <Typography variant="body2" color="text.secondary" style={{ textAlign: 'right' }}>
+                          伸展总次数 / 次
+                        </Typography>
+                      </TabPanel>
+                    </CardContent>
+                  </TabContext>
                 </StatisticsCard>
               </Grid>
               <Grid item xs={6} md={2}>

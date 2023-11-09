@@ -370,7 +370,7 @@ export default function PatientList() {
             <Box flexGrow={1}>
               <Title>病人列表</Title>
               <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-                <FormControl sx={{ m: 1, width: 240}}>
+                <FormControl sx={{ m: 1, width: 240}} size={"small"}>
                   <InputLabel id="demo-multiple-checkbox-label">主治医生</InputLabel>
                   <Select
                     labelId="demo-multiple-checkbox-label"
@@ -391,7 +391,7 @@ export default function PatientList() {
                     ))}
                   </Select>
                 </FormControl>
-                <FormControl sx={{ m: 1, width: 480}}>
+                <FormControl sx={{ m: 1, width: 480}} size={"small"}>
                   <OutlinedInput
                       sx={{ ml: 1, flex: 1 }}
                       placeholder="输入病人姓名进行查询"
@@ -417,7 +417,7 @@ export default function PatientList() {
                       style={{float: 'right'}}
                       aria-label="add"
                       onClick={handleAddPatientOpen}>
-                    <AddCircleIcon sx={{ fontSize: 54 }} color="secondary"/>
+                    <AddCircleIcon sx={{ fontSize: 40 }} color="secondary"/>
                   </IconButton>
                 </Tooltip>
               </Paper>
@@ -432,17 +432,17 @@ export default function PatientList() {
         <Paper sx={{ width: '100%', overflow: 'hidden'}}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom:5 }}>
           <TableContainer sx={{ maxHeight: 620}}>
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell sx={{m: 1, minWidth: 90}} align='center'>姓名</TableCell>
                   <TableCell sx={{m: 1, minWidth: 80}} align='center'>年龄</TableCell>
                   <TableCell sx={{m: 1, minWidth: 80}} align='center'>性别</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>诊断</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 90}} align='center'>病变部位</TableCell>
-                  {/*<TableCell sx={{m: 1, minWidth: 110}} align='center'>分类</TableCell>*/}
-                  <TableCell sx={{m: 1, minWidth: 110}} align='center'>发病日期</TableCell>
-                  <TableCell sx={{m: 1, minWidth: 110}} align='center'>NIHSS评分</TableCell>
+                  {/*<TableCell sx={{m: 1, minWidth: 90}} align='center'>诊断</TableCell>*/}
+                  {/*<TableCell sx={{m: 1, minWidth: 90}} align='center'>病变部位</TableCell>*/}
+                  {/*/!*<TableCell sx={{m: 1, minWidth: 110}} align='center'>分类</TableCell>*!/*/}
+                  {/*<TableCell sx={{m: 1, minWidth: 110}} align='center'>发病日期</TableCell>*/}
+                  {/*<TableCell sx={{m: 1, minWidth: 110}} align='center'>NIHSS评分</TableCell>*/}
                   <TableCell sx={{m: 1, minWidth: 90}} align='center'>主治医生</TableCell>
                   <TableCell sx={{m: 1, minWidth: 190}} align='center'>身份证号</TableCell>
                   <TableCell sx={{m: 1, minWidth: 200}} align='center'>操作</TableCell>
@@ -456,15 +456,15 @@ export default function PatientList() {
                           <TableCell align='center'>{patient.name}</TableCell>
                           <TableCell align='center'>{patient.age}</TableCell>
                           <TableCell align='center'>{patient.genderLabel}</TableCell>
-                          <TableCell align='center'>{patient.medicalHistory}</TableCell>
-                          <TableCell align='center'>部位占位</TableCell>
-                          {/*<TableCell align='center'>{PatientNumClassifyToClassifyLabelMapping[String(patient.mediaStrokeType)]}</TableCell>*/}
-                          <TableCell align='center'>日期占位</TableCell>
-                          <TableCell align='center'>分数占位</TableCell>
+                          {/*<TableCell align='center'>{patient.medicalHistory}</TableCell>*/}
+                          {/*<TableCell align='center'>部位占位</TableCell>*/}
+                          {/*/!*<TableCell align='center'>{PatientNumClassifyToClassifyLabelMapping[String(patient.mediaStrokeType)]}</TableCell>*!/*/}
+                          {/*<TableCell align='center'>日期占位</TableCell>*/}
+                          {/*<TableCell align='center'>分数占位</TableCell>*/}
                           <TableCell align='center'>{patient.physician}</TableCell>
                           <TableCell align='center'>{patient.i18d}</TableCell>
                           <TableCell align='center'>
-                            <Tooltip title="查看详细信息">
+                            <Tooltip title="康复管理">
                               <Link href={`/rehab/rehabilitation/${patient.id}`} passHref>
                                 <IconButton
                                     aria-label="more"
@@ -595,63 +595,52 @@ export default function PatientList() {
                     </Select>
                   </FormControl>
                 </StyledDiv>
-                <StyledDiv>
-                  <TextField
-                      sx={{ m: 1, minWidth: 120 }}
-                      id="bingbianbuwei"
-                      //value={willEditPatient.name}
-                      //onChange={handleEditPatientInput}
-                      label="病变部位" variant="outlined" size="small"/>
-                  <TextField
-                      sx={{ m: 1, minWidth: 80 }}
-                      id="BIHSS value"
-                      //value={willEditPatient.age}
-                      //onChange={handleEditPatientAgeInput}
-                      label="BIHSS评分" variant="outlined" size="small"/>
-                </StyledDiv>
-                <StyledDiv>
-                  <FormControl sx={{m: 1, minWidth: 200}} size="small">
-                  {/*  <InputLabel id="Classify">分类</InputLabel>*/}
-                  {/*  <Select*/}
-                  {/*    labelId="Classify"*/}
-                  {/*    id="Classify"*/}
-                  {/*    label="分类"*/}
-                  {/*    value={String(willEditPatient.mediaStrokeType)}*/}
-                  {/*    onChange={handleChangeClassify}*/}
-                  {/*  >*/}
-                  {/*    <MenuItem value={10}>缺血性脑卒中</MenuItem>*/}
-                  {/*    <MenuItem value={21}>出血性脑卒中</MenuItem>*/}
-                  {/*  </Select>*/}
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker label="发病日期"/>
-                    </LocalizationProvider>
-                  </FormControl>
-                  <FormControl sx={{m: 1, minWidth: 200}} size="small">
-                    <InputLabel id="mediaStrokeLevel">Brunnstrom分期</InputLabel>
-                    <Select
-                      labelId="mediaStrokeLevel"
-                      id="mediaStrokeLevel"
-                      label="分期"
-                      value={String(willEditPatient.mediaStrokeLevel)}
-                      onChange={handleChangeMediaStrokeLevel}
-                    >
-                      <MenuItem value={10}>1 期</MenuItem>
-                      <MenuItem value={11}>2 期</MenuItem>
-                      <MenuItem value={12}>3 期</MenuItem>
-                      <MenuItem value={13}>4 期</MenuItem>
-                      <MenuItem value={14}>5 期</MenuItem>
-                      <MenuItem value={15}>6 期</MenuItem>
-                    </Select>
-                  </FormControl>
-                </StyledDiv>
-                <TextField
-                    sx={{ m: 1, minWidth: 400 }}
-                    id="medicalHistory"
-                    value={willEditPatient.medicalHistory}
-                    onChange={handleEditPatientInput}
-                    label="诊断" variant="outlined" size="small"
-                    multiline
-                    rows={4} />
+                {/*<StyledDiv>*/}
+                {/*  <TextField*/}
+                {/*      sx={{ m: 1, minWidth: 120 }}*/}
+                {/*      id="bingbianbuwei"*/}
+                {/*      //value={willEditPatient.name}*/}
+                {/*      //onChange={handleEditPatientInput}*/}
+                {/*      label="病变部位" variant="outlined" size="small"/>*/}
+                {/*  <TextField*/}
+                {/*      sx={{ m: 1, minWidth: 80 }}*/}
+                {/*      id="BIHSS value"*/}
+                {/*      //value={willEditPatient.age}*/}
+                {/*      //onChange={handleEditPatientAgeInput}*/}
+                {/*      label="BIHSS评分" variant="outlined" size="small"/>*/}
+                {/*</StyledDiv>*/}
+                {/*<StyledDiv>*/}
+                {/*  <FormControl sx={{m: 1, minWidth: 200}} size="small">*/}
+                {/*    <LocalizationProvider dateAdapter={AdapterDayjs}>*/}
+                {/*      <DatePicker label="发病日期"/>*/}
+                {/*    </LocalizationProvider>*/}
+                {/*  </FormControl>*/}
+                {/*  <FormControl sx={{m: 1, minWidth: 200}} size="small">*/}
+                {/*    <InputLabel id="mediaStrokeLevel">Brunnstrom分期</InputLabel>*/}
+                {/*    <Select*/}
+                {/*      labelId="mediaStrokeLevel"*/}
+                {/*      id="mediaStrokeLevel"*/}
+                {/*      label="分期"*/}
+                {/*      value={String(willEditPatient.mediaStrokeLevel)}*/}
+                {/*      onChange={handleChangeMediaStrokeLevel}*/}
+                {/*    >*/}
+                {/*      <MenuItem value={10}>1 期</MenuItem>*/}
+                {/*      <MenuItem value={11}>2 期</MenuItem>*/}
+                {/*      <MenuItem value={12}>3 期</MenuItem>*/}
+                {/*      <MenuItem value={13}>4 期</MenuItem>*/}
+                {/*      <MenuItem value={14}>5 期</MenuItem>*/}
+                {/*      <MenuItem value={15}>6 期</MenuItem>*/}
+                {/*    </Select>*/}
+                {/*  </FormControl>*/}
+                {/*</StyledDiv>*/}
+                {/*<TextField*/}
+                {/*    sx={{ m: 1, minWidth: 400 }}*/}
+                {/*    id="medicalHistory"*/}
+                {/*    value={willEditPatient.medicalHistory}*/}
+                {/*    onChange={handleEditPatientInput}*/}
+                {/*    label="诊断" variant="outlined" size="small"*/}
+                {/*    multiline*/}
+                {/*    rows={4} />*/}
               </Box>
             </DialogContent>
             <DialogActions>
@@ -711,64 +700,64 @@ export default function PatientList() {
                     </Select>
                   </FormControl>
                 </StyledDiv>
-                <StyledDiv>
-                  <TextField
-                      sx={{ m: 1, minWidth: 120 }}
-                      id="bingbianbuwei"
-                      //value={willEditPatient.name}
-                      //onChange={handleEditPatientInput}
-                      label="病变部位" variant="outlined" size="small"/>
-                  <TextField
-                      sx={{ m: 1, minWidth: 80 }}
-                      id="BIHSS value"
-                      //value={willEditPatient.age}
-                      //onChange={handleEditPatientAgeInput}
-                      label="BIHSS评分" variant="outlined" size="small"/>
-                </StyledDiv>
-                <StyledDiv>
-                  <FormControl sx={{m: 1, minWidth: 200}} size="small">
-                  {/*  <InputLabel id="gender">分类</InputLabel>*/}
-                  {/*  <Select*/}
-                  {/*    labelId="gender"*/}
-                  {/*    id="gender"*/}
-                  {/*    label="分类"*/}
-                  {/*    value={String(willAddPatient.mediaStrokeType)}*/}
-                  {/*    onChange={handleAddPatientClassifyChange}*/}
-                  {/*  >*/}
-                  {/*    <MenuItem value={0}></MenuItem>*/}
-                  {/*    <MenuItem value={10}>缺血性脑卒中</MenuItem>*/}
-                  {/*    <MenuItem value={21}>出血性脑卒中</MenuItem>*/}
-                  {/*  </Select>*/}
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker label="发病日期"/>
-                    </LocalizationProvider>
-                  </FormControl>
-                  <FormControl sx={{m: 1, minWidth: 200}} size="small">
-                    <InputLabel id="gender">Brunnstrom分期</InputLabel>
-                    <Select
-                      labelId="mediaStrokeLevel"
-                      id="mediaStrokeLevel"
-                      label="分期"
-                      value={String(willAddPatient.mediaStrokeLevel)}
-                      onChange={handleAddMediaStrokeLevelChange}
-                    >
-                      <MenuItem value={0}></MenuItem>
-                      <MenuItem value={10}>1 期</MenuItem>
-                      <MenuItem value={11}>2 期</MenuItem>
-                      <MenuItem value={12}>3 期</MenuItem>
-                      <MenuItem value={13}>4 期</MenuItem>
-                      <MenuItem value={14}>5 期</MenuItem>
-                      <MenuItem value={15}>6 期</MenuItem>
-                    </Select>
-                  </FormControl>
-                </StyledDiv>
-                <TextField sx={{m: 1, minWidth: 400}}
-                           id="medicalHistory"
-                           value={willAddPatient.medicalHistory}
-                           onChange={handleAddPatientInput}
-                           label="诊断" variant="outlined" size="small"
-                           multiline
-                           rows={4}/>
+                {/*<StyledDiv>*/}
+                {/*  <TextField*/}
+                {/*      sx={{ m: 1, minWidth: 120 }}*/}
+                {/*      id="bingbianbuwei"*/}
+                {/*      //value={willEditPatient.name}*/}
+                {/*      //onChange={handleEditPatientInput}*/}
+                {/*      label="病变部位" variant="outlined" size="small"/>*/}
+                {/*  <TextField*/}
+                {/*      sx={{ m: 1, minWidth: 80 }}*/}
+                {/*      id="BIHSS value"*/}
+                {/*      //value={willEditPatient.age}*/}
+                {/*      //onChange={handleEditPatientAgeInput}*/}
+                {/*      label="BIHSS评分" variant="outlined" size="small"/>*/}
+                {/*</StyledDiv>*/}
+                {/*<StyledDiv>*/}
+                {/*  <FormControl sx={{m: 1, minWidth: 200}} size="small">*/}
+                {/*  /!*  <InputLabel id="gender">分类</InputLabel>*!/*/}
+                {/*  /!*  <Select*!/*/}
+                {/*  /!*    labelId="gender"*!/*/}
+                {/*  /!*    id="gender"*!/*/}
+                {/*  /!*    label="分类"*!/*/}
+                {/*  /!*    value={String(willAddPatient.mediaStrokeType)}*!/*/}
+                {/*  /!*    onChange={handleAddPatientClassifyChange}*!/*/}
+                {/*  /!*  >*!/*/}
+                {/*  /!*    <MenuItem value={0}></MenuItem>*!/*/}
+                {/*  /!*    <MenuItem value={10}>缺血性脑卒中</MenuItem>*!/*/}
+                {/*  /!*    <MenuItem value={21}>出血性脑卒中</MenuItem>*!/*/}
+                {/*  /!*  </Select>*!/*/}
+                {/*    <LocalizationProvider dateAdapter={AdapterDayjs}>*/}
+                {/*      <DatePicker label="发病日期"/>*/}
+                {/*    </LocalizationProvider>*/}
+                {/*  </FormControl>*/}
+                {/*  <FormControl sx={{m: 1, minWidth: 200}} size="small">*/}
+                {/*    <InputLabel id="gender">Brunnstrom分期</InputLabel>*/}
+                {/*    <Select*/}
+                {/*      labelId="mediaStrokeLevel"*/}
+                {/*      id="mediaStrokeLevel"*/}
+                {/*      label="分期"*/}
+                {/*      value={String(willAddPatient.mediaStrokeLevel)}*/}
+                {/*      onChange={handleAddMediaStrokeLevelChange}*/}
+                {/*    >*/}
+                {/*      <MenuItem value={0}></MenuItem>*/}
+                {/*      <MenuItem value={10}>1 期</MenuItem>*/}
+                {/*      <MenuItem value={11}>2 期</MenuItem>*/}
+                {/*      <MenuItem value={12}>3 期</MenuItem>*/}
+                {/*      <MenuItem value={13}>4 期</MenuItem>*/}
+                {/*      <MenuItem value={14}>5 期</MenuItem>*/}
+                {/*      <MenuItem value={15}>6 期</MenuItem>*/}
+                {/*    </Select>*/}
+                {/*  </FormControl>*/}
+                {/*</StyledDiv>*/}
+                {/*<TextField sx={{m: 1, minWidth: 400}}*/}
+                {/*           id="medicalHistory"*/}
+                {/*           value={willAddPatient.medicalHistory}*/}
+                {/*           onChange={handleAddPatientInput}*/}
+                {/*           label="诊断" variant="outlined" size="small"*/}
+                {/*           multiline*/}
+                {/*           rows={4}/>*/}
               </Box>
             </DialogContent>
             <DialogActions>
