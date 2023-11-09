@@ -150,7 +150,10 @@ export default function ConfigManagement() {
                       variant='outlined'
                       size='small'
                       color='primary'
-                      onClick={handleClickEvent}>
+                      onClick={()=>{
+                        handleSubmit();
+                        handleClickEvent();
+                      }}>
                     提交
                   </StyledButton>
                 </Box>
