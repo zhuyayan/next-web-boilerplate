@@ -158,6 +158,13 @@ import TabList from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
 import Avatar from "@mui/material/Avatar";
+import TextField from "@mui/material/TextField";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {getAssessment} from "@/redux/features/rehab/rehab-assessment-slice";
+import {getSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
+import {getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
+import {getFormFields, getFormFieldsTemplate, SubmissionField} from "@/redux/features/rehab/rehab-formFields-slice";
 
 const nextSunday = dayjs().endOf('week').startOf('day');
 
@@ -174,8 +181,7 @@ const StyledDiv = styled.div`
 `;
 
 const StatisticsCard = styled.div`
-  background-color: rgb(182, 212, 246);
-  height: 150px;
+  height: 160px;
   padding: 10px;
 `;
 
@@ -206,6 +212,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   const [stretchError, setStretchError] = React.useState<string>('')
   const [trainMinus, setTrainMinus] = useState<string>('')
   const [trainDays, setTrainDays] = useState<number>(0)
+
 
   const { register: AddPrescriptionItemRegister, formState: { errors: AddPrescriptionItemErrors }, clearErrors: AddPrescriptionItemClearErrors, trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
 
@@ -428,6 +435,16 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
     setBendValue(newValue)
   }
 
+  const submissionResponseData = useAppSelector((state: RootState) => state.formField.submissionData);
+  useEffect(()=>{
+    thunkDispatch(getFormFields({result_owner_id: rehabPatient.id}))
+  },[params,thunkDispatch])
+  // submissionData
+  const [submissionData, setSubmissionData] = useState<SubmissionField>({
+    fields: [],
+    owner_id: 0,
+  });
+
   return (
     <>
       <Container>
@@ -469,7 +486,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                 {/*      </Box>*/}
                 {/*  </CardContent>*/}
                 {/*</Card>*/}
-                <Card sx={{ backgroundColor: 'rgba(227,236,255,0.78)', height: 160}} >
+                <Card sx={{ backgroundColor: 'rgba(191,215,237,0.8)', height: 160}} >
                   <CardContent>
                     <br />
                     <Grid container spacing={2}>
@@ -503,7 +520,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                 </Card>
               </Grid>
               <Grid item xs={6} md={2}>
-                <StatisticsCard style={{ height: '160px' }}>
+                <StatisticsCard style={{ backgroundColor: 'rgba(88,133,175,0.8)' }}>
                   <TabContext value={bendValue}>
                     <TabList onChange={handleBendChange} aria-label='card navigation example'>
                       <Tab value='1' label='时长' />
@@ -543,7 +560,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                 </StatisticsCard>
               </Grid>
               <Grid item xs={6} md={2} alignItems="center" justifyContent="center">
-                <StatisticsCard style={{ height: '160px' }}>
+                <StatisticsCard style={{ backgroundColor: 'rgba(96,163,217,0.8)'  }}>
                   <TabContext value={stretchValue}>
                     <TabList onChange={handleStretchChange} aria-label='card navigation example'>
                       <Tab value='1' label='时长' />
@@ -583,7 +600,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                 </StatisticsCard>
               </Grid>
               <Grid item xs={6} md={2}>
-                <StatisticsCard style={{ height: '160px' }}>
+                <StatisticsCard style={{ backgroundColor: 'rgba(0,116,183,0.8)' }}>
                   <Typography sx={{ float:"left" }}>
                     <TimerIcon  sx={{ color: '#7442f6', fontSize: 50 }}/>
                   </Typography>
@@ -670,15 +687,16 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
             <Grid item xs={12} md={12}>
               <Card>
                 <CardHeader style={{display:'inline-block'}} title='评估记录' titleTypographyProps={{ variant: 'h5' }}></CardHeader>
-                <Tooltip title="新建评估">
-                  <IconButton
-                      style={{float: 'right'}}
-                      aria-label="add"
-                      // onClick={handleAddPatientOpen}
-                  >
-                    <AddCircleIcon sx={{ fontSize: 48 }} color="primary"/>
-                  </IconButton>
-                </Tooltip>
+                <a href={`/rehab/assessment/${rehabPatient.id}/0/`} target="_blank" rel="noopener noreferrer">
+                  <Tooltip title="新建评估">
+                    <IconButton
+                        style={{float: 'right'}}
+                        aria-label="add"
+                    >
+                      <AddCircleIcon sx={{ fontSize: 48 }} color="primary"/>
+                    </IconButton>
+                  </Tooltip>
+                </a>
                 <Card>
                   <TableWrapper>
                     <TableContainer sx={{ maxHeight: 140 }}>

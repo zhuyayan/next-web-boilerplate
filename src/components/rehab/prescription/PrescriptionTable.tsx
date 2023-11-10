@@ -213,7 +213,7 @@ const PrescriptionTable = (params: {
                       <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleBindDevice}>绑定设备</Button>
                     </TableCell>
                     <TableCell align="center">
-                      <a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">
+                      <a href={`/rehab/assessment/${row.pid}/${row.id}/`} target="_blank" rel="noopener noreferrer">
                         <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}}>填写量表</Button>
                       </a>
                     </TableCell>

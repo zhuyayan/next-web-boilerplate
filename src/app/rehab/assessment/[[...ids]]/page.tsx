@@ -45,16 +45,17 @@ import MenuItem from "@mui/material/MenuItem";
 import {
   formField,
   getFormFields,
+  getFormFieldsTemplate,
   option,
   submitForm,
   SubmissionField,
-  SubmissionData,
+  SubmissionData, fields,
 } from "@/redux/features/rehab/rehab-formFields-slice";
 
 
-export default function FuglMeyerAssessment( { params }: { params: { id: string } } ) {
+export default function FuglMeyerAssessment( { params }: { params: { ids: [] } } ) {
   const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
-  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [components, setComponents] = useState<JSX.Element[]>([]);
   const [inputValue, setInputValue] = useState('');
   const appDispatch = useAppDispatch()
@@ -66,75 +67,52 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   const evaluationResponseData = useAppSelector((state: RootState) => state.evaluation.evaluationData);
   const [isModified, setIsModified] = useState(false);
   const fuglMeyerScores = useAppSelector((state: RootState) => state.assessment.fuglMeyerScores);
+  const pid = parseInt(params.ids[0])
+  const task_id = parseInt(params.ids[1])
   useEffect(()=>{
-    console.log("params->TaskID", params.id)
-    thunkDispatch(getAssessment({task_id: parseInt(params.id)}))
-    thunkDispatch(getSuggestion({task_id: parseInt(params.id)}))
-    thunkDispatch(getEvaluation({task_id: parseInt(params.id)}))
-    thunkDispatch(getFormFields())
-  },[params.id,thunkDispatch])
+    thunkDispatch(getAssessment({task_id: task_id}))
+    thunkDispatch(getSuggestion({task_id: task_id}))
+    thunkDispatch(getEvaluation({task_id: task_id}))
+    thunkDispatch(getFormFields({result_owner_id: pid}))
+    thunkDispatch(getFormFieldsTemplate())
+  },[params,thunkDispatch])
 
   const [groupedFields, setGroupedFields] = useState<formField[][]>([]);
   useEffect(()=>{
     setGroupedFields(groupByGroupName(formFieldsResponseData));
   },[formFieldsResponseData])
 
-  const [submissionData, setSubmissionData] = useState<SubmissionField[]>([]);
+  const [submissionData, setSubmissionData] = useState<SubmissionField>({
+    fields: [],
+    owner_id: 0,
+  });
+
   useEffect(() => {
-    setSubmissionData(submissionResponseData);
+    let selectedSubmissionData = submissionResponseData.filter((item) => {
+      if(item.owner_id == task_id){
+        return item
+      }
+    })
+    if(selectedSubmissionData.length){
+      setSubmissionData(selectedSubmissionData[0]);
+    }
+
   },[submissionResponseData])
+
   useEffect(() => {
-    const fields = submissionData.reduce((acc, field) => {
-      return {
-        ...acc,
-        [field.form_field_name]: field.value
-      };
-    }, {});
-    setTextFields(fields);
+    console.log("submissionData", submissionData)
+    if (submissionData.fields) {
+      console.log("submissionData.fields", submissionData.fields)
+      const fields = submissionData.fields.reduce((acc, field) => {
+        return {
+          ...acc,
+          [field.form_field_name]: field.value
+        };
+      }, {});
+      setTextFields(fields);
+    }
+    console.log("textFields", textFields);
   }, [submissionData]);
-
-
-  // 处理选择量表的函数
-  // const handleAssessmentChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-  //   setSelectedAssessment(event.target.value as string);
-  // };
-
-  // 处理提交选择的函数
-  // const handleSubmit = () => {
-  //   // 在这里处理提交选择的逻辑，例如导航到相关页面 addAssessment
-  //   console.log('用户选择的评定量表:', selectedAssessment);
-  //   thunkDispatch(postAssessment({task_id: parseInt(params.id), selectedRecord: fuglMeyerScores}))
-  // };
-
-  // 医生评价表单
-  // const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
-  //   tolerance: '',
-  //   motionReview: '',
-  //   spasmReview: '',
-  //   muscleTone: '',
-  //   acuteState: '',
-  //   neuroJudgment: '',
-  //   motionInjury: '',
-  // });
-
-  // const handleEvaluationFormDataFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = event.target;
-  //   setEvaluateFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: value,
-  //   }));
-  // };
-
-  // const handleChangeMediaStrokeLevel = (event: SelectChangeEvent) => {
-  //   const {value} = event.target;
-  //   console.log("value: ", value)
-  //   console.log("event.target.value", event.target.value)
-  //   setEvaluateFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: value,
-  //   }));
-  //   // setMediaStrokeLevel(event.target.value);
-  // };
 
   const selectedStyle = {
     height: '40px',
@@ -154,43 +132,9 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
     color: '#ffffff'
   };
 
-  //自定义量表
-
-  // const [openScale, setOpenScale] = useState(false);
-  // const [openEvaluate, setOpenEvaluate] = useState(false);
-  // const handleEditScale = () => {
-  //   setOpenScale(true);
-  // };
-  // const handleCloseScale = () => {
-  //   setOpenScale(false);
-  // };
-  //
-  // //自定义评价内容
-  // const handleEditEvaluate = () => {
-  //   setOpenEvaluate(true);
-  // };
-  // const handleCloseEvaluate = () => {
-  //   setOpenEvaluate(false);
-  // };
-
-  // const handleSaveEvaluate = () => {
-  //   thunkDispatch(addEvaluation({
-  //     acute_state: evaluateFormData.acuteState,
-  //     motion_injury: evaluateFormData.motionInjury,
-  //     motion_review: evaluateFormData.motionReview,
-  //     muscle_tone: evaluateFormData.muscleTone,
-  //     neuro_judgment: evaluateFormData.neuroJudgment,
-  //     pid: parseInt(params.id),
-  //     rehab_session_id: 0,
-  //     spasm_review: evaluateFormData.spasmReview,
-  //     tolerance: evaluateFormData.tolerance,
-  //   }))
-  //   // setOpenAddStatus(false)
-  // };
-
   //保存医生建议
   const handleSaveSuggestion = () => {
-    thunkDispatch(postSuggestion({task_id: parseInt(params.id), suggestion_id: suggestionResponseData?.suggestion_id || 1, suggestion_text: suggestionText}))
+    thunkDispatch(postSuggestion({task_id: parseInt(params[1]), suggestion_id: suggestionResponseData?.suggestion_id || 1, suggestion_text: suggestionText}))
   };
 
   // function handleFuglMeyerAssessmentChange(id: number, newValue: string | undefined | null) {
@@ -206,27 +150,6 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   border: 1px solid #ccc; /* 设置边框样式，可以根据需要进行调整 */
   margin: 16px;
 `;
-
-  // const [degrees, setDegrees] = useState({
-  //   leftThumbMP: '',
-  //   rightThumbMP: '',
-  //   leftThumbIP: '',
-  //   rightThumbIP: '',
-  //   leftRadialAbduction: '',
-  //   rightRadialAbduction: '',
-  //   leftThumbOpposition: '',
-  //   rightThumbOpposition:'',
-  // });
-
-  // const handleInputDegreesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = event.target;
-  //   setDegrees((prevDegrees) => ({
-  //     ...prevDegrees,
-  //     [name]: value,
-  //   }));
-  // };
-
-
 
   const [textFields, setTextFields] = useState({}); // 状态中存储文本框的name和value
   const handleInputTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -265,45 +188,17 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
   const handleSubmitAll = () => {
     // 构建 submissionData 对象
     const submissionData: SubmissionData = {
-      fields: submissionFields,
-      owner_id: 456,
+      form_sub_mission: {
+        fields: submissionFields,
+        owner_id: task_id
+      },
+      result_owner_id: pid
     };
-
     // 调用异步操作
+    console.log("submissionData", submissionData)
     thunkDispatch(submitForm(submissionData));
   };
 
-
-
-  // const initialDegrees = {
-  //   leftHand: {
-  //     finger1: { MCP: '', PIP: '', DIP: '' },
-  //     finger2: { MCP: '', PIP: '', DIP: '' },
-  //     finger3: { MCP: '', PIP: '', DIP: '' },
-  //   },
-  //   rightHand: {
-  //     finger1: { MCP: '', PIP: '', DIP: '' },
-  //     finger2: { MCP: '', PIP: '', DIP: '' },
-  //     finger3: { MCP: '', PIP: '', DIP: '' },
-  //   },
-  // };
-
-  // const [degree, setDegree] = useState(initialDegrees);
-  //
-  // const handleInputDegreeChange = (event) => {
-  //   const { name, value } = event.target;
-  //   const [hand, finger, joint] = name.split('-');
-  //   setDegrees((prevDegrees) => ({
-  //     ...prevDegrees,
-  //     [hand]: {
-  //       ...prevDegrees[hand],
-  //       [finger]: {
-  //         ...prevDegrees[hand][finger],
-  //         [joint]: value,
-  //       },
-  //     },
-  //   }));
-  // };
   const initialSuggestionValue = isModified ? '' : suggestionResponseData?.suggestion;
 
   //根据组名把获取的formField分组
@@ -514,8 +409,6 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                 </MenuItem>
             ))}
           </Select>
-
-
       );
     } else {
       return (
@@ -556,7 +449,6 @@ export default function FuglMeyerAssessment( { params }: { params: { id: string 
                 setSuggestionText(event.target.value)
                 setIsModified(true);
               }}
-
             />
             <Typography variant='body2' style={{ color: 'red' }}>注：填写完毕后请点击保存按钮进行手动保存。</Typography>
             <Grid container spacing={0}>
