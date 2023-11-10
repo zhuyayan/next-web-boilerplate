@@ -16,6 +16,7 @@ import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {string} from "postcss-selector-parser";
 import {saveAs} from "file-saver";
 import {Assessment, getAssessment} from "@/redux/features/rehab/rehab-assessment-slice";
+import {channel} from "diagnostics_channel";
 
 export interface MedicalStaff {
   id: number;
@@ -199,9 +200,22 @@ export interface EquipmentOnlineSIdClientIdMap {
   s_id: number
 }
 
+//蓝牙
+export interface EquipmentBlueToothMap {
+  topic: string
+  content: string
+}
+
 export interface EquipmentOnlineWSMessage {
   code: number
   data: EquipmentOnlineSIdClientIdMap[]
+  msg: string
+}
+
+//蓝牙
+export interface EquipmentBlueToothWSMessage {
+  code: number
+  data: EquipmentBlueToothMap[]
   msg: string
 }
 
@@ -265,6 +279,17 @@ function isEquipmentOnlineWSMessage(obj: any): obj is EquipmentOnlineWSMessage {
   )
 }
 
+function isEquipmentBlueToothWSMessage(obj: any): obj is EquipmentBlueToothWSMessage {
+  return (
+      obj &&
+      typeof obj === "object" &&
+      typeof obj.code === "number" &&
+      typeof obj.msg === "string" &&
+      Array.isArray(obj.data) &&
+      obj.data.every((item: EquipmentBlueToothMap) => item.topic && item.content != null)
+  )
+}
+
 export interface RealTimeTrainData {
   D: number
 }
@@ -272,6 +297,12 @@ export interface RealTimeTrainData {
 export interface EquipmentOnline {
   sId: number
   clientId: string
+}
+
+//蓝牙
+export  interface  EquipmentBlueTooth {
+  topic: string
+  content: string
 }
 
 export interface equipmentAll {
@@ -293,6 +324,11 @@ export function isRealTimeTrainData(data: any): data is RealTimeTrainData {
 const latestOnlineEquipmentReceived = createAction<EquipmentOnline[]>(
     'latestOnlineEquipment/latestOnlineEquipmentReceived'
 )
+
+const latestBlueToothEquipmentReceived = createAction<EquipmentOnline[]>(
+    'latestBlueToothEquipment/latestBlueToothEquipmentReceived'
+)
+
 export const rehabApi = createApi({
   reducerPath: 'rehabApi',
   baseQuery: fetchBaseQuery({baseUrl: '/'}),
@@ -325,7 +361,7 @@ export const rehabApi = createApi({
                     latestOnlineEquipmentReceived(data.data.map(item => ({
                       sId: item.s_id,
                       clientId: item.client_id,
-                }))))
+                    }))))
               }
             })
           }
@@ -362,6 +398,44 @@ export const rehabApi = createApi({
             })
           }
           ws.addEventListener('message', l)
+        }catch {
+          console.log("ws error")
+        }
+        await cacheEntryRemoved
+        ws.close()
+        console.log("ws closed")
+      },
+    }),
+    publishBlueToothEquipments: builder.query<EquipmentBlueTooth[], Channel>({
+      queryFn:(channel) => {
+        return { data:[] };
+      },
+      async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
+        const ws = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_ADDR + 'equipment/ble_heartbeat_publish/ws')
+        try {
+          await cacheDataLoaded
+          const listener = (event: MessageEvent) => {
+            const data: EquipmentOnlineWSMessage = JSON.parse(event.data)
+            if (!isEquipmentBlueToothWSMessage(data)) {
+              // return
+            }
+            updateCachedData((draft) => {
+              draft.length = 0
+              if(data.data.length == 0) {
+                draft.length = 0
+                draft.push({topic: -1,content: '无蓝牙设备'})
+              } else {
+                // Add each item from data.data to the draft
+                data.data.forEach(item => draft.push({topic: item.topic, content: item.content}))
+                dispatch(
+                    latestBlueToothEquipmentReceived(data.data.map(item => ({
+                      topic: item.topic,
+                      content: item.content,
+                    }))))
+              }
+            })
+          }
+          ws.addEventListener('message', listener)
         }catch {
           console.log("ws error")
         }
@@ -927,5 +1001,5 @@ const RehabSlice = createSlice({
 })
 
 export const { selectedMenu } = RehabSlice.actions;
-export const { useGetOnlineEquipmentsQuery, useGetTrainMessageQuery } = rehabApi
+export const { useGetOnlineEquipmentsQuery, useGetTrainMessageQuery, useGetBlueToothEquipmentsQuery } = rehabApi
 export default RehabSlice.reducer

@@ -6,6 +6,7 @@ import assessmentReducer from "@/redux/features/rehab/rehab-assessment-slice";
 import suggestionReducer from "@/redux/features/rehab/rehab-suggestion-slice";
 import evaluationReducer from "@/redux/features/rehab/rehab-evaluation-slice";
 import formFieldsReducer from "@/redux/features/rehab/rehab-formFields-slice";
+import strokeEventReducer from "@/redux/features/rehab/rehab-patient-slice";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import {setupListeners} from "@reduxjs/toolkit/query";
 
@@ -18,6 +19,7 @@ const store = configureStore({
     suggestion: suggestionReducer,
     evaluation: evaluationReducer,
     formField: formFieldsReducer,
+    patient: strokeEventReducer,
     [rehabApi.reducerPath]: rehabApi.reducer,
   },
   middleware:(getDefaultMiddleware) => {
