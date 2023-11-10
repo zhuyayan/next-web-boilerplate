@@ -1,4 +1,4 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {ActionReducerMapBuilder, createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {AxiosResponse} from "axios";
 import MCTAxiosInstance from "@/utils/mct-request";
 
@@ -78,7 +78,7 @@ const formFieldsSlice = createSlice({
     name: 'formFields',
     initialState,
     reducers: {},
-    extraReducers: (builder) => {
+    extraReducers: (builder: ActionReducerMapBuilder<RehabFormFieldsState>) => {
         builder.addCase(getFormFields.fulfilled, (state, action) => {
             state.formFieldsData = action.payload.data.form_fields;
             state.submissionData = action.payload.data.submission.fields;

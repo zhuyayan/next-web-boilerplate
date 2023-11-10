@@ -15,7 +15,7 @@ import Button from '@mui/material/Button';
 import styled from "styled-components";
 
 import Select, {SelectChangeEvent} from '@mui/material/Select';
-import {ChangeEvent, useEffect, useRef, useState} from "react";
+import {ChangeEvent, SyntheticEvent, useCallback, useEffect, useRef, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
@@ -29,7 +29,7 @@ import {
   addStatus,
   addEvaluation,
   fetchEvaluationById,
-  fetchStatusById
+  fetchStatusById, useGetBlueToothEquipmentsQuery
 } from "@/redux/features/rehab/rehab-slice";
 import {
   addPrescription,
@@ -45,7 +45,7 @@ import {
   NumToModeMapping,
   PatientNumClassifyToClassifyLabelMapping, PatientNumStrokeLevelToStrokeLevelLabelMapping
 } from "@/utils/mct-utils";
-import {IconButton, TableContainer} from "@mui/material";
+import {IconButton, InputAdornment, TableContainer} from "@mui/material";
 
 import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
@@ -65,16 +65,28 @@ import TableBody from "@mui/material/TableBody";
 import Table from "@mui/material/Table";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import TextField from '@mui/material/TextField';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+
+import Tab from '@mui/material/Tab'
+import TabList from '@mui/lab/TabList'
+import TabPanel from '@mui/lab/TabPanel'
+import TabContext from '@mui/lab/TabContext'
+import Avatar from "@mui/material/Avatar";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {getStrokeEvents, putStrokeEvent, StrokeEvent} from "@/redux/features/rehab/rehab-patient-slice";
+import SaveAsIcon from '@mui/icons-material/SaveAs';
 
 //双击编辑组件
 type EditableTextProps = {
-  initialText: string;
+  initialText: string | null;
 };
 
-const EditableText: React.FC<EditableTextProps> = ({ initialText }) => {
+const EditableText: React.FC<EditableTextProps> = ({ initialText, handleTextChange }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [text, setText] = useState(initialText);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [text, setText] = useState(initialText === null ? "" : initialText);
+  const inputRef = useRef<HTMLInputElement>(null!);
 
   const handleDoubleClick = () => {
     setIsEditing(true);
@@ -82,11 +94,17 @@ const EditableText: React.FC<EditableTextProps> = ({ initialText }) => {
 
   const handleBlur = () => {
     setIsEditing(false);
+    handleTextChange(text);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
+    //handleTextChange(text);
   };
+
+  useEffect(()=>{
+    setText(initialText || "")
+  },[initialText])
 
   useEffect(() => {
     if (isEditing) {
@@ -96,7 +114,7 @@ const EditableText: React.FC<EditableTextProps> = ({ initialText }) => {
 
   return (
       <>
-        {isEditing ? (
+        {isEditing || text === "" ? (
             <TextField
                 inputRef={inputRef}
                 autoFocus
@@ -113,51 +131,50 @@ const EditableText: React.FC<EditableTextProps> = ({ initialText }) => {
 };
 
 type EditableDateProps = {
-  initialDate: string;
+  initialDateString: string;
 };
 
-const EditableDate: React.FC<EditableDateProps> = ({ initialDate }) => {
+const EditableDate: React.FC<EditableDateProps> = ({ initialDateString, handleWillDateChange }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(initialDate);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(initialDateString !== "" ? new Date(initialDateString) : null);
 
   const handleDoubleClick = () => {
     setIsEditing(true);
   };
 
-  const handleDateChange = (date: string | null) => {
+  const handleDateChange = (date: Date | null) => {
     setSelectedDate(date);
+    setIsEditing(false);
+    // handleWillDateChange(date.toString());
   };
 
-  const handleBlur = () => {
-    setIsEditing(false);
-  };
+  useEffect(() => {
+    const result: string = selectedDate ? selectedDate.toISOString().split('T')[0].concat(' ').concat(initialDateString.split('T')[1].split('Z')[0]) : "";
+    console.log("result", result)
+    handleWillDateChange(result);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    setSelectedDate(initialDateString !== "" ? new Date(initialDateString) : null);
+  }, [initialDateString]);
 
   return (
       <div>
-        {isEditing ? (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+        {isEditing || initialDateString === "" ? (
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                   value={selectedDate}
                   onChange={handleDateChange}
-                  onClose={handleBlur}
+                  renderInput={(params) => <input {...params.inputProps} autoFocus />}
               />
             </LocalizationProvider>
-
         ) : (
-            <Typography onDoubleClick={handleDoubleClick}>
-              {selectedDate ? selectedDate : "请双击选择日期"}
-            </Typography>
+            <Typography onDoubleClick={handleDoubleClick}>{selectedDate ? selectedDate.toISOString().split('T')[0] : initialDateString}</Typography>
         )}
       </div>
   );
 };
 
-
-import Tab from '@mui/material/Tab'
-import TabList from '@mui/lab/TabList'
-import TabPanel from '@mui/lab/TabPanel'
-import TabContext from '@mui/lab/TabContext'
-import Avatar from "@mui/material/Avatar";
 
 const nextSunday = dayjs().endOf('week').startOf('day');
 
@@ -206,8 +223,6 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   const [stretchError, setStretchError] = React.useState<string>('')
   const [trainMinus, setTrainMinus] = useState<string>('')
   const [trainDays, setTrainDays] = useState<number>(0)
-
-  const { register: AddPrescriptionItemRegister, formState: { errors: AddPrescriptionItemErrors }, clearErrors: AddPrescriptionItemClearErrors, trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
 
   const [openAddStatus, setOpenAddStatus] = React.useState(false);
 
@@ -348,18 +363,68 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
     setOpen(false);
   };
 
+  const { register: AddPrescriptionItemRegister, formState: { errors: AddPrescriptionItemErrors }, clearErrors: AddPrescriptionItemClearErrors, trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
+
+  const strokeEventResponse = useAppSelector((state: RootState) => state.patient.strokeEventData);
+  const [lastEvent, setLastEvent] = React.useState<StrokeEvent | null>(null);
+  const [willEditStrokeEvent, setWillEditStrokeEvent] = React.useState<StrokeEvent | null>(null);
+
   useEffect(() => {
     // thunkDispatch(fetchPrescriptionById({id: parseInt(params.id)}))
+    console.log(123123)
     thunkDispatch(fetchPrescriptionByPId({pid: parseInt(params.id)}))
     thunkDispatch(fetchEvaluationById({task_id: parseInt(params.task_id)}))
     thunkDispatch(fetchStatusById({task_id: parseInt(params.task_id),pid:parseInt(params.pid)}))
     thunkDispatch(fetchPatientById({id: parseInt(params.id)}))
     thunkDispatch(fetchPrescriptionRecordById({id: parseInt(params.id)}))
     thunkDispatch(fetchPatientStatisticsById({id: parseInt(params.id)}))
+    thunkDispatch(getStrokeEvents({pid: parseInt(params.id)}))
     console.log("patient id: ", params.id)
     console.log("patient pid: ", params.pid)
     console.log("patient task_id: ", params.task_id)
   },[params.id, thunkDispatch])
+
+  useEffect(() => {
+    console.log("strokeEventResponse changed", strokeEventResponse)
+    if (strokeEventResponse.length > 0) {
+      setLastEvent(strokeEventResponse[0]);
+      setWillEditStrokeEvent(strokeEventResponse[0]);
+    }
+  },[strokeEventResponse])
+
+  const handleLesionLocationChange = (text: string) => {
+    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
+      ...prevState,
+      lesion_location: text,
+    }));
+  };
+
+  const handleOnsetDataChange = (text: string) => {
+    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
+      ...prevState,
+      onset_date: text,
+    }));
+  };
+
+  const handleNihssScoreChange = (text: string) => {
+    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
+      ...prevState,
+      nihss_score: parseInt(text),
+    }));
+  };
+
+  const handleMedicalHistoryChange = (text: string) => {
+    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
+      ...prevState,
+      medical_history: text,
+    }));
+  };
+
+  //提交修改
+  const handleEditStrokeEvent = () => {
+    console.log("WillStrokeEvent", willEditStrokeEvent);
+    thunkDispatch(putStrokeEvent({ strokeEvent: willEditStrokeEvent!}))
+  };
 
   useEffect(() => {
     setTrainDays(patientDuration.data_count.length)
@@ -607,16 +672,24 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
             <Grid item xs={12} md={12}>
               <Card>
                 <CardHeader style={{display:'inline-block'}} title='病人详细信息' titleTypographyProps={{ variant: 'h5' }}></CardHeader>
+                {/*<Button style={{float: 'right'}} onClick={handleEditStrokeEvent}>保存修改</Button>*/}
+                <Tooltip title="保存修改">
+                  <IconButton
+                      style={{float: 'right'}}
+                      onClick={handleEditStrokeEvent}>
+                    <SaveAsIcon color="primary"/>
+                  </IconButton>
+                </Tooltip>
                 <CardContent>
                   <Grid container spacing={2}>
                     <Grid item xs={6} md={6}>
                       <Box sx={{padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center" justify-items="center">
-                          <Grid item xs={4}>
+                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
                             <label htmlFor="input9">病变部位:</label>
                           </Grid>
-                          <Grid item xs={8}>
-                            <EditableText initialText="我是部位" />
+                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                            <EditableText initialText={lastEvent?.lesion_location ?? ""} handleTextChange={handleLesionLocationChange}/>
                           </Grid>
                         </Grid>
                       </Box>
@@ -624,28 +697,28 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                     <Grid  item xs={6} md={6}>
                       <Box sx={{padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center">
-                          <Grid item xs={4}>
+                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
                             <label htmlFor="input9">发病日期:</label>
                           </Grid>
-                          <Grid item xs={8}>
-                            {/*<FormControl sx={{m: 1, minWidth: 50}} size="small">*/}
-                            {/*  <LocalizationProvider dateAdapter={AdapterDayjs}>*/}
-                            {/*    <DatePicker label="发病日期"/>*/}
-                            {/*  </LocalizationProvider>*/}
-                            {/*</FormControl>*/}
-                            <EditableDate initialDate={"2023-01-01"}/>
+                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                            <EditableDate initialDateString={lastEvent?.onset_date ?? ""} handleWillDateChange={handleOnsetDataChange}/>
                           </Grid>
                         </Grid>
                       </Box>
                     </Grid>
+                  </Grid>
+                  <br/>
+                  <Divider/>
+                  <br/>
+                  <Grid container spacing={2}>
                     <Grid item xs={6} md={6}>
                       <Box sx={{padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center" justify-items="center">
-                          <Grid item xs={4}>
+                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
                             <label htmlFor="input9">BIHSS评分:</label>
                           </Grid>
-                          <Grid item xs={8}>
-                            <EditableText initialText="我是评分" />
+                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                            <EditableText initialText={lastEvent?.nihss_score.toString() ?? ""} handleTextChange={handleNihssScoreChange}/>
                           </Grid>
                         </Grid>
                       </Box>
@@ -653,11 +726,11 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                     <Grid  item xs={6} md={6}>
                       <Box sx={{padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center" justify-items="center">
-                          <Grid item xs={4}>
+                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
                             <label htmlFor="input9">诊断:</label>
                           </Grid>
-                          <Grid item xs={8}>
-                            <EditableText initialText="我是诊断" />
+                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                            <EditableText initialText={lastEvent?.medical_history ?? ""} handleTextChange={handleMedicalHistoryChange}/>
                           </Grid>
                         </Grid>
                       </Box>
