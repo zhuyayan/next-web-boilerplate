@@ -96,7 +96,6 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
     if(selectedSubmissionData.length){
       setSubmissionData(selectedSubmissionData[0]);
     }
-
   },[submissionResponseData])
 
   useEffect(() => {

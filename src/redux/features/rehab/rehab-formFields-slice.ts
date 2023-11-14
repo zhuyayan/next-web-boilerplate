@@ -47,6 +47,7 @@ export interface fields {
 export interface SubmissionField {
     fields:fields[];
     owner_id:number;
+    assessment_time:string;
 }
 
 export interface SubmissionData {

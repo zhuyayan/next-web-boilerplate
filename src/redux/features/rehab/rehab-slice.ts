@@ -71,6 +71,14 @@ export interface Prescription {
   prescription_record?: PrescriptionRecord[];
 }
 
+export interface BalloonPrescription {
+  p_id: number;
+  e_id:string;
+  part: string;
+  mode: string;
+}
+
+
 export interface Evaluation {
   pid: number;
   acute_state: string;
@@ -145,6 +153,15 @@ let patientDuration: PatientDuration = {
   data_count: dateCount,
 }
 
+let statistics: Statistics = {
+  pid: 0,
+  total_rehab_duration: 0,
+  stretching_duration: 0,
+  bending_duration: 0,
+  stretching_count: 0,
+  bending_count: 0,
+}
+
 let patient: Patient = {
   id: 0,
   name: '',
@@ -172,6 +189,7 @@ interface RehabState {
   equipmentAll: equipmentAll[]
   systemInformation: systemInformation
   patientDuration: PatientDuration
+  statistics: Statistics
   selectedMenu: string
   // assessmentData: Assessment[]
 }
@@ -189,6 +207,7 @@ const initialState: RehabState = {
   equipmentAll: equipmentAll,
   systemInformation: sysInfo,
   patientDuration: patientDuration,
+  statistics: statistics,
   selectedMenu: '',
   // assessmentData: assessmentResponse
 }
@@ -724,9 +743,17 @@ export const fetchPrescriptionByPId = createAsyncThunk<Prescription[], { pid: nu
   return p
 });
 
+// 下发处方
 export const sendPrescriptionToEquipment = createAsyncThunk<number, {prescription_id: number, e_id: string}, {}>('sendPrescriptionToEquipment', async ({prescription_id, e_id}):Promise<any> => {
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('prescription/command', {params:{ prescription_id, e_id}});
   console.log("send prescription to equipment: ", response.data)
+  return response.data.code
+});
+
+// 下发评估
+export const sendBalloonPrescriptionToEquipment = createAsyncThunk<number, {p_id: number, e_id: string,x: number,y: number}, {}>('sendBalloonPrescriptionToEquipment', async ({p_id, e_id,x,y}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('prescription/balloon/command', {params:{ p_id, e_id,x,y}});
+  console.log("send Balloon prescription to equipment: ", response.data)
   return response.data.code
 });
 
@@ -779,11 +806,47 @@ interface PatientDuration {
   hour_duration: number;
   data_count: DateCount[];
 }
+
+interface Statistics {
+  pid: number;
+  total_rehab_duration: number;
+  stretching_duration: number;
+  bending_duration: number;
+  stretching_count: number;
+  bending_count: number;
+}
 export const fetchPatientStatisticsById = createAsyncThunk<PatientDuration, { id: number}, {}>('fetchPatientStatisticsById', async ({ id}):Promise<any> => {
   let start_date = GetOneYearAgoDate()
   let end_date = GetCurrentDate()
   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('rehab/duration', {params:{ start_date: start_date, end_date: end_date, id}});
   console.log("fetch fetchPatientStatisticsById by id async thunk: ", response.data.data)
+  return response.data.data
+});
+
+// "total_rehab_duration": 11,
+//   "stretching_duration": 65,
+//   "bending_duration": 56,
+//   "stretching_count": 578,
+//   "bending_count": 569
+
+// export const fetchStatusById = createAsyncThunk<PatientStatus, { pid:number,task_id: number},
+//   {}>('fetchStatusById', async ({pid,task_id}):Promise<any> => {
+//   const response:AxiosResponse<any, any> = await MCTAxiosInstance.get('train/status', {params:{pid,task_id}});
+//   console.log("fetch Status by id async thunk: ", response.data.data)
+//   //let p = response.data.data.map(convertAPIStatusToStatus)
+//   let p = convertAPIStatusToStatus(response.data.data)
+//   console.log('PatientStatus', p)
+//   return p
+// });
+
+// 伸展弯曲时长和次数
+export const fetchStatisticsById = createAsyncThunk<Statistics, { pid: number}, {}>('fetchStatisticsById',
+  async ({ pid}):Promise<any> => {
+  console.log("qqqq",pid)
+  // let start_date = GetOneYearAgoDate()
+  // let end_date = GetCurrentDate()
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.get(`patient/statistic/${pid}`);
+  console.log("fetch fetchStatisticsById by id async thunk: ", response.data.data)
   return response.data.data
 });
 
@@ -953,7 +1016,9 @@ const RehabSlice = createSlice({
         .addCase(sendPrescriptionToEquipment.fulfilled, (state, action) => {
           console.log("send prescription to equipment code -> ", action.payload)
         })
-
+      .addCase(sendBalloonPrescriptionToEquipment.fulfilled, (state, action) => {
+        console.log("send prescription to equipment code -> ", action.payload)
+      })
         .addCase(deletePrescription.fulfilled,(state,action)=>{
           // 重新分页查询
           state.prescription = state.prescription.filter((item) => {
@@ -979,6 +1044,9 @@ const RehabSlice = createSlice({
         })
         .addCase(fetchPatientStatisticsById.fulfilled, (state, action) => {
           state.patientDuration = action.payload
+        })
+        .addCase(fetchStatisticsById.fulfilled, (state, action) => {
+         state.statistics = action.payload
         })
         .addCase(getSystemInformation.fulfilled, (state, action)=> {
           state.systemInformation = action.payload

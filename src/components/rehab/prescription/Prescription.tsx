@@ -42,7 +42,11 @@ import {
   addEvaluation,
   EvaluateFormProps,
   addPrescription,
-  Prescription as PrescriptionEntity, AddPrescriptionItem, useGetTrainMessageQuery
+  Prescription as PrescriptionEntity,
+  AddPrescriptionItem,
+  useGetTrainMessageQuery,
+  RealTimeTrainData,
+  sendBalloonPrescriptionToEquipment, BalloonPrescription
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -244,16 +248,19 @@ export default function StickyHeadTable(params: {
   PId: string,
   task_id: string,
   prescription: Prescription[],
+  balloonPrescription:BalloonPrescription[],
   status: PatientStatus,
+  trainData:RealTimeTrainData[],
   onlineEquipment: EquipmentOnline[]}) {
   const appDispatch = useAppDispatch()
-  const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
+  // const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
   const status = useAppSelector((state: RootState) => state.rehab.patientStatus)
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
+  const [balloonOpen, setBalloonOpen] = React.useState(false);
   const [openadd, setOpenAdd] = React.useState(false);
   const [openModify, setOpenModify] = React.useState(false);
   const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
@@ -276,6 +283,7 @@ export default function StickyHeadTable(params: {
     frequency_per_day: 1,
     total_days: 1,
   })
+
   const [willEditPrescription, setWillEditPrescription] = useState<Prescription>({
     id: 0,
     created_at: "",
@@ -293,6 +301,111 @@ export default function StickyHeadTable(params: {
   const [openDelPrescription, setOpenDelPrescription] = useState(false);
   const [prescriptionToBeDeleted, setPrescriptionToBeDeleted] = useState<Prescription>(GetDefaultPrescription());
   const { enqueueSnackbar } = useSnackbar();
+  const [strength, setStrength] = useState<{
+    left_max_strength: number,
+    left_avg_strength: number,
+    right_max_strength: number,
+    right_avg_strength: number,
+  }>({
+    left_avg_strength: 0,
+    left_max_strength: 0,
+    right_avg_strength: 0,
+    right_max_strength: 0,
+  });
+  // 计算肌力平均值和最大值
+  // useEffect(()=>{
+  //   const trainData = params.trainData || [];
+  //   console.log("肌力平均值和最大值",trainData);
+  //   const sum = trainData.reduce((acc, data) => acc + data.value, 0);
+  //   const average = trainData.length > 0 ? sum / trainData.length : 0;
+  //   const max = Math.max(...trainData.map(data => data.value));
+  //   let timeThreshold;
+  //   if(willEditPrescription.mode==8){
+  //     timeThreshold = 5;
+  //   }else if(willEditPrescription.mode==9){
+  //     timeThreshold = 20;
+  //   }
+  //   // 获取当前时间戳
+  //   const currentTime = new Date().getTime();
+  //   // 过滤出规定时间段内的数据
+  //   const relevantData = trainData.filter(data => currentTime - data.timestamp <= timeThreshold);
+  //   // 计算规定时间段内的总数
+  //   const total_sum = relevantData.reduce((acc, data) => acc + data.value, 0);
+  //
+  //   if (willEditPrescription.part == 1) {
+  //     // 左手
+  //     let left_avg_strength = (total_sum) / timeThreshold
+  //     let left_max_strength = max > strength.left_max_strength? max: strength.left_max_strength
+  //     setStrength((prevState)=>({
+  //       ...prevState,
+  //       left_max_strength: left_max_strength,
+  //       left_avg_strength: left_avg_strength,
+  //     }))
+  //   } else if (willEditPrescription.part == 2) {
+  //     // 右手
+  //     let right_avg_strength = (total_sum) / timeThreshold
+  //     let right_max_strength = max > strength.right_max_strength? max: strength.left_max_strength
+  //     setStrength((prevState)=>({
+  //       ...prevState,
+  //       right_max_strength: right_max_strength,
+  //       right_avg_strength: right_avg_strength,
+  //     }))
+  //   }
+  // }, [params.trainData])
+
+  // 计算肌力平均值和最大值
+  let totalAverageSum = 0;
+  useEffect(()=>{
+    const trainData = params.trainData || [];
+    // console.log("肌力平均值和最大值", willEditBalloonPrescription);
+
+    // 计算总和
+    const sum = trainData.reduce((acc, data) => acc + data.D, 0);
+    // 计算平均值
+    const average = trainData.length > 0 ? sum / trainData.length : 0;
+    // 找到最大值
+    const max = Math.max(...trainData.map(data => data.D));
+
+    const p_avg = ((200/2.5)*((3.3/4096)*average - 0.2)-100).toFixed(1);
+    const p_max = ((200/2.5)*((3.3/4096)*max - 0.2)-100).toFixed(1);
+    // console.log('p_平均值:', p_avg);
+    // console.log('P_最大值:', p_max);
+    let timeThreshold;
+    if(willEditBalloonPrescription.mode==8){
+      timeThreshold = 5;
+    }else if(willEditBalloonPrescription.mode==9){
+      timeThreshold = 20;
+    }
+
+    if (willEditBalloonPrescription.part == "左手") {
+      // 左手
+      const parsedPMax = parseFloat(p_max);
+      console.log("xx", parsedPMax, strength.left_max_strength)
+      let left_avg_strength = parseFloat(p_avg)
+      let left_max_strength = parsedPMax > strength.left_max_strength? parsedPMax: strength.left_max_strength
+      for (let i = 0; i < timeThreshold; i++) {
+        totalAverageSum += left_avg_strength;
+      }
+      console.log('所有 average 的总和:', totalAverageSum);
+      setStrength((prevState)=>({
+        ...prevState,
+        left_max_strength: left_max_strength,
+        left_avg_strength: left_avg_strength,
+      }))
+    } else if (willEditBalloonPrescription.part == "右手") {
+      // 右手
+      const parsedPMax = parseFloat(p_max);
+      console.log("xx", parsedPMax, strength.right_max_strength)
+      let right_avg_strength = parseFloat(p_avg)
+      let right_max_strength = parsedPMax > strength.right_max_strength? parsedPMax: strength.left_max_strength
+      setStrength((prevState)=>({
+        ...prevState,
+        right_max_strength: right_max_strength,
+        right_avg_strength: right_avg_strength,
+      }))
+    }
+  }, [params.trainData])
+
   const handleClickOpen = (row: Prescription) => {
     setOpen(true);
     setSelectedPrescription(row)
@@ -332,7 +445,6 @@ export default function StickyHeadTable(params: {
       mode: ModeToNumMapping[parseInt(event.target.value)]
     }))
   };
-
   const handlePartChange = (event: SelectChangeEvent) => {
     setWillEditPrescription((prevState) => ({
       ...prevState,
@@ -340,8 +452,42 @@ export default function StickyHeadTable(params: {
     }))
   };
 
+  //BalloonPrescription
+  const [selectedBalloonPrescription, setSelectedBalloonPrescription] = useState<BalloonPrescription>({
+    p_id: 0,
+    e_id:"",
+    part: "0",
+    mode: "0",
+  })
+
+  const [willEditBalloonPrescription, setWillEditBalloonPrescription] = useState<BalloonPrescription>({
+    p_id: 0,
+    e_id:"",
+    part: "0",
+    mode: "0",
+  })
+
+  const handleBalloonModeChange = (event: SelectChangeEvent) => {
+    console.log(event.target)
+    console.log(ModeToNumMapping[parseInt(event.target.value)])
+    setWillEditBalloonPrescription((prevState) => ({
+      ...prevState,
+      mode: ModeToNumMapping[parseInt(event.target.value)]
+    }))
+  };
+
+  const handleBalloonPartChange = (event: SelectChangeEvent) => {
+    setWillEditBalloonPrescription((prevState) => ({
+      ...prevState,
+      part: BodyPartToNumMapping[parseInt(event.target.value)]
+    }))
+  };
+
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleBalloonClose = () => {
+    setBalloonOpen(false);
   };
   const handleCloseAdd = () => {
     setOpenAdd(false);
@@ -355,6 +501,18 @@ export default function StickyHeadTable(params: {
         location.reload(); //父页面仅仅是刷新页面，当然也可以自定义逻辑函数写在里面
       })
     }
+  };
+
+  const handleClickBalloonOpen = (row: BalloonPrescription) => {
+    //setBalloonOpen(true);
+    setSelectedBalloonPrescription(row)
+    console.log("selectedBalloobPrescription -> ", row)
+  };
+
+  const handleSendBalloonCommand = () => {
+    console.log("selectedBalloonPrescription", selectedBalloonPrescription)
+    appThunkDispatch(sendBalloonPrescriptionToEquipment({p_id:parseInt(params.id), e_id: clientId, x: NumToBodyPartMapping[selectedBalloonPrescription.part], y: NumToModeMapping[selectedBalloonPrescription.mode]}))
+    setBalloonOpen(false);
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -702,6 +860,15 @@ export default function StickyHeadTable(params: {
   }
 
 
+  function handleStrengthChange(event: ChangeEvent<HTMLInputElement>) {
+    // console.log(event.target.value)
+    // console.log(event.target)
+    setStrength(  (prevState) => ({
+      ...prevState,
+      [event.target.id]: event.target.value
+    }))
+  }
+
   return (<>
     <Grid container alignItems="center" justifyContent="space-between" sx={{ height: 50 }}>
       <Grid item style={{display: 'flex', alignItems: 'center'}} >
@@ -847,10 +1014,10 @@ export default function StickyHeadTable(params: {
                                 {...register('mode', {required: '训练模式是必需的'})}
                                 labelId="demo-select-small-label"
                                 id="demo-select-small"
-                                value={String(NumToModeMapping[willEditPrescription.mode])}
+                                value={String(NumToModeMapping[willEditBalloonPrescription.mode])}
                                 label="Age1"
                                 name="mode"
-                                onChange={handleModeChange}>
+                                onChange={handleBalloonModeChange}>
                                 <MenuItem value={8}>被动评估模式</MenuItem>
                                 <MenuItem value={9}>主动评估模式</MenuItem>
                               </Select>
@@ -863,9 +1030,9 @@ export default function StickyHeadTable(params: {
                                 {...register('part', { required: '训练部位是必需的' })}
                                 labelId="demo-select-small-label"
                                 id="demo-select-small"
-                                value={String(NumToBodyPartMapping[willEditPrescription.part])}
+                                value={String(NumToBodyPartMapping[willEditBalloonPrescription.part])}
                                 label="Age2"
-                                onChange={handlePartChange}
+                                onChange={handleBalloonPartChange}
                                 name="part">
                                 <MenuItem value={1}>左手</MenuItem>
                                 <MenuItem value={2}>右手</MenuItem>
@@ -877,7 +1044,7 @@ export default function StickyHeadTable(params: {
                               <IconButton
                                 aria-label="edit"
                                 color="primary"
-                                onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
+                                onClick={(event)=>{event.stopPropagation(); setBalloonOpen(true); handleClickBalloonOpen({p_id:parseInt(params.id), e_id: clientId, part:willEditBalloonPrescription.part, mode:willEditBalloonPrescription.mode});}}
                               >
                                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                   下发评估：
@@ -897,15 +1064,23 @@ export default function StickyHeadTable(params: {
                               <Typography sx={{ fontSize: 18,padding:'5px'}}>
                                 最大肌力：
                                 <TextField
-                                id="min_heart_rate"
+                                id="left_max_strength"
                                 size="small"
+                                type="number"
+                                InputProps={{ readOnly: true }}
+                                onChange={handleStrengthChange}
+                                value={strength.left_max_strength}
                                 />
                               </Typography>
                               <Typography sx={{ fontSize: 18,padding:'5px'}}>
                                 平均肌力：
                                 <TextField
-                                  id="min_heart_rate"
+                                  id="left_avg_strength"
                                   size="small"
+                                  type="number"
+                                  InputProps={{ readOnly: true }}
+                                  onChange={handleStrengthChange}
+                                  value={strength.left_avg_strength}
                                 />
                               </Typography>
                             </Card>
@@ -919,15 +1094,24 @@ export default function StickyHeadTable(params: {
                               <Typography sx={{ fontSize: 18,padding:'5px'}}>
                                 最大肌力：
                                 <TextField
-                                  id="min_heart_rate"
+                                  key={strength.right_max_strength}
+                                  id="right_max_strength"
                                   size="small"
+                                  type="number"
+                                  InputProps={{ readOnly: true }}
+                                  onChange={handleStrengthChange}
+                                  value={strength.right_max_strength}
                                 />
                               </Typography>
                               <Typography sx={{ fontSize: 18,padding:'5px'}}>
                                 平均肌力：
                                 <TextField
-                                  id="min_heart_rate"
+                                  id="right_avg_strength"
                                   size="small"
+                                  type="number"
+                                  InputProps={{ readOnly: true }}
+                                  onChange={handleStrengthChange}
+                                  value={strength.right_avg_strength}
                                 />
                               </Typography>
                             </Card>
@@ -1144,6 +1328,45 @@ export default function StickyHeadTable(params: {
       </Dialog>
 
       <Dialog
+        open={balloonOpen} onClose={handleBalloonClose}
+        slotProps={{
+          backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
+        PaperProps={{ elevation: 0 }}>
+        <DialogContent>
+          <DialogContentText>
+            请选择将评估模式要下发至哪台康复仪
+          </DialogContentText>
+          <StyledDiv>
+            <Box>
+              <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
+                <InputLabel id="device">康复仪设备</InputLabel>
+                <Select
+                  labelId="device"
+                  id="device"
+                  value={device}
+                  label="device"
+                  onChange={handleChange}
+                  name="device"
+                >
+                  {params.onlineEquipment ? (
+                    params.onlineEquipment.map((item) => (
+                      <MenuItem key={item.sId} value={item.sId}>
+                        {item.clientId}
+                      </MenuItem>
+                    ))
+                  ) : null}
+                </Select>
+              </FormControl>
+            </Box>
+          </StyledDiv>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleBalloonClose}>取消</Button>
+          <Button onClick={handleSendBalloonCommand}>确定</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
           open={openModify} onClose={handleCloseModify}
           slotProps={{
             backdrop: { sx: {backgroundColor: 'rgba(0, 0, 0, 0.5)'}}}}
@@ -1170,6 +1393,8 @@ export default function StickyHeadTable(params: {
                     <MenuItem value={5}>助力计次模式</MenuItem>
                     <MenuItem value={6}>助力定时模式</MenuItem>
                     <MenuItem value={7}>手动计次模式</MenuItem>
+                    {/*<MenuItem value={8}>被动评估模式</MenuItem>*/}
+                    {/*<MenuItem value={9}>主动评估模式</MenuItem>*/}
                   </Select>
                 </FormControl>
                 <FormControl sx={{ m: 1, minWidth: 240 }} size="small">

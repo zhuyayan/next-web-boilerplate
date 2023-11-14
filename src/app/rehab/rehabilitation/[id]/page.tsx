@@ -29,7 +29,7 @@ import {
   addStatus,
   addEvaluation,
   fetchEvaluationById,
-  fetchStatusById, useGetBlueToothEquipmentsQuery
+  fetchStatusById, useGetBlueToothEquipmentsQuery, fetchStatisticsById, RealTimeTrainData
 } from "@/redux/features/rehab/rehab-slice";
 import {
   addPrescription,
@@ -38,6 +38,11 @@ import {
   useGetOnlineEquipmentsQuery,
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
+
+import {
+  formField,
+} from "@/redux/features/rehab/rehab-formFields-slice";
+
 import {
   BodyPartToNumMapping,
   ModeToNumMapping,
@@ -176,6 +181,10 @@ const EditableDate: React.FC<EditableDateProps> = ({ initialDateString, handleWi
 };
 
 import {getFormFields, getFormFieldsTemplate, SubmissionField} from "@/redux/features/rehab/rehab-formFields-slice";
+import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
+import {getAssessment} from "@/redux/features/rehab/rehab-assessment-slice";
+import {getSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
+import {getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
 
 const nextSunday = dayjs().endOf('week').startOf('day');
 
@@ -207,22 +216,25 @@ const TableWrapper = styled.div`
   margin: 16px;
 `;
 
-export default function MUITable({ params }: { params: { id: string ,task_id:string, pid:string} }) {
-  const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
-  const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
-  const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
-  const status = useAppSelector((state: RootState) => state.rehab.patientStatus)
-  const patientDuration = useAppSelector((state:RootState) => state.rehab.patientDuration)
-  const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
-  const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
-  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
-  const [open, setOpen] = React.useState(false)
-  const [error, setError] = React.useState(false)
-  const [timesError, setTimesError] = React.useState<string>('')
-  const [bendError, setBendError] = React.useState<string>('')
-  const [stretchError, setStretchError] = React.useState<string>('')
-  const [trainMinus, setTrainMinus] = useState<string>('')
-  const [trainDays, setTrainDays] = useState<number>(0)
+export default function MUITable({ params }: { params: { id: string ,task_id:string, pid:string,trainData:RealTimeTrainData[]} }) {
+  const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient);
+  const prescription = useAppSelector((state: RootState) => state.rehab.prescription);
+  const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord);
+  const status = useAppSelector((state: RootState) => state.rehab.patientStatus);
+  // const submissionResponseData = useAppSelector((state: RootState) => state.formField.submissionData);
+  const patientDuration = useAppSelector((state:RootState) => state.rehab.patientDuration);
+
+  const statistics = useAppSelector((state:RootState) => state.rehab.statistics);
+  const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux");
+  const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux");
+  const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  const [open, setOpen] = React.useState(false);
+  const [error, setError] = React.useState(false);
+  const [timesError, setTimesError] = React.useState<string>('');
+  const [bendError, setBendError] = React.useState<string>('');
+  const [stretchError, setStretchError] = React.useState<string>('');
+  const [trainMinus, setTrainMinus] = useState<string>('');
+  const [trainDays, setTrainDays] = useState<number>(0);
   const [openAddStatus, setOpenAddStatus] = React.useState(false);
 
   // 医生评价表单
@@ -367,21 +379,27 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   const strokeEventResponse = useAppSelector((state: RootState) => state.patient.strokeEventData);
   const [lastEvent, setLastEvent] = React.useState<StrokeEvent | null>(null);
   const [willEditStrokeEvent, setWillEditStrokeEvent] = React.useState<StrokeEvent | null>(null);
-
   useEffect(() => {
     // thunkDispatch(fetchPrescriptionById({id: parseInt(params.id)}))
-    console.log(123123)
     thunkDispatch(fetchPrescriptionByPId({pid: parseInt(params.id)}))
     thunkDispatch(fetchEvaluationById({task_id: parseInt(params.task_id)}))
     thunkDispatch(fetchStatusById({task_id: parseInt(params.task_id),pid:parseInt(params.pid)}))
     thunkDispatch(fetchPatientById({id: parseInt(params.id)}))
     thunkDispatch(fetchPrescriptionRecordById({id: parseInt(params.id)}))
     thunkDispatch(fetchPatientStatisticsById({id: parseInt(params.id)}))
+    thunkDispatch(fetchStatisticsById({pid: parseInt(params.id)}))
     thunkDispatch(getStrokeEvents({pid: parseInt(params.id)}))
+    thunkDispatch(getFormFields({result_owner_id: parseInt(params.id)}))
     console.log("patient id: ", params.id)
     console.log("patient pid: ", params.pid)
     console.log("patient task_id: ", params.task_id)
   },[params.id, thunkDispatch])
+
+  const [submissionData, setSubmissionData] = useState<SubmissionField>({
+    fields: [],
+    owner_id: 0,
+    assessment_time: "",
+  });
 
   useEffect(() => {
     console.log("strokeEventResponse changed", strokeEventResponse)
@@ -493,14 +511,6 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   }
 
   const submissionResponseData = useAppSelector((state: RootState) => state.formField.submissionData);
-  useEffect(()=>{
-    thunkDispatch(getFormFields({result_owner_id: rehabPatient.id}))
-  },[params,thunkDispatch])
-  // submissionData
-  const [submissionData, setSubmissionData] = useState<SubmissionField>({
-    fields: [],
-    owner_id: 0,
-  });
 
   return (
     <>
@@ -596,7 +606,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                     <CardContent  sx={{ textAlign: 'right' }}>
                       <TabPanel value='1' sx={{ p: 0 }}>
                         <Typography variant="h4" color="primary" style={{display:'inline-block'}}>
-                          {trainMinus}
+                          {statistics.bending_duration}
                         </Typography>
                         <Divider />
                         <Typography variant="body2" color="text.secondary">
@@ -605,7 +615,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                       </TabPanel>
                       <TabPanel value='2' sx={{ p: 0 }}>
                         <Typography variant="h4" color="primary" style={{ textAlign: 'right' }}>
-                          666
+                          {statistics.bending_count}
                         </Typography>
                         <Divider />
                         <Typography variant="body2" color="text.secondary" style={{ textAlign: 'right' }}>
@@ -636,7 +646,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                     <CardContent  sx={{ textAlign: 'right' }}>
                       <TabPanel value='1' sx={{ p: 0 }}>
                         <Typography variant="h4" color="primary" style={{display:'inline-block'}}>
-                          {record.length}
+                          {statistics.stretching_duration}
                         </Typography>
                         <Divider />
                         <Typography variant="body2" color="text.secondary">
@@ -645,7 +655,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                       </TabPanel>
                       <TabPanel value='2' sx={{ p: 0 }}>
                         <Typography variant="h4" color="primary" style={{ textAlign: 'right' }}>
-                          666
+                          {statistics.stretching_count}
                         </Typography>
                         <Divider />
                         <Typography variant="body2" color="text.secondary" style={{ textAlign: 'right' }}>
@@ -663,7 +673,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                   </Typography>
                   <CardContent sx={{ textAlign: 'right' }}>
                     <Typography variant="h3" color="primary" sx={{display:'inline-block'}}>
-                      {trainDays}
+                      {statistics.total_rehab_duration}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       总训练天数
@@ -676,7 +686,6 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                 </StatisticsCard>
               </Grid>
             </Grid>
-
 
             <Grid item xs={12} md={12}>
               <Card>
@@ -775,60 +784,21 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                         </TableHead>
                         <TableBody>
                           {/* 表格内容 */}
-                          <TableRow>
+                          {submissionResponseData && submissionResponseData.map(field => (
+                            <TableRow key={field.owner_id}>
+                          {/*    <TableRow>*/}
                             <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <Typography variant="body2" color="text.secondary">
-                                2023-08-30 10:20:47
-                              </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                          {field.assessment_time}
+                            </Typography>
                             </TableCell>
                             <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <a target="_blank" rel="noopener noreferrer">
-                                {/*<a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">*/}
+                              <a href={`/rehab/assessment/${params.id}/${field.owner_id}/`} target="_blank" rel="noopener noreferrer">
                                 <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
                               </a>
                             </TableCell>
-                            {/*<TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">*/}
-                            {/*  <Typography variant="body2" color="text.secondary">*/}
-                            {/*    90 %*/}
-                            {/*  </Typography>*/}
-                            {/*</TableCell>*/}
-                          </TableRow>
-                          <TableRow>
-                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <Typography variant="body2" color="text.secondary">
-                                2023-11-06 16:20:47
-                              </Typography>
-                            </TableCell>
-                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <a target="_blank" rel="noopener noreferrer">
-                                {/*<a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">*/}
-                                <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
-                              </a>
-                            </TableCell>
-                            {/*<TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">*/}
-                            {/*  <Typography variant="body2" color="text.secondary">*/}
-                            {/*    80 %*/}
-                            {/*  </Typography>*/}
-                            {/*</TableCell>*/}
-                          </TableRow>
-                          <TableRow>
-                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <Typography variant="body2" color="text.secondary">
-                                2023-08-30 10:20:47
-                              </Typography>
-                            </TableCell>
-                            <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center">
-                              <a target="_blank" rel="noopener noreferrer">
-                                {/*<a href={`/rehab/assessment/${row.id}`} target="_blank" rel="noopener noreferrer">*/}
-                                <Button style={{backgroundColor: '#2196f3', color: '#ffffff'}}>查看量表</Button>
-                              </a>
-                            </TableCell>
-                            {/*<TableCell style={{ borderLeft: a'1px solid #ccc' }} align="center">*/}
-                            {/*  <Typography variant="body2" color="text.secondary">*/}
-                            {/*    90 %*/}
-                            {/*  </Typography>*/}
-                            {/*</TableCell>*/}
-                          </TableRow>
+                            </TableRow>
+                          ))}
                         </TableBody>
                       </Table>
                     </TableContainer>
@@ -850,6 +820,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                   task_id={params.task_id}
                   prescription={prescription}
                   status={status}
+                  trainData={trainData}
                   onlineEquipment={onlineData || []}/>
               </Card>
             </Grid>
@@ -867,14 +838,14 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
             {/*<br/>*/}
 
             {/*压力数据折线图*/}
-            {/*<Grid item xs={6} md={5.5}>*/}
-            {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
-            {/*    <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />*/}
-            {/*    {*/}
-            {/*      trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>*/}
-            {/*    }*/}
-            {/*  </Card>*/}
-            {/*</Grid>*/}
+            <Grid item xs={6} md={5.5}>
+              <Card sx={{ height: 365 ,padding: '10px'}}>
+                <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
+                {
+                  trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
+                }
+              </Card>
+            </Grid>
 
             {/*康复记录*/}
             {/*<Grid item xs={6} md={6.5}>*/}
