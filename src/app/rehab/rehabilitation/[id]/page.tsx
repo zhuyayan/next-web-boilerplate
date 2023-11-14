@@ -207,6 +207,11 @@ const TableWrapper = styled.div`
   margin: 16px;
 `;
 
+interface HeartBeat {
+  topic: string;
+  content: string;
+}
+
 export default function MUITable({ params }: { params: { id: string ,task_id:string, pid:string} }) {
   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
   const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
@@ -215,6 +220,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   const patientDuration = useAppSelector((state:RootState) => state.rehab.patientDuration)
   const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
+  const {data: blueToothData, isLoading: blueToothLoading, error: blueToothError} = useGetBlueToothEquipmentsQuery<HeartBeat[]>("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
   const [open, setOpen] = React.useState(false)
   const [error, setError] = React.useState(false)
@@ -224,6 +230,28 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   const [trainMinus, setTrainMinus] = useState<string>('')
   const [trainDays, setTrainDays] = useState<number>(0)
   const [openAddStatus, setOpenAddStatus] = React.useState(false);
+
+  const [numbers, setNumbers] = useState<number[]>(new Array(120).fill(0));
+  const addNumber = (newNumber: number) => {
+    setNumbers(prevNumbers => {
+      // 添加新数字到数组开头
+      const updatedNumbers = [newNumber, ...prevNumbers];
+      // 如果数组长度超过120，去掉最旧的数字（数组末尾的数字）
+      if (updatedNumbers.length > 120) {
+        updatedNumbers.pop(); // 去掉数组末尾的元素
+      }
+      return updatedNumbers;
+    });
+  };
+  useEffect(()=>{
+    blueToothData?.map((item: HeartBeat)=>{
+      console.log("blueToothData item", item)
+      addNumber(parseInt(item.content));
+    })
+    // addNumber(parseInt(blueToothData?.content));
+    console.log("blueToothData", blueToothData)
+    console.log("numbers", numbers)
+  }, [blueToothData])
 
   // 医生评价表单
   const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
@@ -450,6 +478,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   };
 
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
+    id: 0,
     pid:0,
     task_id:0,
     min_heart_rate : 0,
@@ -850,7 +879,9 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                   task_id={params.task_id}
                   prescription={prescription}
                   status={status}
-                  onlineEquipment={onlineData || []}/>
+                  onlineEquipment={onlineData || []}
+                  heartBeats={numbers || []}
+                />
               </Card>
             </Grid>
             <br/>

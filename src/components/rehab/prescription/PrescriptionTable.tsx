@@ -19,7 +19,7 @@ import {
 import {
   addStatus,
   exportTaskPressureData, PatientStatus, fetchStatusById,
-  PrescriptionRecord,
+  PrescriptionRecord, EquipmentBlueTooth, editStatus
 } from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
@@ -65,6 +65,7 @@ import {SelectChangeEvent} from "@mui/material/Select";
 const PrescriptionTable = (params: {
   record: PrescriptionRecord[],
   status: PatientStatus,
+  heartBeats: number[],
   pid: string,
   task_id: string}) => {
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
@@ -96,6 +97,7 @@ const PrescriptionTable = (params: {
   };
   const handleCloseBindDevice = () => {
     setOpenBindDevice(false);
+    setIsSurvey(false);
   };
 
   const thunkDispatch = useAppDispatch();
@@ -108,6 +110,7 @@ const PrescriptionTable = (params: {
   }, [statusData, taskid]);
 
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
+    id: 0,
     pid: 0,
     task_id: 0,
     min_heart_rate: 0,
@@ -151,21 +154,42 @@ const PrescriptionTable = (params: {
   };
 
   const handleSaveAddStatus = () => {
-    appThunkDispatch(addStatus({
-      pid: parseInt(params.pid),
-      task_id: taskid,
-      min_heart_rate: willAddStatus.min_heart_rate,
-      max_heart_rate: willAddStatus.max_heart_rate,
-      avg_heart_rate: willAddStatus.avg_heart_rate
-    }));
+    if (statusData.id === 0) {
+      appThunkDispatch(addStatus({
+        pid: parseInt(params.pid),
+        task_id: taskid,
+        min_heart_rate: willAddStatus.min_heart_rate,
+        max_heart_rate: willAddStatus.max_heart_rate,
+        avg_heart_rate: willAddStatus.avg_heart_rate
+      }))
+    }
+    else {
+      appThunkDispatch(editStatus({
+        id: statusData.id,
+        min_heart_rate: willAddStatus.min_heart_rate,
+        max_heart_rate: willAddStatus.max_heart_rate,
+        avg_heart_rate: willAddStatus.avg_heart_rate
+      }));
+    }
     setOpenStatus(false);
+    setIsSurvey(false);
   };
 
-  const [heartrate, setHeartRate] = React.useState('');
+  //控制监测
+  const [isSurvey, setIsSurvey] = React.useState(false)
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setHeartRate(event.target.value as string);
-  };
+  useEffect(()=>{
+    if (isSurvey) {
+      setWillAddStatus({
+        ...willAddStatus, // 保留原始状态中未被更新的属性
+        min_heart_rate: Math.min(...params.heartBeats.filter(number => number !== 0)),
+        max_heart_rate: Math.max(...params.heartBeats),
+        avg_heart_rate: Math.round(
+            params.heartBeats.filter(number => number !== 0).reduce((acc, val) => acc + val, 0) / params.heartBeats.filter(number => number !== 0).length
+        ),
+      });
+    }
+  }, [params.heartBeats])
 
   return (
     <>
@@ -210,7 +234,7 @@ const PrescriptionTable = (params: {
                     <TableCell>{row.created_at === row.updated_at ? ' ' : row.updated_at}</TableCell>
                     <TableCell>
                       <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'left'}} onClick={handleClickOpenStatus} data-task-id={row.id}>手动录入</Button>
-                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={handleBindDevice}>绑定设备</Button>
+                      <Button style={{backgroundColor: '#2196f3', color: '#ffffff', float: 'right'}} onClick={async (event)=>{await handleBindDevice(event); setIsSurvey(true);}} data-task-id={row.id}>设备数据</Button>
                     </TableCell>
                     <TableCell align="center">
                       <a href={`/rehab/assessment/${row.pid}/${row.id}/`} target="_blank" rel="noopener noreferrer">
@@ -388,38 +412,47 @@ const PrescriptionTable = (params: {
           onClose={handleCloseBindDevice}
           aria-describedby="BindDevice"
       >
-        <DialogTitle>{"绑定心率设备"}</DialogTitle>
+        <DialogTitle>{"心率设备实时数据"}</DialogTitle>
         <DialogContent>
           <Grid container spacing={0}>
             <Grid item xs={12}>
               <Grid container spacing={0} alignItems="center">
-                <Grid item xs={4}>
-                  <label htmlFor="input9">选择心率手环:</label>
-                </Grid>
-                <Grid item xs={4}>
+                {/*<Grid item xs={4}>*/}
+                {/*  <label htmlFor="input9">选择心率手环:</label>*/}
+                {/*</Grid>*/}
+                <Grid item xs={6}>
                   <Box>
                     <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
-                      <InputLabel id="device">心率设备</InputLabel>
-                      <Select
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
-                          value={heartrate}
-                          label="HeartRate"
-                          onChange={handleChange}
-                      >
-                        <MenuItem value={10}>Ten</MenuItem>
-                        <MenuItem value={20}>Twenty</MenuItem>
-                        <MenuItem value={30}>Thirty</MenuItem>
-                      </Select>
+                      <Typography>实时心率:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{params.heartBeats[0]}</Typography>
+                      {/*<InputLabel id="device">心率设备</InputLabel>*/}
+                      {/*<Select*/}
+                      {/*    labelId="demo-simple-select-label"*/}
+                      {/*    id="demo-simple-select"*/}
+                      {/*    value={heartrate}*/}
+                      {/*    label="HeartRate"*/}
+                      {/*    onChange={handleChange}*/}
+                      {/*>*/}
+                      {/*  {params.blueToothEquipment ? (*/}
+                      {/*      params.blueToothEquipment.map((item) => (*/}
+                      {/*          <MenuItem value={item.topic} key={item.topic}>*/}
+                      {/*            {item.content}*/}
+                      {/*          </MenuItem>*/}
+                      {/*      ))*/}
+                      {/*  ): null}*/}
+                        {/*<MenuItem value={10}>Ten</MenuItem>*/}
+                        {/*<MenuItem value={20}>Twenty</MenuItem>*/}
+                        {/*<MenuItem value={30}>Thirty</MenuItem>*/}
+                      {/*</Select>*/}
                     </FormControl>
                   </Box>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={6}>
                   <Tooltip title="开始监测">
                     <IconButton
                         aria-label="edit"
                         color="primary"
                         // onClick={(event)=>{event.stopPropagation(); handleClickOpen(row);}}
+                        onClick={()=>{setIsSurvey(true);}}
                     >
                       <PlayCircleOutlineIcon sx={{ fontSize: 30 }} />
                     </IconButton>
@@ -430,11 +463,11 @@ const PrescriptionTable = (params: {
             <Grid item xs={6}>
               <Box sx={{padding: '8px' }}>
                 <Grid container spacing={0} alignItems="center">
-                  <Grid item xs={4}>
+                  <Grid item xs={6}>
                     <label htmlFor="input9">最大心率:</label>
                   </Grid>
-                  <Grid item xs={8}>
-
+                  <Grid item xs={6}>
+                    <Typography>{Math.max(...params.heartBeats)}</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -442,11 +475,11 @@ const PrescriptionTable = (params: {
             <Grid item xs={6}>
               <Box sx={{padding: '8px' }}>
                 <Grid container spacing={0} alignItems="center">
-                  <Grid item xs={4}>
+                  <Grid item xs={6}>
                     <label htmlFor="input9">平均心率:</label>
                   </Grid>
-                  <Grid item xs={8}>
-
+                  <Grid item xs={6}>
+                    <Typography>{Math.round(params.heartBeats.filter(number => number !== 0).reduce((acc, val) => acc + val, 0) / params.heartBeats.filter(number => number !== 0).length)}</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -454,7 +487,7 @@ const PrescriptionTable = (params: {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseBindDevice}>保存</Button>
+          <Button onClick={handleSaveAddStatus}>保存</Button>
           <Button onClick={handleCloseBindDevice}>关闭</Button>
         </DialogActions>
       </Dialog>
