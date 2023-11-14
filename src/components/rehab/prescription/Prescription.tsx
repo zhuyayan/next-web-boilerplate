@@ -42,11 +42,9 @@ import {
   addEvaluation,
   EvaluateFormProps,
   addPrescription,
-  Prescription as PrescriptionEntity,
-  AddPrescriptionItem,
-  useGetTrainMessageQuery,
   RealTimeTrainData,
-  sendBalloonPrescriptionToEquipment, BalloonPrescription
+  sendBalloonPrescriptionToEquipment, BalloonPrescription,
+  Prescription as PrescriptionEntity, AddPrescriptionItem, useGetTrainMessageQuery, EquipmentBlueTooth
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -251,7 +249,8 @@ export default function StickyHeadTable(params: {
   balloonPrescription:BalloonPrescription[],
   status: PatientStatus,
   trainData:RealTimeTrainData[],
-  onlineEquipment: EquipmentOnline[]}) {
+  onlineEquipment: EquipmentOnline[] ,
+  heartBeats: number[]}) {
   const appDispatch = useAppDispatch()
   // const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
@@ -628,6 +627,7 @@ export default function StickyHeadTable(params: {
 
 
   const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
+    id: 0,
     pid:0,
     task_id:0,
     min_heart_rate : 0,
@@ -998,7 +998,7 @@ export default function StickyHeadTable(params: {
                   <Grid item xs={12} md={12}>
                     <Card sx={{ height: 220 ,padding: '5px'}}>
                       <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                      <PrescriptionTable record={row.prescription_record? row.prescription_record : []} pid={params.id} status={status} task_id={params.task_id}/>
+                      <PrescriptionTable record={row.prescription_record? row.prescription_record : []} pid={params.id} status={status} heartBeats={params.heartBeats} task_id={params.task_id}/>
                     {/*  prescription_record*/}
                     </Card>
                   </Grid>

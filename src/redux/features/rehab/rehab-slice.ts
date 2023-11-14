@@ -26,6 +26,7 @@ export interface MedicalStaff {
 }
 
 export interface PatientStatus {
+  id: number;
   pid: number;
   task_id: number;
   min_heart_rate : number;
@@ -125,6 +126,7 @@ export interface EvaluateFormProps {
 
 let staffs: MedicalStaff[] = []
 let status: PatientStatus = {
+  id: 0,
   pid: 0,
   task_id: 0,
   min_heart_rate : 0,
@@ -425,33 +427,27 @@ export const rehabApi = createApi({
         console.log("ws closed")
       },
     }),
-    publishBlueToothEquipments: builder.query<EquipmentBlueTooth[], Channel>({
+    getBlueToothEquipments: builder.query<EquipmentBlueTooth[], Channel>({
       queryFn:(channel) => {
-        return { data:[] };
+        return { data:[{
+           topic: "-1",
+           content: "000",
+          }] };
       },
       async onCacheEntryAdded(arg,{updateCachedData, cacheDataLoaded, cacheEntryRemoved}){
-        const ws = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_ADDR + 'equipment/ble_heartbeat_publish/ws')
+        const ws = new WebSocket('ws://127.0.0.1:18182/subscribe/heartbeat')
         try {
           await cacheDataLoaded
           const listener = (event: MessageEvent) => {
-            const data: EquipmentOnlineWSMessage = JSON.parse(event.data)
-            if (!isEquipmentBlueToothWSMessage(data)) {
-              // return
-            }
+            const data: EquipmentOnlineWSMessage = event.data
             updateCachedData((draft) => {
-              draft.length = 0
-              if(data.data.length == 0) {
-                draft.length = 0
-                draft.push({topic: -1,content: '无蓝牙设备'})
-              } else {
-                // Add each item from data.data to the draft
-                data.data.forEach(item => draft.push({topic: item.topic, content: item.content}))
-                dispatch(
-                    latestBlueToothEquipmentReceived(data.data.map(item => ({
-                      topic: item.topic,
-                      content: item.content,
-                    }))))
+              console.log('getBlueToothEquipments', draft)
+              draft = []
+              if (!Array.isArray(draft)) {
+                draft= []
               }
+              draft.push({topic: "item", content: data})
+              return draft
             })
           }
           ws.addEventListener('message', listener)
@@ -492,6 +488,7 @@ function convertAPIStaffToMedicalStaff(apiStaff: any): MedicalStaff {
 }
 function convertAPIStatusToStatus(apiStatus: any): PatientStatus {
   return {
+    id: apiStatus.id,
     pid:apiStatus.patient_id,
     task_id:apiStatus.task_id,
     min_heart_rate : apiStatus.min_heart_rate,
@@ -720,9 +717,9 @@ export const fetchStatusById = createAsyncThunk<PatientStatus, { pid:number,task
   return p
 });
 // 更新指标
-export const editStatus = createAsyncThunk<PatientStatus, {pid: number, task_id: number, min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number},
-    {}>('editstatus', async ({pid, task_id, min_heart_rate , max_heart_rate , avg_heart_rate}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('train/status', { pid, task_id, min_heart_rate , max_heart_rate , avg_heart_rate});
+export const editStatus = createAsyncThunk<PatientStatus, {id: number, min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number},
+    {}>('editstatus', async ({id, min_heart_rate , max_heart_rate , avg_heart_rate}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('train/status', { id, min_heart_rate , max_heart_rate , avg_heart_rate});
   console.log("edit status: ", response.data)
   return convertAPIStatusToStatus(response.data.data.status[0])
 });
