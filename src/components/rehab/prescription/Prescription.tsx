@@ -43,8 +43,14 @@ import {
   EvaluateFormProps,
   addPrescription,
   RealTimeTrainData,
-  sendBalloonPrescriptionToEquipment, BalloonPrescription,
-  Prescription as PrescriptionEntity, AddPrescriptionItem, useGetTrainMessageQuery, EquipmentBlueTooth
+  sendBalloonPrescriptionToEquipment,
+  BalloonPrescription,
+  Prescription as PrescriptionEntity,
+  AddPrescriptionItem,
+  useGetTrainMessageQuery,
+  EquipmentBlueTooth,
+  editStatus,
+  fetchStatusById
 } from "@/redux/features/rehab/rehab-slice";
 import {ChangeEvent, createContext, useContext, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
@@ -256,7 +262,7 @@ export default function StickyHeadTable(params: {
   // const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
-  const status = useAppSelector((state: RootState) => state.rehab.patientStatus)
+  const status = useAppSelector(state => state.rehab.patientStatus);
   const appThunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [device, setDevice] = React.useState('');
   const [open, setOpen] = React.useState(false);
@@ -649,6 +655,10 @@ export default function StickyHeadTable(params: {
     min_heart_rate : 0,
     max_heart_rate : 0,
     avg_heart_rate : 0,
+    left_max_strength: 0,
+    left_avg_strength: 0,
+    right_max_strength: 0,
+    right_avg_strength: 0
   })
 
   const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
@@ -664,14 +674,35 @@ export default function StickyHeadTable(params: {
     }))
   };
 
+  //保存肌力评估数据
   const handleSaveAddStatus = () => {
-    appThunkDispatch(addStatus({
-      pid: parseInt(params.id),
-      task_id:0,
-      min_heart_rate: willAddStatus.min_heart_rate,
-      max_heart_rate: willAddStatus.max_heart_rate,
-      avg_heart_rate: willAddStatus.avg_heart_rate
-    }))
+    console.log("status data", status)
+    if (status.id === 0) {
+      appThunkDispatch(addStatus({
+        pid: parseInt(params.id),
+        task_id: taskId,
+        min_heart_rate: status.min_heart_rate,
+        max_heart_rate: status.max_heart_rate,
+        avg_heart_rate: status.avg_heart_rate,
+        left_max_strength: strength.left_max_strength,
+        left_avg_strength: strength.left_avg_strength,
+        right_max_strength: strength.right_max_strength,
+        right_avg_strength: strength.right_avg_strength
+      }))
+    }
+    else {
+      appThunkDispatch(editStatus({
+        id: status.id,
+        min_heart_rate: status.min_heart_rate,
+        max_heart_rate: status.max_heart_rate,
+        avg_heart_rate: status.avg_heart_rate,
+        left_max_strength: strength.left_max_strength,
+        left_avg_strength: strength.left_avg_strength,
+        right_max_strength: strength.right_max_strength,
+        right_avg_strength: strength.right_avg_strength
+      }));
+    }
+    appThunkDispatch(fetchStatusById({pid: parseInt(params.id), task_id: taskId}));
   }
 
 // 医生评价表单
@@ -885,6 +916,19 @@ export default function StickyHeadTable(params: {
     }))
   }
 
+  const [isReady, setIsReady] = React.useState(true);
+  const [taskId, setTaskId] = React.useState(0);
+  const handleChildData = (data) => {
+    // 在这里处理从子组件传递过来的参数
+    console.log('Received data from child:', data);
+    setTaskId(parseInt(data));
+    setIsReady(false);
+  };
+
+  useEffect(()=>{
+    appThunkDispatch(fetchStatusById({pid: parseInt(params.id), task_id: taskId}));
+  }, [taskId]);
+
   return (<>
     <Grid container alignItems="center" justifyContent="space-between" sx={{ height: 50 }}>
       <Grid item style={{display: 'flex', alignItems: 'center'}} >
@@ -1014,8 +1058,29 @@ export default function StickyHeadTable(params: {
                   <Grid item xs={12} md={12}>
                     <Card sx={{ height: 220 ,padding: '5px'}}>
                       <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />
-                      <PrescriptionTable record={row.prescription_record? row.prescription_record : []} pid={params.id} status={status} heartBeats={params.heartBeats} task_id={params.task_id}/>
+                      <PrescriptionTable record={row.prescription_record? row.prescription_record : []} pid={params.id} status={status} heartBeats={params.heartBeats} task_id={params.task_id} onChildData={handleChildData}/>
                     {/*  prescription_record*/}
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} md={12}>
+                    <Card sx={{ padding: '5px'}}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={12}>
+                          <Typography variant="h6">历史肌力数据：</Typography>
+                        </Grid>
+                        <Grid item xs={3} md={3}>
+                          <Typography>左手最大肌力：{status.left_max_strength}</Typography>
+                        </Grid>
+                        <Grid item xs={3} md={3}>
+                          <Typography>左手平均肌力：{status.left_avg_strength}</Typography>
+                        </Grid>
+                        <Grid item xs={3} md={3}>
+                          <Typography>右手最大肌力：{status.right_max_strength}</Typography>
+                        </Grid>
+                        <Grid item xs={3} md={3}>
+                          <Typography>右手平均肌力：{status.right_avg_strength}</Typography>
+                        </Grid>
+                      </Grid>
                     </Card>
                   </Grid>
                   <Grid item xs={12} md={12}>
@@ -1055,12 +1120,12 @@ export default function StickyHeadTable(params: {
                               </Select>
                             </FormControl>
                           </Grid>
-                          <Grid item xs={4} md={4}>
+                          <Grid item xs={2} md={2}>
                             <Tooltip title="下发评估">
                               <IconButton
                                 aria-label="edit"
                                 color="primary"
-                                onClick={(event)=>{event.stopPropagation(); setBalloonOpen(true); handleClickBalloonOpen({p_id:parseInt(params.id), e_id: clientId, part:willEditBalloonPrescription.part, mode:willEditBalloonPrescription.mode});}}
+                                onClick={(event)=>{event.stopPropagation(); setBalloonOpen(true); handleClickBalloonOpen({p_id:parseInt(params.id), e_id: clientId, part:willEditBalloonPrescription.part, mode:willEditBalloonPrescription.mode}); }}
                               >
                                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                   下发评估：
@@ -1068,6 +1133,9 @@ export default function StickyHeadTable(params: {
                                 <SendAndArchiveIcon sx={{ fontSize: 30 }} />
                               </IconButton>
                             </Tooltip>
+                          </Grid>
+                          <Grid item xs={2} md={2}>
+                            <Button disabled={isReady} onClick={handleSaveAddStatus}>保存评估数据</Button>
                           </Grid>
                         </Grid>
                         <Grid container spacing={4}>

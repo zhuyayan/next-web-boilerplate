@@ -65,6 +65,7 @@ import {SelectChangeEvent} from "@mui/material/Select";
 const PrescriptionTable = (params: {
   record: PrescriptionRecord[],
   status: PatientStatus,
+  onChildData,
   heartBeats: number[],
   pid: string,
   task_id: string}) => {
@@ -116,6 +117,10 @@ const PrescriptionTable = (params: {
     min_heart_rate: 0,
     max_heart_rate: 0,
     avg_heart_rate: 0,
+    left_max_strength: 0,
+    left_avg_strength: 0,
+    right_max_strength: 0,
+    right_avg_strength: 0
   })
 
   // 查看评价弹框
@@ -140,6 +145,12 @@ const PrescriptionTable = (params: {
     targetElement?.scrollIntoView({ behavior: 'smooth'});
   };
 
+  //传选中的task_id给Prescription
+  const sendDataToParent = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const taskId = event.currentTarget.dataset.taskId;
+    params.onChildData(taskId); // 调用父组件传入的回调函数，并传递参数
+  };
+
   const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
     let processedValue: string | number = value;
@@ -160,7 +171,11 @@ const PrescriptionTable = (params: {
         task_id: taskid,
         min_heart_rate: willAddStatus.min_heart_rate,
         max_heart_rate: willAddStatus.max_heart_rate,
-        avg_heart_rate: willAddStatus.avg_heart_rate
+        avg_heart_rate: willAddStatus.avg_heart_rate,
+        left_max_strength: statusData.left_max_strength,
+        left_avg_strength: statusData.left_avg_strength,
+        right_max_strength: statusData.right_max_strength,
+        right_avg_strength: statusData.right_avg_strength
       }))
     }
     else {
@@ -168,7 +183,11 @@ const PrescriptionTable = (params: {
         id: statusData.id,
         min_heart_rate: willAddStatus.min_heart_rate,
         max_heart_rate: willAddStatus.max_heart_rate,
-        avg_heart_rate: willAddStatus.avg_heart_rate
+        avg_heart_rate: willAddStatus.avg_heart_rate,
+        left_max_strength: statusData.left_max_strength,
+        left_avg_strength: statusData.left_avg_strength,
+        right_max_strength: statusData.right_max_strength,
+        right_avg_strength: statusData.right_avg_strength
       }));
     }
     setOpenStatus(false);
@@ -242,7 +261,7 @@ const PrescriptionTable = (params: {
                       </a>
                     </TableCell>
                     <TableCell align="center">
-                      <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={handleClickMove}>进行肌力评估</Button>
+                      <Button style={{backgroundColor: '#06c426', color: '#ffffff', float: 'right'}} onClick={(event)=>{handleClickMove(); sendDataToParent(event);}} data-task-id={row.id}>进行肌力评估</Button>
                     </TableCell>
                     {/*<TableCell align='center'>*/}
                     {/*  <Tooltip title="导出">*/}
@@ -479,7 +498,7 @@ const PrescriptionTable = (params: {
                     <label htmlFor="input9">平均心率:</label>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography>{Math.round(params.heartBeats.filter(number => number !== 0).reduce((acc, val) => acc + val, 0) / params.heartBeats.filter(number => number !== 0).length)}</Typography>
+                    <Typography>{Math.round(params.heartBeats.filter(number => number !== 0).reduce((acc, val) => acc + val, 0) / (params.heartBeats.filter(number => number !== 0).length === 0 ? 1 : params.heartBeats.filter(number => number !== 0).length))}</Typography>
                   </Grid>
                 </Grid>
               </Box>
