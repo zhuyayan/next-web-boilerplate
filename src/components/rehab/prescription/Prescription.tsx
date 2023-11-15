@@ -46,10 +46,10 @@ import {
   sendBalloonPrescriptionToEquipment, BalloonPrescription,
   Prescription as PrescriptionEntity, AddPrescriptionItem, useGetTrainMessageQuery, EquipmentBlueTooth
 } from "@/redux/features/rehab/rehab-slice";
-import {ChangeEvent, useEffect, useRef, useState} from "react";
+import {ChangeEvent, createContext, useContext, useEffect, useRef, useState} from "react";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {
   BodyPartToNumMapping,
   ModeToNumMapping,
@@ -87,6 +87,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {Simulate} from "react-dom/test-utils";
 import PrescriptionTable from "@/components/rehab/prescription/PrescriptionTable";
 import Divider from "@mui/material/Divider";
+import {mergePressData, StrengthMerge, StrokeStrength} from "@/redux/features/rehab/rehab-strength-slice";
 
 
 interface TabPanelProps {
@@ -311,103 +312,118 @@ export default function StickyHeadTable(params: {
     right_avg_strength: 0,
     right_max_strength: 0,
   });
-  // 计算肌力平均值和最大值
-  // useEffect(()=>{
-  //   const trainData = params.trainData || [];
-  //   console.log("肌力平均值和最大值",trainData);
-  //   const sum = trainData.reduce((acc, data) => acc + data.value, 0);
-  //   const average = trainData.length > 0 ? sum / trainData.length : 0;
-  //   const max = Math.max(...trainData.map(data => data.value));
-  //   let timeThreshold;
-  //   if(willEditPrescription.mode==8){
-  //     timeThreshold = 5;
-  //   }else if(willEditPrescription.mode==9){
-  //     timeThreshold = 20;
-  //   }
-  //   // 获取当前时间戳
-  //   const currentTime = new Date().getTime();
-  //   // 过滤出规定时间段内的数据
-  //   const relevantData = trainData.filter(data => currentTime - data.timestamp <= timeThreshold);
-  //   // 计算规定时间段内的总数
-  //   const total_sum = relevantData.reduce((acc, data) => acc + data.value, 0);
-  //
-  //   if (willEditPrescription.part == 1) {
-  //     // 左手
-  //     let left_avg_strength = (total_sum) / timeThreshold
-  //     let left_max_strength = max > strength.left_max_strength? max: strength.left_max_strength
-  //     setStrength((prevState)=>({
-  //       ...prevState,
-  //       left_max_strength: left_max_strength,
-  //       left_avg_strength: left_avg_strength,
-  //     }))
-  //   } else if (willEditPrescription.part == 2) {
-  //     // 右手
-  //     let right_avg_strength = (total_sum) / timeThreshold
-  //     let right_max_strength = max > strength.right_max_strength? max: strength.left_max_strength
-  //     setStrength((prevState)=>({
-  //       ...prevState,
-  //       right_max_strength: right_max_strength,
-  //       right_avg_strength: right_avg_strength,
-  //     }))
-  //   }
-  // }, [params.trainData])
+
+  // 定义初始状态
+  const initialState = {
+    pAvg: 0, // 初始化 p_avg 为默认值 0
+    // 其他可能的初始状态...
+  };
+
+  const STORE_P_AVG = 'STORE_P_AVG';
+
+// 创建一个 action 创建函数，用于存储 p_avg 到 Store 中
+  const storePAvg = (pAvg) => {
+    return {
+      type: STORE_P_AVG,
+      payload: pAvg,
+    };
+  };
+
+// 在 reducer 中处理这个 action
+  const reducer = (state = initialState, action) => {
+    switch (action.type) {
+      case STORE_P_AVG:
+        return {
+          ...state,
+          pAvg: action.payload, // 将 p_avg 存入 state 中的 pAvg 字段
+        };
+      // 其他的 case
+      default:
+        return state;
+    }
+  };
+  const dispatch = useDispatch();
+
+  const strengthData = useAppSelector((state: RootState) => state.rehab.strengthMerge) as StrengthMerge;
+
+  useEffect(() => {
+    console.log("strength changed", strengthData)
+  }, [strengthData])
 
   // 计算肌力平均值和最大值
   let totalAverageSum = 0;
   useEffect(()=>{
-    const trainData = params.trainData || [];
-    // console.log("肌力平均值和最大值", willEditBalloonPrescription);
 
-    // 计算总和
-    const sum = trainData.reduce((acc, data) => acc + data.D, 0);
-    // 计算平均值
-    const average = trainData.length > 0 ? sum / trainData.length : 0;
-    // 找到最大值
-    const max = Math.max(...trainData.map(data => data.D));
+    if (willEditBalloonPrescription.mode == "被动评估模式" || willEditBalloonPrescription.mode == "主动评估模式"){
+      const trainData = params.trainData || [];
+      // console.log("肌力平均值和最大值", willEditBalloonPrescription);
+      // 过滤掉小于等于0的数值
+      const positiveData = trainData.filter(data => data.D > 0);
 
-    const p_avg = ((200/2.5)*((3.3/4096)*average - 0.2)-100).toFixed(1);
-    const p_max = ((200/2.5)*((3.3/4096)*max - 0.2)-100).toFixed(1);
-    // console.log('p_平均值:', p_avg);
-    // console.log('P_最大值:', p_max);
-    let timeThreshold;
-    if(willEditBalloonPrescription.mode==8){
-      timeThreshold = 5;
-    }else if(willEditBalloonPrescription.mode==9){
-      timeThreshold = 20;
-    }
+      // 计算总和，只添加大于0的数值
+      const sum = positiveData.reduce((acc, data) => acc + data.D, 0);
 
-    if (willEditBalloonPrescription.part == "左手") {
-      // 左手
-      const parsedPMax = parseFloat(p_max);
-      console.log("xx", parsedPMax, strength.left_max_strength)
-      let left_avg_strength = parseFloat(p_avg)
-      let left_max_strength = parsedPMax > strength.left_max_strength? parsedPMax: strength.left_max_strength
-      for (let i = 0; i < timeThreshold; i++) {
-        totalAverageSum += left_avg_strength;
+      // 计算平均值
+      const average = positiveData.length > 0 ? sum / positiveData.length : 0;
+
+      // 找到最大值
+      const max = Math.max(...trainData.map(data => data.D));
+
+      const p_avg = ((200/2.5)*((3.3/4096)*average - 0.2)-100).toFixed(1);
+      const p_max = ((200/2.5)*((3.3/4096)*max - 0.2)-100).toFixed(1);
+      dispatch(storePAvg(p_avg));
+      // console.log('p_平均值:', p_avg);
+      // console.log('P_最大值:', p_max);
+      let timeThreshold;
+      if(willEditBalloonPrescription.mode=="被动评估模式"){
+        timeThreshold = 5;
+      }else if(willEditBalloonPrescription.mode== "主动评估模式"){
+        timeThreshold = 20;
       }
-      console.log('所有 average 的总和:', totalAverageSum);
-      setStrength((prevState)=>({
-        ...prevState,
-        left_max_strength: left_max_strength,
-        left_avg_strength: left_avg_strength,
-      }))
-    } else if (willEditBalloonPrescription.part == "右手") {
-      // 右手
-      const parsedPMax = parseFloat(p_max);
-      console.log("xx", parsedPMax, strength.right_max_strength)
-      let right_avg_strength = parseFloat(p_avg)
-      let right_max_strength = parsedPMax > strength.right_max_strength? parsedPMax: strength.left_max_strength
-      setStrength((prevState)=>({
-        ...prevState,
-        right_max_strength: right_max_strength,
-        right_avg_strength: right_avg_strength,
-      }))
+
+      if (willEditBalloonPrescription.part == "左手") {
+        // 左手
+        appDispatch(mergePressData({type: "left", data: trainData}))
+        const parsedPMax = parseFloat(p_max);
+        console.log("left_max_strength", parsedPMax, strength.left_max_strength)
+        let left_avg_strength = parseFloat(p_avg)
+        console.log("left_avg_strength", left_avg_strength, strength.left_avg_strength)
+        let left_max_strength = parsedPMax > strength.left_max_strength? parsedPMax: strength.left_max_strength;
+        for (let i = 0; i < timeThreshold; i++) {
+          totalAverageSum = totalAverageSum + strength.left_avg_strength;
+          console.log("计数",i,totalAverageSum)
+        }
+        console.log('所有 average 的总和:', totalAverageSum);
+        setStrength((prevState)=>({
+          ...prevState,
+          left_max_strength: left_max_strength,
+          left_avg_strength: left_avg_strength,
+        }))
+      } else if (willEditBalloonPrescription.part == "右手") {
+        // 右手
+        appDispatch(mergePressData({type: "right", data: trainData}))
+        const parsedPMax = parseFloat(p_max);
+        console.log("xx", parsedPMax, strength.right_max_strength)
+        let right_avg_strength = parseFloat(p_avg)
+        let right_max_strength = parsedPMax > strength.right_max_strength? parsedPMax: strength.right_max_strength;
+        setStrength((prevState)=>({
+          ...prevState,
+          right_max_strength: right_max_strength,
+          right_avg_strength: right_avg_strength,
+        }))
+      }
     }
   }, [params.trainData])
 
   const handleClickOpen = (row: Prescription) => {
     setOpen(true);
-    setSelectedPrescription(row)
+    setSelectedPrescription(row);
+    setWillEditBalloonPrescription({
+      p_id: 0,
+      e_id: "",
+      part: "0",
+      mode: "0",
+    });
     console.log("selectedPrescription -> ", row)
   };
 

@@ -1059,7 +1059,7 @@ const RehabSlice = createSlice({
           console.log("addMatcher rehabApi getOnlineEquipments fulfilled -> ", action.payload, action.type)
         })
         .addMatcher(latestOnlineEquipmentReceived.match, (state, action) =>{
-          console.log("latestOnlineEquipmentReceived.match -> ",state.prescriptionRecord, action)
+          // console.log("latestOnlineEquipmentReceived.match -> ",state.prescriptionRecord, action)
           state.onlineEquipment = action.payload
         })
   },

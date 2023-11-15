@@ -739,8 +739,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
 
             <Grid item xs={12} md={12}>
               <Card>
-                <CardHeader style={{display:'inline-block'}} title='病人详细信息' titleTypographyProps={{ variant: 'h5' }}></CardHeader>
-                {/*<Button style={{float: 'right'}} onClick={handleEditStrokeEvent}>保存修改</Button>*/}
+                <CardHeader style={{display:'inline-block',height: '28px'}} title='病人详细信息' titleTypographyProps={{ variant: 'h6' }}></CardHeader>
                 <Tooltip title="保存修改">
                   <IconButton
                       style={{float: 'right'}}
@@ -753,10 +752,10 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                     <Grid item xs={6} md={6}>
                       <Box sx={{padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center" justify-items="center">
-                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
                             <label htmlFor="input9">病变部位:</label>
                           </Grid>
-                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
                             <EditableText initialText={lastEvent?.lesion_location ?? ""} handleTextChange={handleLesionLocationChange}/>
                           </Grid>
                         </Grid>
@@ -765,27 +764,25 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                     <Grid  item xs={6} md={6}>
                       <Box sx={{padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center">
-                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
                             <label htmlFor="input9">发病日期:</label>
                           </Grid>
-                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
                             <EditableDate initialDateString={lastEvent?.onset_date ?? ""} handleWillDateChange={handleOnsetDataChange}/>
                           </Grid>
                         </Grid>
                       </Box>
                     </Grid>
                   </Grid>
-                  <br/>
-                  <Divider/>
-                  <br/>
+                  <Divider sx={{padding: '5px'}}/>
                   <Grid container spacing={2}>
                     <Grid item xs={6} md={6}>
                       <Box sx={{padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center" justify-items="center">
-                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '26px' }}>
                             <label htmlFor="input9">BIHSS评分:</label>
                           </Grid>
-                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '26px' }}>
                             <EditableText initialText={lastEvent?.nihss_score.toString() ?? ""} handleTextChange={handleNihssScoreChange}/>
                           </Grid>
                         </Grid>
@@ -794,10 +791,10 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                     <Grid  item xs={6} md={6}>
                       <Box sx={{padding: '8px' }}>
                         <Grid container spacing={0} alignItems="center" justify-items="center">
-                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                          <Grid item xs={4} justifyContent="center" style={{ display: 'flex', alignItems: 'center', height: '26px' }}>
                             <label htmlFor="input9">诊断:</label>
                           </Grid>
-                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '30px' }}>
+                          <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '26px' }}>
                             <EditableText initialText={lastEvent?.medical_history ?? ""} handleTextChange={handleMedicalHistoryChange}/>
                           </Grid>
                         </Grid>
@@ -890,14 +887,14 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
             {/*<br/>*/}
 
             {/*压力数据折线图*/}
-            <Grid item xs={6} md={5.5}>
-              <Card sx={{ height: 365 ,padding: '10px'}}>
-                <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
-                {
-                  trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
-                }
-              </Card>
-            </Grid>
+            {/*<Grid item xs={6} md={5.5}>*/}
+            {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
+            {/*    <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />*/}
+            {/*    {*/}
+            {/*      trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>*/}
+            {/*    }*/}
+            {/*  </Card>*/}
+            {/*</Grid>*/}
 
             {/*康复记录*/}
             {/*<Grid item xs={6} md={6.5}>*/}
