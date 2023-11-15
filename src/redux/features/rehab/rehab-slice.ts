@@ -32,6 +32,11 @@ export interface PatientStatus {
   min_heart_rate : number;
   max_heart_rate : number;
   avg_heart_rate : number;
+  left_max_strength:number;
+  left_avg_strength: number;
+  right_max_strength:number;
+  right_avg_strength: number;
+
 }
 
 export interface RehabEvaluation {
@@ -132,6 +137,10 @@ let status: PatientStatus = {
   min_heart_rate : 0,
   max_heart_rate : 0,
   avg_heart_rate : 0,
+  left_max_strength: 0,
+  left_avg_strength: 0,
+  right_max_strength: 0,
+  right_avg_strength: 0
 }
 let patients: Patient[] = []
 let prescriptions: Prescription[] = []
@@ -494,6 +503,10 @@ function convertAPIStatusToStatus(apiStatus: any): PatientStatus {
     min_heart_rate : apiStatus.min_heart_rate,
     max_heart_rate : apiStatus.max_heart_rate,
     avg_heart_rate : apiStatus.avg_heart_rate,
+    left_max_strength:apiStatus.left_max_strength,
+    left_avg_strength: apiStatus.left_avg_strength,
+    right_max_strength: apiStatus.right_max_strength,
+    right_avg_strength: apiStatus.right_avg_strength
   };
 }
 
@@ -700,9 +713,9 @@ export const fetchEvaluationById = createAsyncThunk<Evaluation[], { task_id: num
 });
 
 // 添加指标
-export const addStatus = createAsyncThunk<PatientStatus, {pid: number, task_id: number , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number },
-    {}>('addStatus', async ({pid, task_id , min_heart_rate , max_heart_rate , avg_heart_rate}, thunkAPI):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{pid, task_id, min_heart_rate , max_heart_rate , avg_heart_rate })
+export const addStatus = createAsyncThunk<PatientStatus, {pid: number, task_id: number , min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number ,left_max_strength:number, left_avg_strength: number, right_max_strength:number, right_avg_strength: number},
+    {}>('addStatus', async ({pid, task_id , min_heart_rate , max_heart_rate , avg_heart_rate,left_max_strength, left_avg_strength, right_avg_strength, right_max_strength}, thunkAPI):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.post('train/status',{pid, task_id, min_heart_rate , max_heart_rate , avg_heart_rate, left_max_strength, left_avg_strength, right_avg_strength, right_max_strength })
   console.log("add status async thunk: ", response.data.data.status[0])
   return convertAPIStatusToStatus(response.data.data.status[0])
 });
@@ -717,9 +730,9 @@ export const fetchStatusById = createAsyncThunk<PatientStatus, { pid:number,task
   return p
 });
 // 更新指标
-export const editStatus = createAsyncThunk<PatientStatus, {id: number, min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number},
-    {}>('editstatus', async ({id, min_heart_rate , max_heart_rate , avg_heart_rate}):Promise<any> => {
-  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('train/status', { id, min_heart_rate , max_heart_rate , avg_heart_rate});
+export const editStatus = createAsyncThunk<PatientStatus, {id: number, min_heart_rate : number,max_heart_rate : number,avg_heart_rate : number, left_max_strength:number, left_avg_strength: number, right_max_strength:number, right_avg_strength: number},
+    {}>('editstatus', async ({id, min_heart_rate , max_heart_rate , avg_heart_rate, left_max_strength, left_avg_strength, right_avg_strength, right_max_strength}):Promise<any> => {
+  const response:AxiosResponse<any, any> = await MCTAxiosInstance.put('train/status', { id, min_heart_rate , max_heart_rate , avg_heart_rate, left_max_strength, left_avg_strength, right_avg_strength, right_max_strength});
   console.log("edit status: ", response.data)
   return convertAPIStatusToStatus(response.data.data.status[0])
 });
