@@ -24,7 +24,6 @@ export const postSuggestion = createAsyncThunk<Suggestion, {task_id: number, sug
         }
         const response:AxiosResponse<any, any> = await MCTAxiosInstance.put(`suggestion/${task_id}`, putSugg)
         console.log("post suggestion async thunk: ", response.data.data)
-        //return response.data.data;
     });
 
 interface RehabSuggestionState {

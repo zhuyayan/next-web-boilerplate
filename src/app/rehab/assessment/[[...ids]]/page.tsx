@@ -1,8 +1,6 @@
 "use client";
 import {
   Container,
-  IconButton, Input,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -19,28 +17,17 @@ import Grid from '@mui/material/Grid';
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { Card } from '@mui/material';
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import Tooltip from "@mui/material/Tooltip";
-import {
-  addEvaluation, EvaluateFormProps
-} from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { useCallback } from 'react';
-import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
+import {RootState, useAppSelector} from "@/redux/store";
 import {
-  Assessment,
-  AssessmentLevel,
-  getAssessment, postAssessment,
-  setFuglMeyerScores
+  getAssessment
 } from "@/redux/features/rehab/rehab-assessment-slice";
 import styled from "styled-components";
 import {getSuggestion, postSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
-import {CommonEvaluation, getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
-import InputLabel from "@mui/material/InputLabel";
-import Select, {SelectChangeEvent} from "@mui/material/Select";
+import {getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
+import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import {
   formField,
@@ -49,24 +36,16 @@ import {
   option,
   submitForm,
   SubmissionField,
-  SubmissionData, fields,
+  SubmissionData, Fields,
 } from "@/redux/features/rehab/rehab-formFields-slice";
 
-
-export default function FuglMeyerAssessment( { params }: { params: { ids: [] } } ) {
-  const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
+export default function FuglMeyerAssessment( { params }: { params: { ids: string[] } } ) {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
-  const [components, setComponents] = useState<JSX.Element[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const appDispatch = useAppDispatch()
-  const assessmentResponseData = useAppSelector((state: RootState) => state.assessment.assessmentData);
   const formFieldsResponseData = useAppSelector((state: RootState) => state.formField.formFieldsData);
   const submissionResponseData = useAppSelector((state: RootState) => state.formField.submissionData);
   const suggestionResponseData = useAppSelector((state: RootState) => state.suggestion.suggestionData);
   const [suggestionText, setSuggestionText] = useState('')
-  const evaluationResponseData = useAppSelector((state: RootState) => state.evaluation.evaluationData);
   const [isModified, setIsModified] = useState(false);
-  const fuglMeyerScores = useAppSelector((state: RootState) => state.assessment.fuglMeyerScores);
   const pid = parseInt(params.ids[0])
   const task_id = parseInt(params.ids[1])
   useEffect(()=>{
@@ -75,7 +54,7 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
     thunkDispatch(getEvaluation({task_id: task_id}))
     thunkDispatch(getFormFields({result_owner_id: pid}))
     thunkDispatch(getFormFieldsTemplate())
-  },[params,thunkDispatch])
+  },[params, thunkDispatch])
 
   const [groupedFields, setGroupedFields] = useState<formField[][]>([]);
   useEffect(()=>{
@@ -85,6 +64,7 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
   const [submissionData, setSubmissionData] = useState<SubmissionField>({
     fields: [],
     owner_id: 0,
+    assessment_time: '',
   });
 
   useEffect(() => {
@@ -133,12 +113,8 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
 
   //保存医生建议
   const handleSaveSuggestion = () => {
-    thunkDispatch(postSuggestion({task_id: parseInt(params[1]), suggestion_id: suggestionResponseData?.suggestion_id || 1, suggestion_text: suggestionText}))
+    thunkDispatch(postSuggestion({task_id: task_id, suggestion_id: suggestionResponseData?.suggestion_id || 1, suggestion_text: suggestionText}))
   };
-
-  // function handleFuglMeyerAssessmentChange(id: number, newValue: string | undefined | null) {
-  //   thunkDispatch(setFuglMeyerScores({id, newValue}));
-  // }
 
   const StyledTableCell = styled(TableCell)`
     background-color: #f0f0f0;
@@ -178,18 +154,21 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
   };
 
   // 将 textFields 转换为 SubmissionField 数组
-  const submissionFields: SubmissionField[] = Object.entries(textFields).map(([name, value]) => ({
+  const submissionFields: Fields[] = Object.entries(textFields).map(([name, value]) => ({
     form_field_name: name,
-    value: value as string, // 使用类型断言将未知类型的 value 转换为字符串类型
+    value: value as string,
+
   }));
 
   //保存
   const handleSubmitAll = () => {
     // 构建 submissionData 对象
     const submissionData: SubmissionData = {
+      formID: 0,
       form_sub_mission: {
         fields: submissionFields,
-        owner_id: task_id
+        owner_id: task_id,
+        assessment_time: '',
       },
       result_owner_id: pid
     };
@@ -222,6 +201,7 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
   const uniqueStringsLeft: Set<string> = new Set();
   const uniqueStringsRight: Set<string> = new Set();
   let uniqueArrayLeft: string[];
+  let uniqueArrayLeftTemp: string[];
   let uniqueArrayRight: string[];
 
   //根据不同group返回相应量表的样式
@@ -297,11 +277,11 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
         }
       });
       uniqueArrayLeft = Array.from(uniqueStringsLeft);
+      uniqueArrayLeftTemp = Array.from(uniqueStringsLeft);
       uniqueArrayRight = Array.from(uniqueStringsRight);
       let num: number;
 
       num = group.length/uniqueArrayLeft.length;
-
 
       return (
           <>
@@ -314,21 +294,20 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
                       <TableRow>
                         <StyledTableCell></StyledTableCell>
                         {uniqueArrayRight.map((str, index) => (
-                            <StyledTableCell key ={index} align="center">{str}</StyledTableCell>
+                            <StyledTableCell key={str} align="center">{str}</StyledTableCell>
                         ))}
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {uniqueArrayLeft.map((finger, index) => (
-                          <TableRow key={index}>
+                      {uniqueArrayLeftTemp.map((finger, index) => (
+                          <TableRow key={finger}>
                             <StyledTableCell align="center">{finger}</StyledTableCell>
                             {group.slice(index * num, (index + 1) * num).map((item) => (
                                 <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center" key={item.name}>
                                   <TextField
                                       name={item.name}
-                                      value={textFields[ item.name as keyof typeof textFields] || ''} // 设置文本框的值为状态中存储的值
-                                      //value={item.name}
-                                      onChange={handleInputTextChange} // 绑定onChange事件处理函数
+                                      value={textFields[item.name as keyof typeof textFields] || ''}
+                                      onChange={handleInputTextChange}
                                       size="small"
                                   />
                                 </TableCell>
