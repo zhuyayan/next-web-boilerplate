@@ -15,6 +15,17 @@ export const getSuggestion = createAsyncThunk<Suggestion, {task_id: number}, {}>
         return response.data.data;
     });
 
+export const putSuggestion = createAsyncThunk<Suggestion, {suggestion_id: number, suggestion_text: string}, {}>(
+    'putSuggestion',
+    async ({suggestion_id, suggestion_text}):Promise<any> => {
+        let putSugg: {suggestion_id:number, suggestion_text: string} = {
+            suggestion_id: suggestion_id,
+            suggestion_text: suggestion_text
+        }
+        const response:AxiosResponse<any, any> = await MCTAxiosInstance.put(`suggestion/${suggestion_id}`, putSugg)
+        console.log("post suggestion async thunk: ", response.data.data)
+    });
+
 export const postSuggestion = createAsyncThunk<Suggestion, {task_id: number, suggestion_id: number, suggestion_text: string}, {}>(
     'postSuggestion',
     async ({task_id, suggestion_id, suggestion_text}):Promise<any> => {
@@ -22,9 +33,8 @@ export const postSuggestion = createAsyncThunk<Suggestion, {task_id: number, sug
             suggestion_id: suggestion_id,
             suggestion_text: suggestion_text
         }
-        const response:AxiosResponse<any, any> = await MCTAxiosInstance.put(`suggestion/${task_id}`, putSugg)
+        const response:AxiosResponse<any, any> = await MCTAxiosInstance.post(`suggestion/${task_id}`, putSugg)
         console.log("post suggestion async thunk: ", response.data.data)
-        //return response.data.data;
     });
 
 interface RehabSuggestionState {

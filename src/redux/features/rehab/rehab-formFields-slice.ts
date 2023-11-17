@@ -1,18 +1,20 @@
 import {ActionReducerMapBuilder, createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {AxiosResponse} from "axios";
 import MCTAxiosInstance from "@/utils/mct-request";
-import {Suggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
-import {string} from "postcss-selector-parser";
-import {Patient} from "@/redux/features/rehab/rehab-slice";
 
-export interface AllData {
+export interface ApiResponse {
     code: number;
-    data: {
-        form_fields: formField[];
-        submission: SubmissionData;
-    };
+    data: any;
     msg: string;
 }
+
+
+interface ApiFormFieldsTemplate{
+    form_fields: formField[];
+}
+
+type ApiUserSubmissionPayload = SubmissionField[]
+
 
 export interface formField {
     id: number;
@@ -39,38 +41,37 @@ export interface formFieldRole {
     role_name: string;
 }
 
-export interface fields {
+export interface Fields {
     form_field_name: string;
     value: string;
 }
 
 export interface SubmissionField {
-    fields:fields[];
-    owner_id:number;
-    assessment_time:string;
+    fields: Fields[];
+    owner_id: number;
+    assessment_time: string;
 }
 
 export interface SubmissionData {
-    formID:number;
+    formID: number;
     form_sub_mission: SubmissionField;
     result_owner_id: number;
 }
 
-export const getFormFields = createAsyncThunk<AllData,{result_owner_id:number}>('getFormFields',
+export const getFormFields = createAsyncThunk<ApiUserSubmissionPayload,{result_owner_id:number}>('getFormFields',
   async ({result_owner_id}):Promise<any> => {
-    const response: AxiosResponse<any, any> = await MCTAxiosInstance.get('form-fields',
+    const response: AxiosResponse<ApiResponse, any> = await MCTAxiosInstance.get('form-fields',
       {params:{result_owner_id: result_owner_id}});
-    console.log('get form-fields async thunk: ', response.data);
-    return response.data;
+    console.log('get form-fields async thunk: ', response.data.data);
+    return  response.data.data
 });
 
-export const getFormFieldsTemplate = createAsyncThunk<AllData>('getFormFieldsTemplate', async (_, thunkAPI) => {
-    const response: AxiosResponse<AllData> = await MCTAxiosInstance.get('form-fields/template?owner_id=0');
-    console.log('get form-fields template async thunk: ', response.data);
-    return response.data;
+export const getFormFieldsTemplate = createAsyncThunk<ApiFormFieldsTemplate>('getFormFieldsTemplate', async (_, thunkAPI) => {
+    const response: AxiosResponse<ApiResponse, any> = await MCTAxiosInstance.get('form-fields/template?owner_id=0');
+    console.log('get form-fields template async thunk: ', response.data, response.data.data.form_fields);
+    return {form_fields: response.data.data.form_fields}
 });
 
-// SubmissionData
 export const submitForm = createAsyncThunk<FormData, SubmissionData>(
   'submitForm',
   async (submissionData, thunkAPI) => {
@@ -111,10 +112,9 @@ const formFieldsSlice = createSlice({
     reducers: {},
     extraReducers: (builder: ActionReducerMapBuilder<RehabFormFieldsState>) => {
         builder.addCase(getFormFields.fulfilled, (state, action) => {
-            state.submissionData = action.payload.data;
-            console.log("abca", action.payload.data)
+            state.submissionData = action.payload;
         }).addCase(getFormFieldsTemplate.fulfilled,(state, action) => {
-            state.formFieldsData = action.payload.data.form_fields;
+            state.formFieldsData = action.payload.form_fields;
         });
     },
 });
