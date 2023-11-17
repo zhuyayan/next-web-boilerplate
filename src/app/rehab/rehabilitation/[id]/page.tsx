@@ -7,14 +7,12 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import Prescription from "@/components/rehab/prescription/Prescription";
-import {EChartsTest} from "@/components/rehab/echarts/EChartsTest";
-import {quEcharts} from "@/components/rehab/echarts/quEcharts";
 import * as React from 'react';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import styled from "styled-components";
 
-import Select, {SelectChangeEvent} from '@mui/material/Select';
+import {SelectChangeEvent} from '@mui/material/Select';
 import {ChangeEvent, SyntheticEvent, useCallback, useEffect, useRef, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
 import {AnyAction} from "redux";
@@ -25,8 +23,6 @@ import {
   Prescription as PrescriptionEntity,
   EvaluateFormProps,
   AddPrescriptionItem,
-  PatientStatus,
-  addStatus,
   addEvaluation,
   fetchEvaluationById,
   fetchStatusById, useGetBlueToothEquipmentsQuery, fetchStatisticsById, RealTimeTrainData
@@ -40,17 +36,12 @@ import {
 } from "@/redux/features/rehab/rehab-slice";
 
 import {
-  formField,
-} from "@/redux/features/rehab/rehab-formFields-slice";
-
-import {
   BodyPartToNumMapping,
   ModeToNumMapping,
   NumToBodyPartMapping,
   NumToModeMapping,
-  PatientNumClassifyToClassifyLabelMapping, PatientNumStrokeLevelToStrokeLevelLabelMapping
 } from "@/utils/mct-utils";
-import {IconButton, InputAdornment, TableContainer} from "@mui/material";
+import {IconButton, TableContainer} from "@mui/material";
 
 import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
@@ -70,7 +61,6 @@ import TableBody from "@mui/material/TableBody";
 import Table from "@mui/material/Table";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TextField from '@mui/material/TextField';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
@@ -78,7 +68,6 @@ import Tab from '@mui/material/Tab'
 import TabList from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
-import Avatar from "@mui/material/Avatar";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {getStrokeEvents, putStrokeEvent, StrokeEvent} from "@/redux/features/rehab/rehab-patient-slice";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
@@ -86,6 +75,7 @@ import SaveAsIcon from '@mui/icons-material/SaveAs';
 //双击编辑组件
 type EditableTextProps = {
   initialText: string | null;
+  handleTextChange: (text: string) => void;
 };
 
 const EditableText: React.FC<EditableTextProps> = ({ initialText, handleTextChange }) => {
@@ -137,6 +127,7 @@ const EditableText: React.FC<EditableTextProps> = ({ initialText, handleTextChan
 
 type EditableDateProps = {
   initialDateString: string;
+  handleWillDateChange: (text: string) => void;
 };
 
 const EditableDate: React.FC<EditableDateProps> = ({ initialDateString, handleWillDateChange }) => {
@@ -170,7 +161,7 @@ const EditableDate: React.FC<EditableDateProps> = ({ initialDateString, handleWi
               <DatePicker
                   value={selectedDate}
                   onChange={handleDateChange}
-                  renderInput={(params) => <input {...params.inputProps} autoFocus />}
+                  //renderInput={(params) => <TextField {...params.inputProps} autoFocus />}
               />
             </LocalizationProvider>
         ) : (
@@ -228,7 +219,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   const statistics = useAppSelector((state:RootState) => state.rehab.statistics);
   const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux");
   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux");
-  const {data: blueToothData, isLoading: blueToothLoading, error: blueToothError} = useGetBlueToothEquipmentsQuery<HeartBeat[]>("redux")
+  const { data: blueToothData, isLoading: blueToothLoading, error: blueToothError } = useGetBlueToothEquipmentsQuery("redux");
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
   const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState(false);
@@ -459,32 +450,51 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
   },[strokeEventResponse])
 
   const handleLesionLocationChange = (text: string) => {
-    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
-      ...prevState,
-      lesion_location: text,
-    }));
+    setWillEditStrokeEvent((prevState: StrokeEvent | null) => {
+      if (prevState === null) {
+        // 处理 prevState 为 null 的情况
+        // 您可能需要根据应用的逻辑来决定如何处理
+        return null;
+      }
+
+      // 如果 prevState 不是 null，则更新状态
+      return { ...prevState, lesion_location: text };
+    });
   };
+
 
   const handleOnsetDataChange = (text: string) => {
-    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
-      ...prevState,
-      onset_date: text,
-    }));
+    setWillEditStrokeEvent((prevState: StrokeEvent | null) => {
+      if (!prevState) {
+        // 处理 prevState 为 null 的情况
+        return null; // 或者返回合适的默认值
+      }
+      return { ...prevState, onset_date: text };
+    });
   };
+
 
   const handleNihssScoreChange = (text: string) => {
-    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
-      ...prevState,
-      nihss_score: parseInt(text),
-    }));
+    setWillEditStrokeEvent((prevState: StrokeEvent | null) => {
+      if (!prevState) {
+        // 处理 prevState 为 null 的情况
+        return null; // 或者返回合适的默认值
+      }
+      return { ...prevState, nihss_score: parseInt(text, 10) || 0 };
+    });
   };
 
+
   const handleMedicalHistoryChange = (text: string) => {
-    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
-      ...prevState,
-      medical_history: text,
-    }));
+    setWillEditStrokeEvent((prevState: StrokeEvent | null) => {
+      if (!prevState) {
+        // 处理 prevState 为 null 的情况
+        return null; // 或者返回合适的默认值
+      }
+      return { ...prevState, medical_history: text };
+    });
   };
+
 
   //提交修改
   const handleEditStrokeEvent = () => {
@@ -514,39 +524,6 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
       ...prevState,
       part: BodyPartToNumMapping[parseInt(event.target.value)]
     }))
-  };
-
-  const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
-    id: 0,
-    pid:0,
-    task_id:0,
-    min_heart_rate : 0,
-    max_heart_rate : 0,
-    avg_heart_rate : 0,
-  })
-
-  const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target;
-    let processedValue: string | number = value;
-    if (["avg_heart_rate", "max_heart_rate", "min_heart_rate"].includes(id)) {
-      processedValue = Number(value);
-    }
-    console.log('handleAddStatus', id, processedValue)
-    setWillAddStatus((prevInputValues) => ({
-      ...prevInputValues,
-      [id]: processedValue,
-    }))
-  };
-
-  const handleSaveAddStatus = () => {
-    thunkDispatch(addStatus({
-      pid: parseInt(params.id),
-      task_id:parseInt(params.task_id),
-      min_heart_rate: willAddStatus.min_heart_rate,
-      max_heart_rate: willAddStatus.max_heart_rate,
-      avg_heart_rate: willAddStatus.avg_heart_rate
-    }))
-    setOpenAddStatus(false)
   };
 
   const [stretchValue, setStretchValue] = useState<string>('1')
@@ -867,9 +844,10 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                   task_id={params.task_id}
                   prescription={prescription}
                   status={status}
-                  trainData={trainData}
+                  trainData={trainData || []}
                   onlineEquipment={onlineData || []}
                   heartBeats={numbers || []}
+                  balloonPrescription={[]}
                 />
               </Card>
             </Grid>

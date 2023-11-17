@@ -25,7 +25,7 @@ import {
   getAssessment
 } from "@/redux/features/rehab/rehab-assessment-slice";
 import styled from "styled-components";
-import {getSuggestion, postSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
+import {getSuggestion, postSuggestion, putSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
 import {getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -113,7 +113,13 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: string
 
   //保存医生建议
   const handleSaveSuggestion = () => {
-    thunkDispatch(postSuggestion({task_id: task_id, suggestion_id: suggestionResponseData?.suggestion_id || 1, suggestion_text: suggestionText}))
+    console.log("ass task_id", task_id)
+    if (suggestionResponseData?.suggestion_id === 0) {
+      thunkDispatch(postSuggestion({task_id: task_id, suggestion_id: suggestionResponseData?.suggestion_id || 0, suggestion_text: suggestionText}))
+    }
+    else {
+      thunkDispatch(putSuggestion({suggestion_id: suggestionResponseData?.suggestion_id || 0, suggestion_text: suggestionText}))
+    }
   };
 
   const StyledTableCell = styled(TableCell)`
@@ -127,13 +133,13 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: string
 `;
 
   const [textFields, setTextFields] = useState({}); // 状态中存储文本框的name和value
-  const handleInputTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleInputTextChange = (name: string, value: string) => {
     setTextFields((prevTextFields) => ({
       ...prevTextFields,
-      [name]: value, // 更新相应的name和value
+      [name]: value,
     }));
   };
+
 
   //量表选中状态
   const [selectedValues, setSelectedValues] = useState<{ [key: string]: string }>({});
@@ -201,11 +207,43 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: string
   const uniqueStringsLeft: Set<string> = new Set();
   const uniqueStringsRight: Set<string> = new Set();
   let uniqueArrayLeft: string[];
-  let uniqueArrayLeftTemp: string[];
   let uniqueArrayRight: string[];
 
+  interface CustomTextFieldProps {
+    name: string;
+    globalValue: string;
+    onChange: (name: string, value: string) => void;
+  }
+
+  const CustomTextField: React.FC<CustomTextFieldProps> = ({ name, globalValue, onChange }) => {
+    const [localValue, setLocalValue] = useState(globalValue);
+
+    useEffect(() => {
+      setLocalValue(globalValue);
+    }, [globalValue]);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setLocalValue(e.target.value);
+    };
+
+    const handleBlur = () => {
+      onChange(name, localValue);
+    };
+
+    return (
+        <TextField
+            name={name}
+            value={localValue}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            size="small"
+        />
+    );
+  };
+
+
   //根据不同group返回相应量表的样式
-  const renderGroupTable = (group: formField[]) => {
+  const RenderGroupTable: React.FC<{ group: formField[] }> = ({ group }) => {
     if (group[0].group_name === 'Fugl-Meyer') {
       return (
           <>
@@ -277,7 +315,6 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: string
         }
       });
       uniqueArrayLeft = Array.from(uniqueStringsLeft);
-      uniqueArrayLeftTemp = Array.from(uniqueStringsLeft);
       uniqueArrayRight = Array.from(uniqueStringsRight);
       let num: number;
 
@@ -299,16 +336,17 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: string
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {uniqueArrayLeftTemp.map((finger, index) => (
+                      {uniqueArrayLeft.map((finger, index) => (
                           <TableRow key={finger}>
                             <StyledTableCell align="center">{finger}</StyledTableCell>
                             {group.slice(index * num, (index + 1) * num).map((item) => (
                                 <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center" key={item.name}>
-                                  <TextField
+                                  <CustomTextField
                                       name={item.name}
-                                      value={textFields[item.name as keyof typeof textFields] || ''}
+                                      //value={textFields[item.name as keyof typeof textFields] || ''}
+                                      globalValue={textFields[item.name as keyof typeof textFields] || ''}
                                       onChange={handleInputTextChange}
-                                      size="small"
+                                      //size="small"
                                   />
                                 </TableCell>
                             ))}
@@ -390,58 +428,59 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: string
       );
     } else {
       return (
-          <TextField
+          <CustomTextField
               name={fieldName}
-              value={textFields[ fieldName as keyof typeof textFields] || ''} // 设置文本框的值为状态中存储的值
+              //value={textFields[ fieldName as keyof typeof textFields] || ''} // 设置文本框的值为状态中存储的值
+              globalValue={textFields[fieldName as keyof typeof textFields] || ''}
               //value={fieldName}
               onChange={handleInputTextChange} // 绑定onChange事件处理函数
-              size="small"
-              fullWidth
+              //size="small"
+              //fullWidth
           />
       );
     }
   };
 
   return (
-    <>
-      <Container>
-        <FormControl fullWidth>
-          {groupedFields.map((group, index) => (
-              <>
-                {renderGroupTable(group)}
-              </>
-          ))}
-        </FormControl>
+      <>
+        <Container>
+          <FormControl fullWidth>
+            {groupedFields.map((group, index) => (
+                <>
+                  <RenderGroupTable key={index} group={group}/>
+                </>
+            ))}
+          </FormControl>
 
-        <FormControl fullWidth>
-          <Card style={{ marginBottom: '30px', marginTop:'0px' }} sx={{ padding: '20px' }}>
-            <Title>医生建议：</Title>
-            <TextField
-              name="suggestion"
-              multiline
-              rows={4}
-              fullWidth
-              placeholder="请按照本次训练情况在此输入医生建议"
-              value = {suggestionText || initialSuggestionValue}
-              onChange={(event) => {
-                setSuggestionText(event.target.value)
-                setIsModified(true);
-              }}
-            />
-            <Typography variant='body2' style={{ color: 'red' }}>注：填写完毕后请点击保存按钮进行手动保存。</Typography>
-            <Grid container spacing={0}>
-              <Grid item xs={6} style={{display: 'flex', alignItems: 'center'}}>
+          <FormControl fullWidth>
+            <Card style={{ marginBottom: '30px', marginTop:'0px' }} sx={{ padding: '20px' }}>
+              <Title>医生建议：</Title>
+              <TextField
+                  name="suggestion"
+                  multiline
+                  rows={4}
+                  fullWidth
+                  placeholder="请按照本次训练情况在此输入医生建议"
+                  value = {suggestionText || initialSuggestionValue}
+                  onChange={(event) => {
+                    setSuggestionText(event.target.value)
+                    setIsModified(true);
+                  }}
+              />
+              <Typography variant='body2' style={{ color: 'red' }}>注：填写完毕后请点击保存按钮进行手动保存。</Typography>
+              <Grid container spacing={0}>
+                <Grid item xs={6} style={{display: 'flex', alignItems: 'center'}}>
+                </Grid>
+                <Grid item xs={6} alignItems="center">
+                  <Box sx={{padding: '8px' }}>
+                    <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveSuggestion}>保存建议</Button>
+                  </Box>
+                </Grid>
               </Grid>
-              <Grid item xs={6} alignItems="center">
-                <Box sx={{padding: '8px' }}>
-                  <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveSuggestion}>保存建议</Button>
-                </Box>
-              </Grid>
-            </Grid>
-          </Card>
-        </FormControl>
-      </Container>
-    </>
+            </Card>
+          </FormControl>
+        </Container>
+      </>
   )
 }
 

@@ -918,7 +918,7 @@ export default function StickyHeadTable(params: {
 
   const [isReady, setIsReady] = React.useState(true);
   const [taskId, setTaskId] = React.useState(0);
-  const handleChildData = (data) => {
+  const handleChildData = (data: string) => {
     // 在这里处理从子组件传递过来的参数
     console.log('Received data from child:', data);
     setTaskId(parseInt(data));
