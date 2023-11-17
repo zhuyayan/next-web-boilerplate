@@ -875,7 +875,7 @@ export default function StickyHeadTable(params: {
 
   const [isReady, setIsReady] = React.useState(true);
   const [taskId, setTaskId] = React.useState(0);
-  const handleChildData = (data:string) => {
+  const handleChildData = (data: string) => {
     // 在这里处理从子组件传递过来的参数
     console.log('Received data from child:', data);
     setTaskId(parseInt(data));
@@ -1047,13 +1047,13 @@ export default function StickyHeadTable(params: {
                         <Grid container spacing={2}>
                           <Grid item xs={4} md={4}>
                             <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                              <InputLabel id="demo-select-small-label">评估模式</InputLabel>
+                              <InputLabel id="mode">评估模式</InputLabel>
                               <Select
                                 {...register('mode', {required: '训练模式是必需的'})}
-                                labelId="demo-select-small-label"
+                                labelId="mode"
                                 id="demo-select-small"
                                 value={String(NumToModeMapping[willEditBalloonPrescription.mode])}
-                                label="Age1"
+                                label="mode"
                                 name="mode"
                                 onChange={handleBalloonModeChange}>
                                 <MenuItem value={8}>被动评估模式</MenuItem>
@@ -1063,13 +1063,13 @@ export default function StickyHeadTable(params: {
                           </Grid>
                           <Grid item xs={4} md={4}>
                             <FormControl sx={{ m: 1, minWidth: 240 }} size="small">
-                              <InputLabel id="demo-select-small-label">评估部位</InputLabel>
+                              <InputLabel id="part">评估部位</InputLabel>
                               <Select
                                 {...register('part', { required: '训练部位是必需的' })}
                                 labelId="demo-select-small-label"
-                                id="demo-select-small"
+                                id="part"
                                 value={String(NumToBodyPartMapping[willEditBalloonPrescription.part])}
-                                label="Age2"
+                                label="part"
                                 onChange={handleBalloonPartChange}
                                 name="part">
                                 <MenuItem value={1}>左手</MenuItem>

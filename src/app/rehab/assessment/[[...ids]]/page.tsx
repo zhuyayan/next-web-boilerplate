@@ -1,8 +1,6 @@
 "use client";
 import {
   Container,
-  IconButton, Input,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -19,28 +17,17 @@ import Grid from '@mui/material/Grid';
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { Card } from '@mui/material';
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import Tooltip from "@mui/material/Tooltip";
-import {
-  addEvaluation, EvaluateFormProps
-} from "@/redux/features/rehab/rehab-slice";
 import {ThunkDispatch} from "redux-thunk";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { useCallback } from 'react';
-import {RootState, useAppDispatch, useAppSelector} from "@/redux/store";
+import {RootState, useAppSelector} from "@/redux/store";
 import {
-  Assessment,
-  AssessmentLevel,
-  getAssessment, postAssessment,
-  setFuglMeyerScores
+  getAssessment
 } from "@/redux/features/rehab/rehab-assessment-slice";
 import styled from "styled-components";
-import {getSuggestion, postSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
-import {CommonEvaluation, getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
-import InputLabel from "@mui/material/InputLabel";
-import Select, {SelectChangeEvent} from "@mui/material/Select";
+import {getSuggestion, postSuggestion, putSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
+import {getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
+import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import {
   formField,
@@ -49,24 +36,16 @@ import {
   option,
   submitForm,
   SubmissionField,
-  SubmissionData, fields,
+  SubmissionData, Fields,
 } from "@/redux/features/rehab/rehab-formFields-slice";
 
-
-export default function FuglMeyerAssessment( { params }: { params: { ids: [] } } ) {
-  const [selectedAssessment, setSelectedAssessment] = useState<string>(''); // 用于存储用户选择的评定量表
+export default function FuglMeyerAssessment( { params }: { params: { ids: string[] } } ) {
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
-  const [components, setComponents] = useState<JSX.Element[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const appDispatch = useAppDispatch()
-  const assessmentResponseData = useAppSelector((state: RootState) => state.assessment.assessmentData);
   const formFieldsResponseData = useAppSelector((state: RootState) => state.formField.formFieldsData);
   const submissionResponseData = useAppSelector((state: RootState) => state.formField.submissionData);
   const suggestionResponseData = useAppSelector((state: RootState) => state.suggestion.suggestionData);
   const [suggestionText, setSuggestionText] = useState('')
-  const evaluationResponseData = useAppSelector((state: RootState) => state.evaluation.evaluationData);
   const [isModified, setIsModified] = useState(false);
-  const fuglMeyerScores = useAppSelector((state: RootState) => state.assessment.fuglMeyerScores);
   const pid = parseInt(params.ids[0])
   const task_id = parseInt(params.ids[1])
   useEffect(()=>{
@@ -75,7 +54,7 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
     thunkDispatch(getEvaluation({task_id: task_id}))
     thunkDispatch(getFormFields({result_owner_id: pid}))
     thunkDispatch(getFormFieldsTemplate())
-  },[params,thunkDispatch])
+  },[params, thunkDispatch])
 
   const [groupedFields, setGroupedFields] = useState<formField[][]>([]);
   useEffect(()=>{
@@ -85,15 +64,16 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
   const [submissionData, setSubmissionData] = useState<SubmissionField>({
     fields: [],
     owner_id: 0,
+    assessment_time: '',
   });
 
   useEffect(() => {
-    let selectedSubmissionData = submissionResponseData.filter((item) => {
+    let selectedSubmissionData = submissionResponseData?.filter((item) => {
       if(item.owner_id == task_id){
         return item
       }
     })
-    if(selectedSubmissionData.length){
+    if(selectedSubmissionData?.length){
       setSubmissionData(selectedSubmissionData[0]);
     }
   },[submissionResponseData])
@@ -133,12 +113,14 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
 
   //保存医生建议
   const handleSaveSuggestion = () => {
-    thunkDispatch(postSuggestion({task_id: parseInt(params[1]), suggestion_id: suggestionResponseData?.suggestion_id || 1, suggestion_text: suggestionText}))
+    console.log("ass task_id", task_id)
+    if (suggestionResponseData?.suggestion_id === 0) {
+      thunkDispatch(postSuggestion({task_id: task_id, suggestion_id: suggestionResponseData?.suggestion_id || 0, suggestion_text: suggestionText}))
+    }
+    else {
+      thunkDispatch(putSuggestion({suggestion_id: suggestionResponseData?.suggestion_id || 0, suggestion_text: suggestionText}))
+    }
   };
-
-  // function handleFuglMeyerAssessmentChange(id: number, newValue: string | undefined | null) {
-  //   thunkDispatch(setFuglMeyerScores({id, newValue}));
-  // }
 
   const StyledTableCell = styled(TableCell)`
     background-color: #f0f0f0;
@@ -151,13 +133,13 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
 `;
 
   const [textFields, setTextFields] = useState({}); // 状态中存储文本框的name和value
-  const handleInputTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleInputTextChange = (name: string, value: string) => {
     setTextFields((prevTextFields) => ({
       ...prevTextFields,
-      [name]: value, // 更新相应的name和value
+      [name]: value,
     }));
   };
+
 
   //量表选中状态
   const [selectedValues, setSelectedValues] = useState<{ [key: string]: string }>({});
@@ -178,18 +160,21 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
   };
 
   // 将 textFields 转换为 SubmissionField 数组
-  const submissionFields: SubmissionField[] = Object.entries(textFields).map(([name, value]) => ({
+  const submissionFields: Fields[] = Object.entries(textFields).map(([name, value]) => ({
     form_field_name: name,
-    value: value as string, // 使用类型断言将未知类型的 value 转换为字符串类型
+    value: value as string,
+
   }));
 
   //保存
   const handleSubmitAll = () => {
     // 构建 submissionData 对象
     const submissionData: SubmissionData = {
+      formID: 0,
       form_sub_mission: {
         fields: submissionFields,
-        owner_id: task_id
+        owner_id: task_id,
+        assessment_time: '',
       },
       result_owner_id: pid
     };
@@ -224,8 +209,41 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
   let uniqueArrayLeft: string[];
   let uniqueArrayRight: string[];
 
+  interface CustomTextFieldProps {
+    name: string;
+    globalValue: string;
+    onChange: (name: string, value: string) => void;
+  }
+
+  const CustomTextField: React.FC<CustomTextFieldProps> = ({ name, globalValue, onChange }) => {
+    const [localValue, setLocalValue] = useState(globalValue);
+
+    useEffect(() => {
+      setLocalValue(globalValue);
+    }, [globalValue]);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setLocalValue(e.target.value);
+    };
+
+    const handleBlur = () => {
+      onChange(name, localValue);
+    };
+
+    return (
+        <TextField
+            name={name}
+            value={localValue}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            size="small"
+        />
+    );
+  };
+
+
   //根据不同group返回相应量表的样式
-  const renderGroupTable = (group: formField[]) => {
+  const RenderGroupTable: React.FC<{ group: formField[] }> = ({ group }) => {
     if (group[0].group_name === 'Fugl-Meyer') {
       return (
           <>
@@ -302,7 +320,6 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
 
       num = group.length/uniqueArrayLeft.length;
 
-
       return (
           <>
             <Card style={{ paddingBottom: '20px', padding: '8px', marginTop: '20px' }}>
@@ -314,22 +331,22 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
                       <TableRow>
                         <StyledTableCell></StyledTableCell>
                         {uniqueArrayRight.map((str, index) => (
-                            <StyledTableCell key ={index} align="center">{str}</StyledTableCell>
+                            <StyledTableCell key={str} align="center">{str}</StyledTableCell>
                         ))}
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {uniqueArrayLeft.map((finger, index) => (
-                          <TableRow key={index}>
+                          <TableRow key={finger}>
                             <StyledTableCell align="center">{finger}</StyledTableCell>
                             {group.slice(index * num, (index + 1) * num).map((item) => (
                                 <TableCell style={{ borderLeft: '1px solid #ccc' }} align="center" key={item.name}>
-                                  <TextField
+                                  <CustomTextField
                                       name={item.name}
-                                      value={textFields[ item.name as keyof typeof textFields] || ''} // 设置文本框的值为状态中存储的值
-                                      //value={item.name}
-                                      onChange={handleInputTextChange} // 绑定onChange事件处理函数
-                                      size="small"
+                                      //value={textFields[item.name as keyof typeof textFields] || ''}
+                                      globalValue={textFields[item.name as keyof typeof textFields] || ''}
+                                      onChange={handleInputTextChange}
+                                      //size="small"
                                   />
                                 </TableCell>
                             ))}
@@ -411,58 +428,59 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
       );
     } else {
       return (
-          <TextField
+          <CustomTextField
               name={fieldName}
-              value={textFields[ fieldName as keyof typeof textFields] || ''} // 设置文本框的值为状态中存储的值
+              //value={textFields[ fieldName as keyof typeof textFields] || ''} // 设置文本框的值为状态中存储的值
+              globalValue={textFields[fieldName as keyof typeof textFields] || ''}
               //value={fieldName}
               onChange={handleInputTextChange} // 绑定onChange事件处理函数
-              size="small"
-              fullWidth
+              //size="small"
+              //fullWidth
           />
       );
     }
   };
 
   return (
-    <>
-      <Container>
-        <FormControl fullWidth>
-          {groupedFields.map((group, index) => (
-              <>
-                {renderGroupTable(group)}
-              </>
-          ))}
-        </FormControl>
+      <>
+        <Container>
+          <FormControl fullWidth>
+            {groupedFields.map((group, index) => (
+                <>
+                  <RenderGroupTable key={index} group={group}/>
+                </>
+            ))}
+          </FormControl>
 
-        <FormControl fullWidth>
-          <Card style={{ marginBottom: '30px', marginTop:'0px' }} sx={{ padding: '20px' }}>
-            <Title>医生建议：</Title>
-            <TextField
-              name="suggestion"
-              multiline
-              rows={4}
-              fullWidth
-              placeholder="请按照本次训练情况在此输入医生建议"
-              value = {suggestionText || initialSuggestionValue}
-              onChange={(event) => {
-                setSuggestionText(event.target.value)
-                setIsModified(true);
-              }}
-            />
-            <Typography variant='body2' style={{ color: 'red' }}>注：填写完毕后请点击保存按钮进行手动保存。</Typography>
-            <Grid container spacing={0}>
-              <Grid item xs={6} style={{display: 'flex', alignItems: 'center'}}>
+          <FormControl fullWidth>
+            <Card style={{ marginBottom: '30px', marginTop:'0px' }} sx={{ padding: '20px' }}>
+              <Title>医生建议：</Title>
+              <TextField
+                  name="suggestion"
+                  multiline
+                  rows={4}
+                  fullWidth
+                  placeholder="请按照本次训练情况在此输入医生建议"
+                  value = {suggestionText || initialSuggestionValue}
+                  onChange={(event) => {
+                    setSuggestionText(event.target.value)
+                    setIsModified(true);
+                  }}
+              />
+              <Typography variant='body2' style={{ color: 'red' }}>注：填写完毕后请点击保存按钮进行手动保存。</Typography>
+              <Grid container spacing={0}>
+                <Grid item xs={6} style={{display: 'flex', alignItems: 'center'}}>
+                </Grid>
+                <Grid item xs={6} alignItems="center">
+                  <Box sx={{padding: '8px' }}>
+                    <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveSuggestion}>保存建议</Button>
+                  </Box>
+                </Grid>
               </Grid>
-              <Grid item xs={6} alignItems="center">
-                <Box sx={{padding: '8px' }}>
-                  <Button style={{float: 'right'}} variant="outlined" onClick={handleSaveSuggestion}>保存建议</Button>
-                </Box>
-              </Grid>
-            </Grid>
-          </Card>
-        </FormControl>
-      </Container>
-    </>
+            </Card>
+          </FormControl>
+        </Container>
+      </>
   )
 }
 

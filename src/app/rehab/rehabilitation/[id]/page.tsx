@@ -7,50 +7,29 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import Prescription from "@/components/rehab/prescription/Prescription";
-import {EChartsTest} from "@/components/rehab/echarts/EChartsTest";
-import {quEcharts} from "@/components/rehab/echarts/quEcharts";
 import * as React from 'react';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import styled from "styled-components";
-
-import Select, {SelectChangeEvent} from '@mui/material/Select';
-import {ChangeEvent, SyntheticEvent, useCallback, useEffect, useRef, useState} from "react";
+import {SyntheticEvent, useEffect, useRef, useState} from "react";
 import {RootState, useAppSelector} from "@/redux/store";
 import {AnyAction} from "redux";
 import {useDispatch} from "react-redux";
 import {
   fetchPatientStatisticsById,
   fetchPrescriptionByPId,
-  Prescription as PrescriptionEntity,
-  EvaluateFormProps,
   AddPrescriptionItem,
-  PatientStatus,
-  addStatus,
-  addEvaluation,
   fetchEvaluationById,
   fetchStatusById, useGetBlueToothEquipmentsQuery, fetchStatisticsById, RealTimeTrainData
 } from "@/redux/features/rehab/rehab-slice";
 import {
-  addPrescription,
   fetchPatientById,
   fetchPrescriptionRecordById,
   useGetOnlineEquipmentsQuery,
   useGetTrainMessageQuery
 } from "@/redux/features/rehab/rehab-slice";
 
-import {
-  formField,
-} from "@/redux/features/rehab/rehab-formFields-slice";
-
-import {
-  BodyPartToNumMapping,
-  ModeToNumMapping,
-  NumToBodyPartMapping,
-  NumToModeMapping,
-  PatientNumClassifyToClassifyLabelMapping, PatientNumStrokeLevelToStrokeLevelLabelMapping
-} from "@/utils/mct-utils";
-import {IconButton, InputAdornment, TableContainer} from "@mui/material";
+import {IconButton, TableContainer} from "@mui/material";
 
 import TimerIcon from '@mui/icons-material/Timer';
 import Tooltip from "@mui/material/Tooltip";
@@ -61,8 +40,6 @@ import {ThunkDispatch} from "redux-thunk";
 import CardMedia from "@mui/material/CardMedia";
 import Link from "next/link";
 import {useForm} from "react-hook-form";
-
-import dayjs, { Dayjs } from 'dayjs';
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
@@ -70,7 +47,6 @@ import TableBody from "@mui/material/TableBody";
 import Table from "@mui/material/Table";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TextField from '@mui/material/TextField';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
@@ -78,7 +54,6 @@ import Tab from '@mui/material/Tab'
 import TabList from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
-import Avatar from "@mui/material/Avatar";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {getStrokeEvents, putStrokeEvent, StrokeEvent} from "@/redux/features/rehab/rehab-patient-slice";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
@@ -86,6 +61,7 @@ import SaveAsIcon from '@mui/icons-material/SaveAs';
 //双击编辑组件
 type EditableTextProps = {
   initialText: string | null;
+  handleTextChange: (text: string) => void;
 };
 
 const EditableText: React.FC<EditableTextProps> = ({ initialText, handleTextChange }) => {
@@ -137,6 +113,7 @@ const EditableText: React.FC<EditableTextProps> = ({ initialText, handleTextChan
 
 type EditableDateProps = {
   initialDateString: string;
+  handleWillDateChange: (text: string) => void;
 };
 
 const EditableDate: React.FC<EditableDateProps> = ({ initialDateString, handleWillDateChange }) => {
@@ -170,7 +147,7 @@ const EditableDate: React.FC<EditableDateProps> = ({ initialDateString, handleWi
               <DatePicker
                   value={selectedDate}
                   onChange={handleDateChange}
-                  renderInput={(params) => <input {...params.inputProps} autoFocus />}
+                  //renderInput={(params) => <TextField {...params.inputProps} autoFocus />}
               />
             </LocalizationProvider>
         ) : (
@@ -180,35 +157,13 @@ const EditableDate: React.FC<EditableDateProps> = ({ initialDateString, handleWi
   );
 };
 
-import {getFormFields, getFormFieldsTemplate, SubmissionField} from "@/redux/features/rehab/rehab-formFields-slice";
+import {getFormFields} from "@/redux/features/rehab/rehab-formFields-slice";
 import PrescriptionLine from "@/components/rehab/prescription/PrescriptionLine";
-import {getAssessment} from "@/redux/features/rehab/rehab-assessment-slice";
-import {getSuggestion} from "@/redux/features/rehab/rehab-suggestion-slice";
-import {getEvaluation} from "@/redux/features/rehab/rehab-evaluation-slice";
 
-const nextSunday = dayjs().endOf('week').startOf('day');
-
-const isWeekend = (date: Dayjs) => {
-  const day = date.day();
-
-  return day === 0 || day === 6;
-};
-
-const StyledDiv = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-`;
 
 const StatisticsCard = styled.div`
   height: 160px;
   padding: 10px;
-`;
-
-const StyledBoxContainer = styled(Box)`
-  &:not(:first-child) {
-    margin: -1px;
-  }
 `;
 
 const TableWrapper = styled.div`
@@ -216,54 +171,19 @@ const TableWrapper = styled.div`
   margin: 16px;
 `;
 
-// <<<<<<< HEAD
 export default function MUITable({ params }: { params: { id: string ,task_id:string, pid:string,trainData:RealTimeTrainData[]} }) {
   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient);
   const prescription = useAppSelector((state: RootState) => state.rehab.prescription);
-  const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord);
   const status = useAppSelector((state: RootState) => state.rehab.patientStatus);
-  // const submissionResponseData = useAppSelector((state: RootState) => state.formField.submissionData);
-  const patientDuration = useAppSelector((state:RootState) => state.rehab.patientDuration);
-
   const statistics = useAppSelector((state:RootState) => state.rehab.statistics);
   const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux");
   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux");
-  const {data: blueToothData, isLoading: blueToothLoading, error: blueToothError} = useGetBlueToothEquipmentsQuery<HeartBeat[]>("redux")
+  const { data: blueToothData, isLoading: blueToothLoading, error: blueToothError } = useGetBlueToothEquipmentsQuery("redux");
   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
-  const [open, setOpen] = React.useState(false);
-  const [error, setError] = React.useState(false);
-  const [timesError, setTimesError] = React.useState<string>('');
-  const [bendError, setBendError] = React.useState<string>('');
-  const [stretchError, setStretchError] = React.useState<string>('');
-  const [trainMinus, setTrainMinus] = useState<string>('');
-  const [trainDays, setTrainDays] = useState<number>(0);
   interface HeartBeat {
     topic: string;
     content: string;
   }
-// =======
-
-
-// export default function MUITable({ params }: { params: { id: string ,task_id:string, pid:string} }) {
-//   const rehabPatient = useAppSelector((state: RootState) => state.rehab.rehabPatient)
-//   const prescription = useAppSelector((state: RootState) => state.rehab.prescription)
-//   const record = useAppSelector((state: RootState) => state.rehab.prescriptionRecord)
-//   const status = useAppSelector((state: RootState) => state.rehab.patientStatus)
-//   const patientDuration = useAppSelector((state:RootState) => state.rehab.patientDuration)
-//   const {data: trainData, error: trainError, isLoading: trainLoading} = useGetTrainMessageQuery("redux")
-//   const {data: onlineData, isLoading: onlineLoading, error: onlineError} = useGetOnlineEquipmentsQuery("redux")
-//   const {data: blueToothData, isLoading: blueToothLoading, error: blueToothError} = useGetBlueToothEquipmentsQuery<HeartBeat[]>("redux")
-//   const thunkDispatch: ThunkDispatch<any, any, AnyAction> = useDispatch()
-//   const [open, setOpen] = React.useState(false)
-//   const [error, setError] = React.useState(false)
-//   const [timesError, setTimesError] = React.useState<string>('')
-//   const [bendError, setBendError] = React.useState<string>('')
-//   const [stretchError, setStretchError] = React.useState<string>('')
-//   const [trainMinus, setTrainMinus] = useState<string>('')
-//   const [trainDays, setTrainDays] = useState<number>(0)
-// >>>>>>> 23ea011e718e2d0ab61201a75a00100b97895fca
-  const [openAddStatus, setOpenAddStatus] = React.useState(false);
-
   const [numbers, setNumbers] = useState<number[]>(new Array(120).fill(0));
   const addNumber = (newNumber: number) => {
     setNumbers(prevNumbers => {
@@ -286,150 +206,12 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
     console.log("numbers", numbers)
   }, [blueToothData])
 
-  // 医生评价表单
-  const [evaluateFormData, setEvaluateFormData] = React.useState<EvaluateFormProps>({
-    tolerance: '',
-    motionReview: '',
-    spasmReview: '',
-    muscleTone: '',
-    acuteState: '',
-    neuroJudgment: '',
-    motionInjury: '',
-  });
-  const handleEvaluationFormDataFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setEvaluateFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleSaveEvaluate = () => {
-    thunkDispatch(addEvaluation({
-      acute_state: evaluateFormData.acuteState,
-      motion_injury: evaluateFormData.motionInjury,
-      motion_review: evaluateFormData.motionReview,
-      muscle_tone: evaluateFormData.muscleTone,
-      neuro_judgment: evaluateFormData.neuroJudgment,
-      pid: parseInt(params.id),
-      rehab_session_id: 0,
-      spasm_review: evaluateFormData.spasmReview,
-      tolerance: evaluateFormData.tolerance,
-    }))
-    // setOpenAddStatus(false)
-  };
-
-  const [willAddPrescription, setWillAddPrescription] = React.useState<PrescriptionEntity>({
-    id: 0,
-    created_at: "",
-    part: "0",
-    mode: "0",
-    zz: 3,
-    u: 3,
-    v: 3,
-    duration: 1,
-    frequency_per_day:1,
-    total_days:1,
-    prescription_record: [
-      {
-        id: 123,
-        created_at: '2023-08-09 12:00:00',
-        eid: "100000",
-        pid: "11",
-        state: "H_END",
-        updated_at: '2023-08-09 12:20:00'
-      }
-    ],
-  })
-
-
-  const handleAddPrescriptionTimes = (event: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target;
-    console.log(id, value);
-    if (value !== '' && value < '1') {
-      setTimesError('输入的数字不能小于1');
-    } else {
-      setTimesError('');
-      setWillAddPrescription((prevInputValues) => ({
-        ...prevInputValues,
-        [id]: parseInt(value),
-      }))
-    }
-  };
-
-  const handleAddPrescriptionDuration = (event: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target;
-    setWillAddPrescription((prevInputValues) => ({
-      ...prevInputValues,
-      [id]: parseInt(value),
-    }))
-  };
-
-  const handleAddPrescriptionBend = (event: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target;
-    console.log(id, value);
-    if (value == '') {
-      setBendError('不能为空');
-      return
-    }
-    if (value !== '' && parseInt(value) < 3) {
-      setBendError('输入的数字不能小于3');
-    } else {
-      setBendError('');
-      setWillAddPrescription((prevInputValues) => ({
-        ...prevInputValues,
-        [id]: parseInt(value),
-      }))
-    }
-  };
-
-  const handleAddPrescriptionStretch = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    if (inputValue !== '' && inputValue < '3') {
-      setStretchError('输入的数字不能小于3');
-    } else {
-      setStretchError('');
-      const { id, value } = event.target;
-      console.log(id, value)
-      setWillAddPrescription((prevInputValues) => ({
-        ...prevInputValues,
-        [id]: parseInt(value),
-      }))
-    }
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleSaveAddPrescription = () => {
-    console.log(willAddPrescription)
-    console.log(NumToBodyPartMapping[willAddPrescription.part])
-    console.log(NumToModeMapping[willAddPrescription.mode])
-    thunkDispatch(addPrescription({
-      pid: parseInt(params.id),
-      x: NumToBodyPartMapping[willAddPrescription.part],
-      y: NumToModeMapping[willAddPrescription.mode],
-      zz: Number(willAddPrescription.zz),
-      u: Number(willAddPrescription.u),
-      v: Number(willAddPrescription.v),
-      duration:Number(willAddPrescription.duration),
-      frequency_per_day:Number(willAddPrescription.frequency_per_day),
-      total_days:Number(willAddPrescription.total_days)
-    }))
-    setOpen(false);
-  };
-
   const { register: AddPrescriptionItemRegister, formState: { errors: AddPrescriptionItemErrors }, clearErrors: AddPrescriptionItemClearErrors, trigger:AddPrescriptionItemTrigger } = useForm<AddPrescriptionItem>({mode: 'onBlur' });
 
   const strokeEventResponse = useAppSelector((state: RootState) => state.patient.strokeEventData);
   const [lastEvent, setLastEvent] = React.useState<StrokeEvent | null>(null);
   const [willEditStrokeEvent, setWillEditStrokeEvent] = React.useState<StrokeEvent | null>(null);
   useEffect(() => {
-    // thunkDispatch(fetchPrescriptionById({id: parseInt(params.id)}))
     thunkDispatch(fetchPrescriptionByPId({pid: parseInt(params.id)}))
     thunkDispatch(fetchEvaluationById({task_id: parseInt(params.task_id)}))
     thunkDispatch(fetchStatusById({task_id: parseInt(params.task_id),pid:parseInt(params.pid)}))
@@ -444,109 +226,59 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
     console.log("patient task_id: ", params.task_id)
   },[params.id, thunkDispatch])
 
-  const [submissionData, setSubmissionData] = useState<SubmissionField>({
-    fields: [],
-    owner_id: 0,
-    assessment_time: "",
-  });
-
   useEffect(() => {
     console.log("strokeEventResponse changed", strokeEventResponse)
-    if (strokeEventResponse.length > 0) {
+    if (strokeEventResponse?.length > 0) {
       setLastEvent(strokeEventResponse[0]);
       setWillEditStrokeEvent(strokeEventResponse[0]);
     }
   },[strokeEventResponse])
 
   const handleLesionLocationChange = (text: string) => {
-    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
-      ...prevState,
-      lesion_location: text,
-    }));
+    setWillEditStrokeEvent((prevState: StrokeEvent | null) => {
+      if (prevState === null) {
+        return null;
+      }
+      // 如果 prevState 不是 null，则更新状态
+      return { ...prevState, lesion_location: text };
+    });
   };
 
+
   const handleOnsetDataChange = (text: string) => {
-    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
-      ...prevState,
-      onset_date: text,
-    }));
+    setWillEditStrokeEvent((prevState: StrokeEvent | null) => {
+      if (!prevState) {
+        // 处理 prevState 为 null 的情况
+        return null; // 或者返回合适的默认值
+      }
+      return { ...prevState, onset_date: text };
+    });
   };
 
   const handleNihssScoreChange = (text: string) => {
-    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
-      ...prevState,
-      nihss_score: parseInt(text),
-    }));
+    setWillEditStrokeEvent((prevState: StrokeEvent | null) => {
+      if (!prevState) {
+        // 处理 prevState 为 null 的情况
+        return null; // 或者返回合适的默认值
+      }
+      return { ...prevState, nihss_score: parseInt(text, 10) || 0 };
+    });
   };
 
   const handleMedicalHistoryChange = (text: string) => {
-    setWillEditStrokeEvent((prevState: StrokeEvent) => ({
-      ...prevState,
-      medical_history: text,
-    }));
+    setWillEditStrokeEvent((prevState: StrokeEvent | null) => {
+      if (!prevState) {
+        // 处理 prevState 为 null 的情况
+        return null; // 或者返回合适的默认值
+      }
+      return { ...prevState, medical_history: text };
+    });
   };
+
 
   //提交修改
   const handleEditStrokeEvent = () => {
-    console.log("WillStrokeEvent", willEditStrokeEvent);
     thunkDispatch(putStrokeEvent({ strokeEvent: willEditStrokeEvent!}))
-  };
-
-  useEffect(() => {
-    setTrainDays(patientDuration.data_count.length)
-    setTrainMinus((patientDuration.sec_duration/60).toFixed(0))
-    console.log("1111111111111", patientDuration)
-  }, [patientDuration])
-
-  const handleAddPrescriptionModeChange = (event: SelectChangeEvent) => {
-    console.log(event.target)
-    console.log(ModeToNumMapping[parseInt(event.target.value)])
-    setWillAddPrescription((prevState) => ({
-      ...prevState,
-      mode: ModeToNumMapping[parseInt(event.target.value)]
-    }))
-  };
-
-  const handleAddPrescriptionPartChange = (event: SelectChangeEvent) => {
-    console.log(event.target)
-    console.log(BodyPartToNumMapping[parseInt(event.target.value)])
-    setWillAddPrescription((prevState) => ({
-      ...prevState,
-      part: BodyPartToNumMapping[parseInt(event.target.value)]
-    }))
-  };
-
-  const [willAddStatus, setWillAddStatus] = React.useState<PatientStatus>({
-    id: 0,
-    pid:0,
-    task_id:0,
-    min_heart_rate : 0,
-    max_heart_rate : 0,
-    avg_heart_rate : 0,
-  })
-
-  const handleAddStatus = (event: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target;
-    let processedValue: string | number = value;
-    if (["avg_heart_rate", "max_heart_rate", "min_heart_rate"].includes(id)) {
-      processedValue = Number(value);
-    }
-    console.log('handleAddStatus', id, processedValue)
-    setWillAddStatus((prevInputValues) => ({
-      ...prevInputValues,
-      [id]: processedValue,
-    }))
-  };
-
-  const handleSaveAddStatus = () => {
-    thunkDispatch(addStatus({
-      pid: parseInt(params.id),
-      task_id:parseInt(params.task_id),
-      min_heart_rate: willAddStatus.min_heart_rate,
-      max_heart_rate: willAddStatus.max_heart_rate,
-      avg_heart_rate: willAddStatus.avg_heart_rate
-    }))
-    setOpenAddStatus(false)
   };
 
   const [stretchValue, setStretchValue] = useState<string>('1')
@@ -568,7 +300,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
         <Box sx={{marginBottom:5}}>
           <Grid container spacing={8}>
             <Grid item xs={12} md={8} sm={10} lg={6} xl={4}>
-              <div >
+              <div>
                 <Grid container alignItems="center">
                   <Grid item xs={6}>
                     <Title >康复管理</Title>
@@ -594,15 +326,6 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
           <Grid container spacing={2}>
             <Grid container item xs={12} md={12} spacing={2}>
               <Grid item xs={6} md={6}>
-                {/*病人card*/}
-                {/*<Card  sx={{height: 160}}>*/}
-                {/*  <CardContent>*/}
-                {/*      <Box sx={{ mr: 2, mb: 1, display: 'flex', flexDirection: 'column' }}>*/}
-                {/*        <Typography variant='h6'>{rehabPatient.name}</Typography>*/}
-                {/*        <Typography variant='caption'>{rehabPatient.genderLabel}, {rehabPatient.age}, ID：{rehabPatient.i18d}</Typography>*/}
-                {/*      </Box>*/}
-                {/*  </CardContent>*/}
-                {/*</Card>*/}
                 <Card sx={{ backgroundColor: 'rgba(191,215,237,0.8)', height: 160}} >
                   <CardContent>
                     <br />
@@ -867,42 +590,23 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                   task_id={params.task_id}
                   prescription={prescription}
                   status={status}
-                  trainData={trainData}
+                  trainData={trainData || []}
                   onlineEquipment={onlineData || []}
                   heartBeats={numbers || []}
+                  balloonPrescription={[]}
                 />
               </Card>
             </Grid>
             <br/>
-
-            {/*直方图*/}
-            {/*<Grid item xs={12} md={12}>*/}
-            {/*  <Card sx={{ padding: '10px'}}>*/}
-            {/*    <CardHeader title='训练历史压力数据直方图' titleTypographyProps={{ variant: 'h6' }} style={{ textAlign: 'center' }} />*/}
-            {/*    <CardContent>*/}
-
-            {/*    </CardContent>*/}
-            {/*  </Card>*/}
-            {/*</Grid>*/}
-            {/*<br/>*/}
-
             {/*压力数据折线图*/}
-            {/*<Grid item xs={6} md={5.5}>*/}
-            {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
-            {/*    <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />*/}
-            {/*    {*/}
-            {/*      trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>*/}
-            {/*    }*/}
-            {/*  </Card>*/}
-            {/*</Grid>*/}
-
-            {/*康复记录*/}
-            {/*<Grid item xs={6} md={6.5}>*/}
-            {/*  <Card sx={{ height: 365 ,padding: '10px'}}>*/}
-            {/*    <CardHeader style={{display:'inline-block'}} title='康复记录' titleTypographyProps={{ variant: 'h6' }} />*/}
-            {/*    <PrescriptionTable record={record} pid={params.id}/>*/}
-            {/*  </Card>*/}
-            {/*</Grid>*/}
+            <Grid item xs={6} md={5.5}>
+              <Card sx={{ height: 365 ,padding: '10px'}}>
+                <CardHeader title='实时压力数据折线图' titleTypographyProps={{ variant: 'h6' }} />
+                {
+                  trainLoading ? <></> : <PrescriptionLine trainData={trainData || []}></PrescriptionLine>
+                }
+              </Card>
+            </Grid>
           </Grid>
           <br/>
         </Box>

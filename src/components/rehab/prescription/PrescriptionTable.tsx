@@ -65,7 +65,7 @@ import {SelectChangeEvent} from "@mui/material/Select";
 const PrescriptionTable = (params: {
   record: PrescriptionRecord[],
   status: PatientStatus,
-  onChildData,
+  onChildData: (taskId: string) => void,
   heartBeats: number[],
   pid: string,
   task_id: string}) => {
