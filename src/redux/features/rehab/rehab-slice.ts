@@ -448,7 +448,7 @@ export const rehabApi = createApi({
         try {
           await cacheDataLoaded
           const listener = (event: MessageEvent) => {
-            const data: EquipmentOnlineWSMessage = event.data
+            const data: string = event.data
             updateCachedData((draft) => {
               console.log('getBlueToothEquipments', draft)
               draft = []
@@ -498,7 +498,7 @@ function convertAPIStaffToMedicalStaff(apiStaff: any): MedicalStaff {
 function convertAPIStatusToStatus(apiStatus: any): PatientStatus {
   return {
     id: apiStatus.id,
-    pid:apiStatus.patient_id,
+    pid: apiStatus.patient_id,
     task_id:apiStatus.task_id,
     min_heart_rate : apiStatus.min_heart_rate,
     max_heart_rate : apiStatus.max_heart_rate,

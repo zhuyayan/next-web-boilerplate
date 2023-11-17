@@ -65,6 +65,23 @@ export const putStrokeEvent = createAsyncThunk(
     }
 );
 
+export const postStrokeEvent = createAsyncThunk(
+    'postStrokeEvent',
+    async ({ strokeEvent }: { strokeEvent: StrokeEvent }): Promise<any> => {
+        const response: AxiosResponse<any, any> = await MCTAxiosInstance.post(`patient/stroke_event/${strokeEvent.pid}`, {
+            e_id: strokeEvent.e_id,
+            stroke_type: strokeEvent.stroke_type,
+            stroke_level: strokeEvent.stroke_level,
+            onset_date: strokeEvent.onset_date,
+            lesion_location: strokeEvent.lesion_location,
+            nihss_score: strokeEvent.nihss_score,
+            medical_history: strokeEvent.medical_history,
+            pid: strokeEvent.pid,
+        });
+        return response.data;
+    }
+);
+
 interface RehabStrokeEventState {
     strokeEventData: StrokeEvent[];
 }

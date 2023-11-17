@@ -147,7 +147,7 @@ const PrescriptionTable = (params: {
 
   //传选中的task_id给Prescription
   const sendDataToParent = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const taskId = event.currentTarget.dataset.taskId;
+    const taskId: string = event.currentTarget.dataset.taskId || '0';
     params.onChildData(taskId); // 调用父组件传入的回调函数，并传递参数
   };
 

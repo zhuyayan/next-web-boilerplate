@@ -55,7 +55,12 @@ import TabList from '@mui/lab/TabList'
 import TabPanel from '@mui/lab/TabPanel'
 import TabContext from '@mui/lab/TabContext'
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
-import {getStrokeEvents, putStrokeEvent, StrokeEvent} from "@/redux/features/rehab/rehab-patient-slice";
+import {
+  getStrokeEvents,
+  postStrokeEvent,
+  putStrokeEvent,
+  StrokeEvent
+} from "@/redux/features/rehab/rehab-patient-slice";
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 
 //双击编辑组件
@@ -80,7 +85,6 @@ const EditableText: React.FC<EditableTextProps> = ({ initialText, handleTextChan
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
-    //handleTextChange(text);
   };
 
   useEffect(()=>{
@@ -131,9 +135,8 @@ const EditableDate: React.FC<EditableDateProps> = ({ initialDateString, handleWi
   };
 
   useEffect(() => {
-    const result: string = selectedDate ? selectedDate.toISOString().split('T')[0].concat(' ').concat(initialDateString.split('T')[1].split('Z')[0]) : "";
-    console.log("result", result)
-    handleWillDateChange(result);
+      const result: string = selectedDate ? selectedDate.toISOString().split('T')[0].concat(' ').concat(initialDateString.split('T')[1].split('Z')[0]) : "";
+      handleWillDateChange(result);
   }, [selectedDate]);
 
   useEffect(() => {
@@ -232,6 +235,29 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
       setLastEvent(strokeEventResponse[0]);
       setWillEditStrokeEvent(strokeEventResponse[0]);
     }
+    else {
+      setLastEvent({
+        e_id: 0,
+        stroke_type: "",
+        stroke_level: "",
+        onset_date: "2000-01-01T00:00:00Z",
+        lesion_location: "没有数据",
+        nihss_score: 0,
+        medical_history: "没有数据",
+        pid: parseInt(params.id)
+      });
+      setWillEditStrokeEvent({
+        e_id: 0,
+        stroke_type: "",
+        stroke_level: "",
+        onset_date: "2000-01-01 00:00:00",
+        lesion_location: "没有数据",
+        nihss_score: 0,
+        medical_history: "没有数据",
+        pid: parseInt(params.id)
+      })
+    }
+    console.log("NODATA")
   },[strokeEventResponse])
 
   const handleLesionLocationChange = (text: string) => {
@@ -278,7 +304,12 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
 
   //提交修改
   const handleEditStrokeEvent = () => {
-    thunkDispatch(putStrokeEvent({ strokeEvent: willEditStrokeEvent!}))
+    if (strokeEventResponse?.length > 0) {
+      thunkDispatch(putStrokeEvent({ strokeEvent: willEditStrokeEvent!}))
+    }
+    else {
+      thunkDispatch(postStrokeEvent({ strokeEvent: willEditStrokeEvent!}))
+    }
   };
 
   const [stretchValue, setStretchValue] = useState<string>('1')
@@ -479,7 +510,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                             <label htmlFor="input9">病变部位:</label>
                           </Grid>
                           <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
-                            <EditableText initialText={lastEvent?.lesion_location ?? ""} handleTextChange={handleLesionLocationChange}/>
+                            <EditableText initialText={lastEvent?.lesion_location ?? "没有数据"} handleTextChange={handleLesionLocationChange}/>
                           </Grid>
                         </Grid>
                       </Box>
@@ -491,7 +522,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                             <label htmlFor="input9">发病日期:</label>
                           </Grid>
                           <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '28px' }}>
-                            <EditableDate initialDateString={lastEvent?.onset_date ?? ""} handleWillDateChange={handleOnsetDataChange}/>
+                            <EditableDate initialDateString={lastEvent?.onset_date ?? "2000-01-01T00:00:00Z"} handleWillDateChange={handleOnsetDataChange}/>
                           </Grid>
                         </Grid>
                       </Box>
@@ -506,7 +537,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                             <label htmlFor="input9">BIHSS评分:</label>
                           </Grid>
                           <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '26px' }}>
-                            <EditableText initialText={lastEvent?.nihss_score.toString() ?? ""} handleTextChange={handleNihssScoreChange}/>
+                            <EditableText initialText={lastEvent?.nihss_score.toString() ?? "没有数据"} handleTextChange={handleNihssScoreChange}/>
                           </Grid>
                         </Grid>
                       </Box>
@@ -518,7 +549,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
                             <label htmlFor="input9">诊断:</label>
                           </Grid>
                           <Grid item xs={8} style={{ display: 'flex', alignItems: 'center', height: '26px' }}>
-                            <EditableText initialText={lastEvent?.medical_history ?? ""} handleTextChange={handleMedicalHistoryChange}/>
+                            <EditableText initialText={lastEvent?.medical_history ?? "没有数据"} handleTextChange={handleMedicalHistoryChange}/>
                           </Grid>
                         </Grid>
                       </Box>
