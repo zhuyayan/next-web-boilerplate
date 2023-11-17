@@ -1,8 +1,8 @@
 import {createSlice} from "@reduxjs/toolkit";
 
 export interface StrengthMerge {
-  leftStrengthMerge: number[];
-  rightStrengthMerge: number[];
+  leftStrengthMerge: Array<{ D: number }>;
+  rightStrengthMerge: Array<{ D: number }>;
 }
 
 export interface StrokeStrength {
