@@ -88,12 +88,12 @@ export default function FuglMeyerAssessment( { params }: { params: { ids: [] } }
   });
 
   useEffect(() => {
-    let selectedSubmissionData = submissionResponseData.filter((item) => {
+    let selectedSubmissionData = submissionResponseData?.filter((item) => {
       if(item.owner_id == task_id){
         return item
       }
     })
-    if(selectedSubmissionData.length){
+    if(selectedSubmissionData?.length){
       setSubmissionData(selectedSubmissionData[0]);
     }
   },[submissionResponseData])

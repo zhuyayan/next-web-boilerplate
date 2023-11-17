@@ -452,7 +452,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
 
   useEffect(() => {
     console.log("strokeEventResponse changed", strokeEventResponse)
-    if (strokeEventResponse.length > 0) {
+    if (strokeEventResponse?.length > 0) {
       setLastEvent(strokeEventResponse[0]);
       setWillEditStrokeEvent(strokeEventResponse[0]);
     }
@@ -568,7 +568,7 @@ export default function MUITable({ params }: { params: { id: string ,task_id:str
         <Box sx={{marginBottom:5}}>
           <Grid container spacing={8}>
             <Grid item xs={12} md={8} sm={10} lg={6} xl={4}>
-              <div >
+              <div>
                 <Grid container alignItems="center">
                   <Grid item xs={6}>
                     <Title >康复管理</Title>
