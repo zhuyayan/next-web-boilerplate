@@ -14,7 +14,7 @@ import {
 } from "@/utils/mct-utils";
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {string} from "postcss-selector-parser";
-import {saveAs} from "file-saver";
+// import {saveAs} from "file-saver";
 import {Assessment, getAssessment} from "@/redux/features/rehab/rehab-assessment-slice";
 import {channel} from "diagnostics_channel";
 
@@ -880,7 +880,7 @@ export const exportTaskPressureData = createAsyncThunk<{}, {tId: number, pId: nu
       }
     }
     const decodedFileName = decodeURIComponent(filename)
-    saveAs(fileBlob, decodedFileName);
+    // saveAs(fileBlob, decodedFileName);
   } catch (error) {
     throw new Error('File download failed.');
   }

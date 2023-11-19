@@ -19,15 +19,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+      <ReduxProvider>
         <MCTThemeProvider>
           <MCTApiProvider>
-            <ReduxProvider>
               <MCTSnackbarProvider>
                 {children}
               </MCTSnackbarProvider>
-            </ReduxProvider>
           </MCTApiProvider>
         </MCTThemeProvider>
+      </ReduxProvider>
       </body>
     </html>
   )

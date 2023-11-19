@@ -1,9 +1,14 @@
-import Login from "../../components/login/Login"
+import React, {Suspense} from "react";
+import Loading from "@/app/login/loading";
+
+const AppLogin = React.lazy(() => import("@/components/login/social-login/SocialLogin"));
 
 export default function LoginPage() {
   return (
       <>
-        <Login></Login>
+          <Suspense fallback={<Loading />}>
+              <AppLogin />
+          </Suspense>
       </>
   )
 }
